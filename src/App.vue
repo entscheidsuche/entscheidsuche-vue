@@ -17,15 +17,15 @@
         <div class="languages-mobile">
           <a class="toggle-languages"></a>
         </div>
-        <b-button v-b-toggle.sidebar id="burger" style="border:none;outline:none;"></b-button>
+        <b-button v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;border-radius:0;box-shadow:none;"></b-button>
       </div>
       <div class="optional-bar">
         Aktuelles bei Bedarf
       </div>
     </div>
-    <b-sidebar id="sidebar" no-header>
+    <b-sidebar id="sidebar-right" right no-header>
       <div class="menu-overlay">
-        <b-button v-b-toggle.sidebar id="close-menu" style="border:none;outline:none;"></b-button>
+        <b-button v-b-toggle.sidebar-right id="close-menu" style="border:none;outline:none;box-shadow:none;"></b-button>
         <nav>
           <ul class="menu-desktop">
             <li><a href="" class="desktop-menu-item">Über uns</a></li>
@@ -257,9 +257,8 @@
     color: #0c5284;
 
     .header-main{
-      padding-top:15px;
-      padding-bottom:15px;
-      height: 40px;
+      padding-top:10px;
+      padding-bottom:10px;
       display: flex;
       align-items: center;
 
@@ -308,6 +307,8 @@
             color:#fff;
             font-size: 16px;
             font-weight: bold;
+            position:relative;
+            top:0.5px;
           }
           button:focus{
             border:none;
@@ -348,14 +349,14 @@
     }
     .optional-bar{
       //display:none;
-      height: 30px;
+      height: 40px;
       padding-top:10px;
       color: #000;
       background-color: #e5e9f1;
       font-weight: bold;
     }
   }
-  #sidebar{
+  #sidebar-right{
     .menu-overlay{
       z-index: 1001;
       height:100%;
@@ -542,7 +543,7 @@
   #app{
     .header{
       .header-main{
-        height:90px;
+        height:120px;
         position: relative;
         display: flex;
 
@@ -550,7 +551,7 @@
           position: absolute;
           margin:0;
           top:5px;
-          left:15px;
+          margin-left:20px;
           max-width:50%;
         }
 
@@ -565,18 +566,22 @@
               padding:0;
               padding-left:15px;
             }
+            button{
+            position:relative;
+            //top:0px;//0.5px mobile
+            }
           }
         }
         .languages{
           position: absolute;
-          top:22px;
-          right:45px;
+          top:18px;
+          right:50px;
         }
         #burger{
           position: absolute;
           margin:0;
           top:21px;
-          right:15px;
+          right:20px;
         }
       }
     }
@@ -638,9 +643,9 @@
         }
       }
     }
-    #sidebar{
+    #sidebar-right{
       .menu-overlay{
-        width:100%;
+        width:100vw;
         height:100vh;
         .menu-desktop{
           li{
