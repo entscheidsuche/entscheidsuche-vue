@@ -36,132 +36,148 @@
       </nav>
     </div>
     <div class="content">
+      <h1>Wer uns untersützt:</h1>
       <div class="main-sponsors">
-        <h1>Wer uns untersützt:</h1>
-        <div class="tile-row">
-          <a class="tile" href="#">
+          <a class="tile" href="https://my-d.org/index.php/www-my-d-org" target="_blank">
             <div class="tile-img-wapper">
               <img src="./assets/sponsors/sponsor1.png" class="tile-img" alt="sponsor1">
             </div>
-            <div class="tile-footer">
-              <span class="tile-text">MY-D Foundation, Geneva</span>
+            <div class="tile-footer" data-description="MY-D Foundation, Geneva">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">MY-D Foundation, Geneva</span>
+              </div>
             </div>
           </a>
-          <a class="tile">
+          <a class="tile" href="https://www3.unifr.ch/ius/de/" target="_blank">
             <div class="tile-img-wapper">
               <img src="./assets/sponsors/sponsor2.png" class="tile-img" alt="sponsor2">
             </div>
-            <div class="tile-footer">
-              <span class="tile-text">Université de Fribourg<br>Universität Freiburg</span>
+            <div class="tile-footer" data-description="Université de Fribourg Universität Freiburg">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">Université de Fribourg Universität Freiburg</span>
+              </div>
             </div>
           </a>
-          <div class="mobile-break"></div>
-          <a class="tile">
+          <a class="tile" href="https://www.advo-schreiber.ch/advo/" target="_blank">
             <div class="tile-img-wapper">
               <img src="./assets/sponsors/sponsor3.png" class="tile-img" alt="sponsor3">
             </div>
-            <div class="tile-footer">
-              <span class="tile-text">Advokatur Schreiber</span>
+            <div class="tile-footer" data-description="Advokatur Schreiber">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">Advokatur Schreiber</span>
+              </div>
             </div>
           </a>
-          <a class="tile last">
+          <a class="tile" href="https://www.unisg.ch/de/universitaet/schools/law" target="_blank">
             <div class="tile-img-wapper">
               <img src="./assets/sponsors/sponsor4.png" class="tile-img" alt="sponsor4">
             </div>
-            <div class="tile-footer">
-              <span class="tile-text">Universität St.Gallen,<br>Law School</span>
+            <div class="tile-footer" data-description="Universität St.Gallen, Law School">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">Universität St.Gallen, Law School</span>
+              </div>
             </div>
           </a>
-        </div>
-        <div class="tile-row">
-          <a class="tile double">
-            <div class="tile-img-wapper">
-              <img src="./assets/sponsors/sponsor6.png" class="tile-img" alt="sponsor6">
-            </div>
-            <div class="tile-footer">
-              <span class="tile-text">Bernischer Anwaltsverband<br>Association des avocats bernois</span>
-            </div>
-          </a>
-          <div class="mobile-break"></div>
-          <a class="tile">
+          <a class="tile" href="https://www.legalis.ch/de/" target="_blank">
             <div class="tile-img-wapper">
               <img src="./assets/sponsors/sponsor5.png" class="tile-img" alt="sponsor5">
             </div>
-            <div class="tile-footer">
-              <span class="tile-text">legalis.ch</span>
+            <div class="tile-footer" data-description="legalis.ch">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">legalis.ch</span>
+              </div>
             </div>
           </a>
-          <a class="tile last">
+          <a class="tile" href="https://www.bav-aab.ch/de/" target="_blank">
+            <div class="tile-img-wapper">
+              <img src="./assets/sponsors/sponsor6.png" class="tile-img" alt="sponsor6">
+            </div>
+            <div class="tile-footer" data-description="Bernischer Anwaltsverband Association des avocats bernois">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">Bernischer Anwaltsverband Association des avocats bernois</span>
+              </div>
+            </div>
+          </a>
+          <a class="tile" href="https://www.zav.ch/" target="_blank">
             <div class="tile-img-wapper">
               <img src="./assets/sponsors/sponsor7.jpg" class="tile-img" alt="sponsor7">
             </div>
-            <div class="tile-footer">
-              <span class="tile-text">Zürcher Anwaltsverband</span>
+            <div class="tile-footer" data-description="Zürcher Anwaltsverband">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">Zürcher Anwaltsverband</span>
+              </div>
             </div>
           </a>
-        </div>
-        <div class="tile-row">
-          <a class="tile">
+          <a class="tile" href="https://www.zhaw.ch/de/hochschule/" target="_blank">
             <div class="tile-img-wapper">
               <img src="./assets/sponsors/sponsor8.png" class="tile-img" alt="sponsor8">
             </div>
-            <div class="tile-footer">
-              <span class="tile-text">Züricher Hochschule für Angewandte Wissenschaften</span>
+            <div class="tile-footer" data-description="Züricher Hochschule für Angewandte Wissenschaften">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">Züricher Hochschule für Angewandte Wissenschaften</span>
+              </div>
             </div>
           </a>
-          <a class="tile">
+          <a class="tile" href="https://www.kellerhals-carrard.ch/de/home/index.php" target="_blank">
             <div class="tile-img-wapper">
               <img src="./assets/sponsors/sponsor9.svg" class="tile-img" alt="sponsor9">
             </div>
-            <div class="tile-footer">
-              <span class="tile-text">Kellerhals Carrard</span>
+            <div class="tile-footer" data-description="Kellerhals Carrard">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">Kellerhals Carrard</span>
+              </div>
             </div>
           </a>
-          <div class="mobile-break"></div>
-          <a class="tile">
+          <a class="tile" href="https://www.legaltechradar.com/de" target="_blank">
             <div class="tile-img-wapper">
               <img src="./assets/sponsors/sponsor10.png" class="tile-img" alt="sponsor10">
             </div>
-            <div class="tile-footer">
-              <span class="tile-text">LegalTechRadar</span>
+            <div class="tile-footer" data-description="LegalTechRadar">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">LegalTechRadar</span>
+              </div>
             </div>
           </a>
-          <a class="tile last">
-            <div class="tile-img-wapper">
-              <img src="./assets/sponsors/sponsor12.jpg" class="tile-img" alt="sponsor12">
-            </div>
-            <div class="tile-footer">
-              <span class="tile-text">Ordre des avocats vaudois</span>
-            </div>
-          </a>
-        </div>
-        <div class="tile-row">
-          <a class="tile">
-            <div class="tile-img-wapper">
-              <img src="./assets/sponsors/sponsor13.jpg" class="tile-img" alt="sponsor13">
-            </div>
-            <div class="tile-footer">
-              <span class="tile-text">SchKG-Vereinigung<br>Association LP</span>
-            </div>
-          </a>
-          <a class="tile">
-            <div class="tile-img-wapper">
-              <img src="./assets/sponsors/sponsor14.svg" class="tile-img" alt="sponsor14">
-            </div>
-            <div class="tile-footer">
-              <span class="tile-text">St.Galler Anwaltsverband</span>
-            </div>
-          </a>
-          <div class="mobile-break"></div>
-          <a class="tile double last">
+          <a class="tile" href="https://www3.unifr.ch/federalism/en/" target="_blank">
             <div class="tile-img-wapper">
               <img src="./assets/sponsors/sponsor11.jpg" class="tile-img" alt="sponsor11">
             </div>
-            <div class="tile-footer">
-              <span class="tile-text">Institut für Föderalismus, Universität Freiburg<br>Institut du Fédéralisme, Université de Fribourg</span>
+            <div class="tile-footer" data-description="Institut für Föderalismus, Universität Freiburg Institut du Fédéralisme, Université de Fribourg">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">Institut für Föderalismus, Universität Freiburg Institut du Fédéralisme, Université de Fribourg</span>
+              </div>
             </div>
           </a>
-        </div>
+          <a class="tile" href="https://www.oav.ch/" target="_blank">
+            <div class="tile-img-wapper">
+              <img src="./assets/sponsors/sponsor12.jpg" class="tile-img" alt="sponsor12">
+            </div>
+            <div class="tile-footer" data-description="Ordre des avocats vaudois">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">Ordre des avocats vaudois</span>
+              </div>
+            </div>
+          </a>
+          <a class="tile" href="https://www.schkg-vereinigung.ch/" target="_blank">
+            <div class="tile-img-wapper">
+              <img src="./assets/sponsors/sponsor13.jpg" class="tile-img" alt="sponsor13">
+            </div>
+            <div class="tile-footer" data-description="SchKG-Vereinigung Association LP">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">SchKG-Vereinigung Association LP</span>
+              </div>
+            </div>
+          </a>
+          <a class="tile" href="https://www.sgav.ch/" target="_blank">
+            <div class="tile-img-wapper">
+              <img src="./assets/sponsors/sponsor14.svg" class="tile-img" alt="sponsor14">
+            </div>
+            <div class="tile-footer" data-description="St.Galler Anwaltsverband">
+              <div class="tile-text-wrapper">
+                <span class="tile-text">St.Galler Anwaltsverband</span>
+              </div>
+            </div>
+          </a>
       </div>
       <div class="other-sponsors">
         <h1>Weitere Unterstützung erhalten wir von:</h1>
@@ -224,11 +240,12 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
 
   //general
   h1{
     text-align: left;
+    margin-left:5px;
+    color:#000;
   }
 
   .header{
@@ -237,7 +254,8 @@
     left: 0;
     position: fixed;
     width: 100%;
-    background-color: #105285;
+    //background-color: #105285;
+    background-color: #191919;
     color: #0c5284;
 
     .header-content{
@@ -320,9 +338,6 @@
           }
         }
       }
-      .languages-mobile{
-        display: none;
-      }
       .open-desktop-menu{
         flex-shrink: 0;
         //position: absolute;
@@ -361,7 +376,7 @@
       top:21px;
       right:20px;
       cursor:pointer;
-      background: url('assets/close-blue.svg') no-repeat center;
+      background: url('assets/close.svg') no-repeat center;
       background-size: 30px;
       height:30px;
       width:30px;
@@ -382,7 +397,7 @@
           font-size:20px;
           font-weight: bold;
           line-height: 20px;
-          color:#105285;
+          color:#191919;
         }
       }
     }
@@ -391,76 +406,117 @@
     padding-top: 110px!important; //-30px if optional bar not visible
     margin: 0 auto;
     max-width: 984px;
+    //background-color:#fff;
 
     .main-sponsors{
-      .tile-row{
-        display:flex;
-        flex-flow: row wrap;
-        justify-content: center;
+      display:flex;
+      flex-flow: row wrap;
+      justify-content: center;
+      height:auto;
 
-        .tile{
-          width:234px;
-          height:160px;
-          background-color: #fff;
-          box-shadow: 0 2px 30px rgba(0,0,0,.15);
-          border-radius: 0 0 20px 0;
-          margin-right:16px;
-          margin-bottom:20px;
+      .tile{
+        flex-basis:234px;
+        flex-shrink: 2;
+        height:160px;
+        background-color: #fff;
+        box-shadow: 0 2px 30px rgba(0,0,0,.15);
+        border-radius: 0 0 20px 0;
+        margin: 5px;
+        position:relative;
+        cursor:pointer;
+
+        .tile-img-wapper{
+          height:100px;
           position:relative;
-          cursor:pointer;
 
-          &.double{
-            width:484px;
+          .tile-img{
+            height:calc(100% - 10px);
+            width:calc(100% - 10px);
+            transform: matrix(0.9,0,0,0.9,0,0);
+            object-fit: contain;
+            position: absolute;
+            margin: auto;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
           }
+        }
+        .tile-footer{
+          height:60px;
+          width:100%;
+          position:absolute;
+          bottom:0;
+          color:#000;
+          border-radius: 0 0 20px 0;
+          border-top: 1px solid #e5e9f1;
 
-          &.last{
-            margin-right: 0;
-          }
-
-          .tile-img-wapper{
-            height:100px;
-            position:relative;
-
-            .tile-img{
-              height:calc(100% - 10px);
-              width:calc(100% - 10px);
-              transform: matrix(0.9,0,0,0.9,0,0);
-              object-fit: contain;
-              position: absolute;
-              margin: auto;
-              top: 0;
-              left: 0;
-              right: 0;
-              bottom: 0;
-            }
-          }
-
-          .tile-footer{
-            height:60px;
-            width:100%;;
-            position:absolute;
-            bottom:0;
-            background-color: #11a3eb;
-            color:#fff;
-            font-weight: bold;
-            display: table;
-            border-radius: 0 0 20px 0;
+          .tile-text-wrapper{
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            display: block;
+            overflow: hidden;
 
             .tile-text{
-              display: table-cell;
+              line-height:60px;
+              font-size:14px;
+              padding:10px;
               vertical-align: middle;
               text-align: center;
             }
           }
         }
-        .tile:hover{
-          .tile-img-wapper{
-            .tile-img{
-              transform: matrix(1,0,0,1,0,0);
-            }
-          }
-          .tile-footer{
-            background-color:#41b5ef;
+        //tooltip
+        .tile-footer:before {
+          content:attr(data-description);
+          overflow:visible;
+          box-sizing:border-box;
+          display:block;
+          background:rgba(0,0,0,.7);
+          color:white;
+          padding:10px;
+          position:absolute;
+          left:42.5%;
+          margin-left:-100px;
+          width:234px;
+          height:100px;
+          line-height:22px;
+          border-radius:5px;
+          opacity:0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index:100;
+          font-size: 14px;
+        }
+        .tile-footer:after {
+          content:'';
+          display:block;
+          position:absolute;
+          left:50%;
+          margin-left:-8px;
+          height:0;
+          width:0;
+          border-left:8px solid transparent;
+          border-right:8px solid transparent;
+          border-top:8px solid rgba(0,0,0,.7);
+          opacity:0;
+        }
+
+        .tile-footer:hover:before {
+          opacity:1;
+          top:-100px;
+        }
+
+        .tile-footer:hover:after {
+          opacity:1;
+          top:0;
+        }
+      }
+      .tile:hover{
+        .tile-img-wapper{
+          .tile-img{
+            transform: matrix(1,0,0,1,0,0);
           }
         }
       }
@@ -502,18 +558,9 @@
           }
         }
         .languages{
-          display:none;
-        }
-        .languages-mobile{
-          display:inline-block;
-          cursor:pointer;
-          background: url('assets/world2.svg') no-repeat center;
-          background-size: 35px;
-          height:35px;
-          width:35px;
           position: absolute;
-          right:80px;
-          top:19px;
+          top:22px;
+          right:45px;
         }
         .open-desktop-menu{
           position: absolute;
@@ -526,38 +573,33 @@
     .content{
       padding-top: 160px!important;
       max-width: 1024px;
-      margin: 0 auto;
       margin-left:4px;
       margin-right:4px;
 
       .main-sponsors{
-        .tile-row{
-          .tile{
-          //width:160px;
+        .tile{
+          margin:5px;
+          flex: 0 1 160px;
           height:160px;
-          margin-right:10px;
-          margin-bottom:10px;
-          &.double{
-            //width:330px;
-            //width:160px;
+
+          .tile-img-wapper{
+            height:100px;
           }
 
-            .tile-img-wapper{
-              height:80px;
-            }
+          .tile-footer{
+            height:60px;
+            text-overflow: ellipsis;
 
-            .tile-footer{
-              height:80px;
-
-              .tile-text{
-                padding:5px;
-                font-size:14px;
-              }
+            .tile-text{
+              padding:5px;
+              font-size:14px;
             }
           }
-          .mobile-break{
-            flex-basis: 100%;
-            height: 0;
+          .tile-footer:before {
+            width:160px;
+            left:62.5%;
+            font-size: 13px;
+            line-height: 16px;
           }
         }
       }
@@ -567,18 +609,20 @@
 //smartphone
 @media (max-width: 534px){
   #app{
+    .header{
+      .header-content{
+        .languages{
+          .language-item{
+            padding-right: 15px;
+          }
+        }
+      }
+    }
     .content{
       .main-sponsors{
         .tile-row{
           .tile{
-            width:160px;
-            &.double{
-              width:330px;
-            }
-          }
-          .mobile-break{
-            flex-basis: 100%;
-            height: 0;
+            //width:160px;
           }
         }
       }
