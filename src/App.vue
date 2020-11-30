@@ -339,6 +339,7 @@
             border:none;
             outline:none;
             box-shadow: none;
+            padding-top:5px;
 
             &.active{
               text-decoration: underline #fff;
@@ -600,7 +601,7 @@
         }
         .languages{
           position: absolute;
-          top:18px;
+          top:13px;
           right:50px;
         }
         #burger{
