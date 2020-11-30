@@ -402,7 +402,7 @@
     }
   }
   .content{
-    padding-top: 110px!important; //-30px if optional bar not visible
+    padding-top: 120px!important; //-30px if optional bar not visible
     padding-bottom: 80px;
     margin-left: 10px;
     margin-right: 10px;
@@ -508,11 +508,15 @@
         .tile-footer:hover:before {
           opacity:1;
           top:-100px;
+          transition-delay: 0.5s;
+          -webkit-transition-delay: 0.5s;
         }
 
         .tile-footer:hover:after {
           opacity:1;
           top:0;
+          transition-delay: 0.5s;
+          -webkit-transition-delay: 0.5s;
         }
       }
       .tile:hover{
