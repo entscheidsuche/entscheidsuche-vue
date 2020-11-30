@@ -2,7 +2,7 @@
   "name": "entscheidsuche",
   "version": "0.1.0",
   "engines": {
-    "node": "12.x",
+    "node": "14.x",
     "npm": "6.x"
   },
   "private": true,
@@ -13,6 +13,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "bootstrap-vue": "^2.19.0",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
