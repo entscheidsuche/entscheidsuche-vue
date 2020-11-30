@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="header">
-      <div class="header-content">
+      <div class="header-main">
         <a class="logo" href="#" onclick=""></a>
         <form class="header-search" action="#">
           <div class="flex-container">
@@ -17,24 +17,26 @@
         <div class="languages-mobile">
           <a class="toggle-languages"></a>
         </div>
-        <a class="open-desktop-menu"></a>
+        <b-button v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;border-radius:0;box-shadow:none;"></b-button>
       </div>
       <div class="optional-bar">
         Aktuelles bei Bedarf
       </div>
     </div>
-    <div class="menu-overlay">
-      <a class="close-desktop-menu"></a>
-      <nav>
-        <ul class="menu-desktop">
-          <li><a href="" class="desktop-menu-item">Über uns</a></li>
-          <li><a href="" class="desktop-menu-item">Verein entscheidsuche.ch</a></li>
-          <li><a href="" class="desktop-menu-item">Upload von Urteilen / Entscheiden</a></li>
-          <li><a href="" class="desktop-menu-item">Wer unsere Daten weiterverwendet</a></li>
-          <li><a href="" class="desktop-menu-item">Hinweis / Status</a></li>
-        </ul>
-      </nav>
-    </div>
+    <b-sidebar id="sidebar-right" right no-header>
+      <div class="menu-overlay">
+        <b-button v-b-toggle.sidebar-right id="close-menu" style="border:none;outline:none;box-shadow:none;"></b-button>
+        <nav>
+          <ul class="menu-desktop">
+            <li><a href="" class="desktop-menu-item">Über uns</a></li>
+            <li><a href="" class="desktop-menu-item">Verein entscheidsuche.ch</a></li>
+            <li><a href="" class="desktop-menu-item">Upload von Urteilen / Entscheiden</a></li>
+            <li><a href="" class="desktop-menu-item">Wer unsere Daten weiterverwendet</a></li>
+            <li><a href="" class="desktop-menu-item">Hinweis / Status</a></li>
+          </ul>
+        </nav>
+      </div>
+    </b-sidebar>
     <div class="content">
       <h1>Wer uns untersützt:</h1>
       <div class="main-sponsors">
@@ -230,6 +232,7 @@
         <p>... sowie vielen weiteren Unterstützerinnen und Unterstützern, die anonym bleiben wollen.</p>
       </div>
     </div>
+    <footer></footer>
     <router-view/>
   </div>
 </template>
@@ -240,13 +243,8 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-
-  //general
-  h1{
-    text-align: left;
-    margin-left:5px;
-    color:#000;
-  }
+  position: relative;
+  min-height: 100%;
 
   .header{
     z-index: 1000;
@@ -258,10 +256,9 @@
     background-color: #191919;
     color: #0c5284;
 
-    .header-content{
-      padding-top:15px;
-      padding-bottom:15px;
-      height: 40px;
+    .header-main{
+      padding-top:10px;
+      padding-bottom:10px;
       display: flex;
       align-items: center;
 
@@ -290,7 +287,7 @@
             border:0;
             padding:0;
             padding-left:5px;
-            //border-radius: 30px 0 0 30px;
+            border-radius:0;
             font-size: 16px;
           }
           input::placeholder{
@@ -308,9 +305,10 @@
             padding:0;
             background-color:#11a3eb;
             color:#fff;
-            //border-radius: 0 30px 30px 0;
             font-size: 16px;
             font-weight: bold;
+            position:relative;
+            top:0.5px;
           }
           button:focus{
             border:none;
@@ -338,7 +336,7 @@
           }
         }
       }
-      .open-desktop-menu{
+      #burger{
         flex-shrink: 0;
         //position: absolute;
         margin-right:20px;
@@ -351,59 +349,63 @@
     }
     .optional-bar{
       //display:none;
-      height: 30px;
+      height: 40px;
       padding-top:10px;
       color: #000;
       background-color: #e5e9f1;
       font-weight: bold;
     }
   }
-  .menu-overlay{
-    display:none;
-    z-index: 1001;
-    height:100%;
-    width:500px;
-    position:fixed;
-    top:0;
-    right:0;
-    background-color:#fff;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 25px 0px;
+  #sidebar-right{
+    .menu-overlay{
+      z-index: 1001;
+      height:100%;
+      width:500px;
+      position:fixed;
+      top:0;
+      right:0;
+      background-color:#fff;
+      box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 25px 0px;
 
-    ul { list-style-type: none; }
+      ul { list-style-type: none; }
 
-    .close-desktop-menu{
-      position: absolute;
-      top:21px;
-      right:20px;
-      cursor:pointer;
-      background: url('assets/close.svg') no-repeat center;
-      background-size: 30px;
-      height:30px;
-      width:30px;
-    }
+      #close-menu{
+        position: absolute;
+        top:21px;
+        right:20px;
+        cursor:pointer;
+        background: url('assets/close.svg') no-repeat center;
+        background-size: 30px;
+        height:30px;
+        width:30px;
+      }
 
-    .close-desktop-menu:hover{
-      transform: rotate(15deg);
-    }
-    .menu-desktop{
-      margin-top:70px;
+      #close-menu:hover{
+        transform: rotate(15deg);
+      }
+      .menu-desktop{
+        margin-top:70px;
 
-      li{
-        padding: 15px 0 15px 0;
-        text-align: left;
+        li{
+          padding: 15px 0 15px 0;
+          text-align: left;
 
-        .desktop-menu-item{
-          text-decoration: none;
-          font-size:20px;
-          font-weight: bold;
-          line-height: 20px;
-          color:#191919;
+          .desktop-menu-item{
+            text-decoration: none;
+            font-size:20px;
+            font-weight: bold;
+            line-height: 20px;
+            color:#191919;
+          }
         }
       }
     }
   }
   .content{
     padding-top: 110px!important; //-30px if optional bar not visible
+    padding-bottom: 80px;
+    margin-left: 10px;
+    margin-right: 10px;
     margin: 0 auto;
     max-width: 984px;
     //background-color:#fff;
@@ -526,13 +528,22 @@
       //font-size: 20px;
     }
   }
+  footer{
+    position:absolute;
+    bottom: 0;
+    left:0;
+    height:50px;
+    width:100%;
+    //margin-top: 50px;
+    background-color: #191919;
+  }
 }
 //tablet
 @media (max-width: 1024px){
   #app{
     .header{
-      .header-content{
-        height:90px;
+      .header-main{
+        height:120px;
         position: relative;
         display: flex;
 
@@ -540,7 +551,7 @@
           position: absolute;
           margin:0;
           top:5px;
-          left:15px;
+          margin-left:20px;
           max-width:50%;
         }
 
@@ -555,26 +566,30 @@
               padding:0;
               padding-left:15px;
             }
+            button{
+            position:relative;
+            //top:0px;//0.5px mobile
+            }
           }
         }
         .languages{
           position: absolute;
-          top:22px;
-          right:45px;
+          top:18px;
+          right:50px;
         }
-        .open-desktop-menu{
+        #burger{
           position: absolute;
           margin:0;
           top:21px;
-          right:15px;
+          right:20px;
         }
       }
     }
     .content{
       padding-top: 160px!important;
       max-width: 1024px;
-      margin-left:4px;
-      margin-right:4px;
+      margin-left: 10px;
+      margin-right: 10px;
 
       .main-sponsors{
         .tile{
@@ -610,11 +625,34 @@
 @media (max-width: 534px){
   #app{
     .header{
-      .header-content{
+      .header-main{
         .languages{
-          .language-item{
-            padding-right: 15px;
+          display:none;
+        }
+        .languages-mobile{
+          .toggle-languages{
+            position: absolute;
+            top:21px;
+            right:80px;
+            cursor:pointer;
+            background: url('assets/world2.svg') no-repeat center;
+            background-size: 30px;
+            height:30px;
+            width:30px;
           }
+        }
+      }
+    }
+    #sidebar-right{
+      .menu-overlay{
+        width:100vw;
+        height:100vh;
+        .menu-desktop{
+          li{
+            .desktop-menu-item{
+                font-size: 16px;
+              }
+            }
         }
       }
     }
