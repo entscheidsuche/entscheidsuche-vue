@@ -9,11 +9,15 @@
             <button>Suchen</button>
           </div>
         </form>
-        <div class="languages">
-          <span class="language-item active" id="de">DE</span>
-          <span class="language-item" id="fr">FR</span>
-          <span class="language-item" id="it">IT</span>
-        </div>
+        <b-form-group class="languages">
+          <b-form-radio-group
+            id="btn-radios-1"
+            v-model="selected"
+            :options="options"
+            buttons
+            name="radios-btn-default"
+          ></b-form-radio-group>
+        </b-form-group>
         <div class="languages-mobile">
           <a class="toggle-languages"></a>
         </div>
@@ -232,7 +236,9 @@
         <p>... sowie vielen weiteren Unterstützerinnen und Unterstützern, die anonym bleiben wollen.</p>
       </div>
     </div>
-    <footer></footer>
+    <footer>
+      <a class="logo" href="#" onclick=""></a>
+    </footer>
     <router-view/>
   </div>
 </template>
@@ -321,18 +327,22 @@
         }
       }
       .languages{
-       flex-shrink: 0;
+        flex-shrink: 0;
+        margin-bottom:0;
+        margin-right: 20px;
 
-        .language-item{
-          font-size: 24px;
-          font-weight: bold;
-          padding-right: 20px;
-          color:#fff;
-          cursor:pointer;
+        .bv-no-focus-ring{
+          .btn-secondary{
+            font-size: 24px;
+            font-weight: bold;
+            background-color: #191919;
+            border:none;
+            outline:none;
+            box-shadow: none;
 
-          &.active{
-            text-decoration: underline #fff;
-            cursor:default;
+            &.active{
+              text-decoration: underline #fff;
+            }
           }
         }
       }
@@ -540,6 +550,18 @@
     width:100%;
     //margin-top: 50px;
     background-color: #191919;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .logo{
+      width: 200px;
+      height: 20px;
+      background: url('assets/logo-white.png') no-repeat center;
+      color:#fff;
+      background-size: contain;
+      flex-shrink: 0;
+    }
   }
 }
 //tablet
@@ -672,3 +694,17 @@
   }
 }
 </style>
+<script>
+export default {
+  data () {
+    return {
+      selected: 'radio1',
+      options: [
+        { text: 'DE', value: 'radio1' },
+        { text: 'FR', value: 'radio2' },
+        { text: 'IT', value: 'radio3' }
+      ]
+    }
+  }
+}
+</script>
