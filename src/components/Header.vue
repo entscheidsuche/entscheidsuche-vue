@@ -1,7 +1,7 @@
 <template>
   <div id="header">
     <div class="header-main">
-      <a class="logo" href="#" onclick=""></a>
+      <router-link :to="{ name: 'Home' }" class="logo"></router-link>
       <form class="header-search" action="#">
         <div class="flex-container">
           <input type="text" placeholder="Suchbegriff" name="search" autocomplete="off">
@@ -18,7 +18,7 @@
       Aktuelles bei Bedarf
       <b-button v-b-toggle.optional-bar id="close-optional-bar" style="border:none;outline:none;box-shadow:none;"></b-button>
     </b-collapse>
-    <div id="language-overlay" v-show="showLanguageChange">
+    <div id="language-overlay" v-if="showLanguageChange">
       <div class="language-wrapper">
         <b-button v-b-toggle id="close-language-overlay" v-on:click="onCancelLanguageChange()" style="border:none;outline:none;box-shadow:none;"></b-button>
         <div class="language-body">
@@ -40,7 +40,7 @@
         <b-button v-b-toggle.sidebar-right id="close-menu" style="border:none;outline:none;box-shadow:none;"></b-button>
         <nav>
           <ul class="menu-desktop">
-            <li><a href="" class="desktop-menu-item">Über uns</a></li>
+            <li><router-link :to="{ name: 'About' }" class="desktop-menu-item">Über uns</router-link></li>
             <li><a href="" class="desktop-menu-item">Verein entscheidsuche.ch</a></li>
             <li><a href="" class="desktop-menu-item">Upload von Urteilen / Entscheiden</a></li>
             <li><a href="" class="desktop-menu-item">Wer unsere Daten weiterverwendet</a></li>
@@ -353,13 +353,21 @@
 }
 </style>
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
+import { AppModule } from '@/store/modules/app'
 
 @Component
 export default class Header extends Vue {
-  @Prop() private showLanguageChange = false;
-  @Prop() private languageChangeSelected!: string;
-  @Prop() private language = 'DE';
+  private showLanguageChange = false;
+  private languageChangeSelected!: string;
+
+  public mounted () {
+    this.languageChangeSelected = this.language
+  }
+
+  public get language () {
+    return AppModule.language
+  }
 
   public onLanguageChange (): void {
     this.languageChangeSelected = this.language
@@ -371,7 +379,7 @@ export default class Header extends Vue {
   }
 
   public onSaveLanguageChange (): void {
-    this.language = this.languageChangeSelected
+    AppModule.SetLanguage(this.languageChangeSelected)
     this.showLanguageChange = false
   }
 }

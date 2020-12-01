@@ -195,7 +195,6 @@
         <p>... sowie vielen weiteren Unterstützerinnen und Unterstützern, die anonym bleiben wollen.</p>
       </div>
     </div>
-    <router-view/>
   </div>
 </template>
 

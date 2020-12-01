@@ -1,15 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { AppState } from '@/store/modules/app'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
-  state: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
-  modules: {
-  }
+export interface RootState {
+  app: AppState;
+}
+
+export const store = new Vuex.Store<RootState>({
+  strict: true
 })
