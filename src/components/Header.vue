@@ -82,7 +82,7 @@
       height:40px;
       width:100%;
       flex-grow:1;
-      margin-right: 98px;
+      margin-right: 160px;
 
       .flex-container{
         height:40px;
@@ -122,7 +122,7 @@
       height:40px;
       width:80px;
       margin-bottom:0;
-      margin-right: 96px;
+      margin-right: 20px;
       font-size: 20px;
       //font-weight: bold;
       color:#fff;
@@ -138,7 +138,7 @@
       .language-icon{
           position: absolute;
           top:21px;
-          right:160px;
+          right:85px;
           background: url('../assets/world2.svg') no-repeat center;
           background-size: 26px;
           height:30px;
@@ -317,8 +317,8 @@
         }
         #language-toggler{
           position: absolute;
-          top:13px;
-          right:6px;
+          top:16px;
+          right:49px;
 
           .language-icon{
             top:6px;
@@ -337,11 +337,6 @@
 //smartphone
 @media (max-width: 534px){
   #header{
-    .header-main{
-      .languages{
-        display:none;
-      }
-    }
     #sidebar-right{
       .menu-overlay{
         width:100vw;

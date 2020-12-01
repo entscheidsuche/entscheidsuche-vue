@@ -3,6 +3,8 @@
     <Header/>
     <Home/>
     <!--<SearchResults/>-->
+    <!--<About/>-->
+    <Footer/>
     <router-view/>
   </div>
 </template>
@@ -13,11 +15,14 @@ import { AppModule } from '@/store/modules/app'
 import Header from './components/Header.vue'
 import Home from './components/Home.vue'
 import SearchResults from './components/SearchResults.vue'
+import About from './components/About.vue'
+import Footer from './components/Footer.vue'
 
 @Component({
   components: {
     Header,
-    Home
+    Home,
+    Footer
   }
 
 })

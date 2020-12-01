@@ -195,9 +195,6 @@
         <p>... sowie vielen weiteren Unterstützerinnen und Unterstützern, die anonym bleiben wollen.</p>
       </div>
     </div>
-    <footer>
-      <a class="logo" href="#" onclick=""></a>
-    </footer>
     <router-view/>
   </div>
 </template>
@@ -335,28 +332,10 @@
     }
     .other-sponsors{
       text-align: left;
-      //font-size: 20px;
-    }
-  }
-  footer{
-    position:absolute;
-    bottom: 0;
-    left:0;
-    height:50px;
-    width:100%;
-    //margin-top: 50px;
-    background-color: #191919;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
-    .logo{
-      width: 200px;
-      height: 20px;
-      background: url('../assets/logo-white.png') no-repeat center;
-      color:#fff;
-      background-size: contain;
-      flex-shrink: 0;
+      ul{
+        color:#2b2b2b;
+      }
     }
   }
 }
@@ -366,8 +345,8 @@
     .content{
       padding-top: 160px!important;
       max-width: 1024px;
-      margin-left: 10px;
-      margin-right: 10px;
+      margin-left: 20px;
+      margin-right: 20px;
 
       .main-sponsors{
         .tile{

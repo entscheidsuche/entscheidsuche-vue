@@ -11,12 +11,13 @@ body{
 }
 h1{
     text-align: left;
-    margin-left:5px;
+    //margin-left:5px;
     margin-top:30px;
     font-size:26px;
     font-weight: bold;
     color:#000;
     font-family: 'Open Sans',sans-serif;
+    margin-bottom: 20px;
 }
 h2{
     text-align: left;
@@ -24,6 +25,8 @@ h2{
     line-height:1.2;
     color:#000;
     font-family: 'Open Sans',sans-serif;
+    margin-top: 26px;
+    margin-bottom: 12px;
 }
 h3{
     text-align: left;
@@ -31,6 +34,8 @@ h3{
     line-height:1.2;
     color:#000;
     font-family: 'Open Sans',sans-serif;
+    margin-top: 24px;
+    margin-bottom: 12px;
 }
 h4{
     text-align: left;
@@ -38,6 +43,12 @@ h4{
     font-size:20px;
     color:#000;
     font-family: 'Open Sans',sans-serif;
+    margin-bottom: 12px;
+}
+p{
+    text-align: left;
+    margin-bottom: 12px;
+    color:#2b2b2b;
 }
 button{
     outline:none !important;
