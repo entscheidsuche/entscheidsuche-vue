@@ -8,8 +8,8 @@
           <b-button class="primary">Suchen</b-button>
         </div>
       </form>
-      <div id="language-toggler">
-        <span id="current">DE</span>
+      <div id="language-toggler" v-on:click="onLanguageChange()">
+        <span id="current">{{language}}</span>
          <a class="language-icon"></a>
       </div>
       <b-button v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;border-radius:0;box-shadow:none;"></b-button>
@@ -18,19 +18,19 @@
       Aktuelles bei Bedarf
       <b-button v-b-toggle.optional-bar id="close-optional-bar" style="border:none;outline:none;box-shadow:none;"></b-button>
     </b-collapse>
-    <div id="language-overlay">
+    <div id="language-overlay" v-show="showLanguageChange">
       <div class="language-wrapper">
-        <b-button v-b-toggle id="close-language-overlay" style="border:none;outline:none;box-shadow:none;"></b-button>
+        <b-button v-b-toggle id="close-language-overlay" v-on:click="onCancelLanguageChange()" style="border:none;outline:none;box-shadow:none;"></b-button>
         <div class="language-body">
           <h3 id="language-title">Welche Sprache möchten Sie nutzen?</h3>
           <b-form-group>
-            <b-form-radio v-model="selected" name="some-radios" value="A">Deutsch</b-form-radio>
-            <b-form-radio v-model="selected" name="some-radios" value="B">Französisch</b-form-radio>
-            <b-form-radio v-model="selected" name="some-radios" value="C">Italienisch</b-form-radio>
+            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="DE">Deutsch</b-form-radio>
+            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="FR">Französisch</b-form-radio>
+            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="IT">Italienisch</b-form-radio>
           </b-form-group>
           <div class="language-buttons">
-            <b-button class="secondary">Abbrechen</b-button>
-            <b-button class="primary">Speichern</b-button>
+            <b-button class="secondary" v-on:click="onCancelLanguageChange()">Abbrechen</b-button>
+            <b-button class="primary" v-on:click="onSaveLanguageChange()">Speichern</b-button>
           </div>
         </div>
       </div>
@@ -177,7 +177,6 @@
   }
   #language-overlay {
     position: fixed;
-    display: none;
     width: 100%;
     height: 100%;
     top: 0;
@@ -353,7 +352,30 @@
   }
 }
 </style>
-<script>
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+
+@Component
+export default class Header extends Vue {
+  @Prop() private showLanguageChange = false;
+  @Prop() private languageChangeSelected!: string;
+  @Prop() private language = 'DE';
+
+  public onLanguageChange (): void {
+    this.languageChangeSelected = this.language
+    this.showLanguageChange = !this.showLanguageChange
+  }
+
+  public onCancelLanguageChange (): void {
+    this.showLanguageChange = false
+  }
+
+  public onSaveLanguageChange (): void {
+    this.language = this.languageChangeSelected
+    this.showLanguageChange = false
+  }
+}
+/*
 export default {
   data () {
     return {
@@ -370,4 +392,5 @@ export default {
     }
   }
 }
+ */
 </script>
