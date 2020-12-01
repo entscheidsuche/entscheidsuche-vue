@@ -5,20 +5,12 @@
       <form class="header-search" action="#">
         <div class="flex-container">
           <input type="text" placeholder="Suchbegriff" name="search" autocomplete="off">
-          <button>Suchen</button>
+          <b-button class="primary">Suchen</b-button>
         </div>
       </form>
-      <b-form-group class="languages">
-        <b-form-radio-group
-          id="btn-radios-1"
-          v-model="selected"
-          :options="options"
-          buttons
-          name="radios-btn-default"
-        ></b-form-radio-group>
-      </b-form-group>
-      <div class="languages-mobile">
-        <a class="toggle-languages"></a>
+      <div id="language-toggler">
+        <span id="current">DE</span>
+         <a class="language-icon"></a>
       </div>
       <b-button v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;border-radius:0;box-shadow:none;"></b-button>
     </div>
@@ -26,21 +18,38 @@
       Aktuelles bei Bedarf
       <b-button v-b-toggle.optional-bar id="close-optional-bar" style="border:none;outline:none;box-shadow:none;"></b-button>
     </b-collapse>
-  <b-sidebar id="sidebar-right" right no-header>
-    <div class="menu-overlay">
-      <b-button v-b-toggle.sidebar-right id="close-menu" style="border:none;outline:none;box-shadow:none;"></b-button>
-      <nav>
-        <ul class="menu-desktop">
-          <li><a href="" class="desktop-menu-item">Über uns</a></li>
-          <li><a href="" class="desktop-menu-item">Verein entscheidsuche.ch</a></li>
-          <li><a href="" class="desktop-menu-item">Upload von Urteilen / Entscheiden</a></li>
-          <li><a href="" class="desktop-menu-item">Wer unsere Daten weiterverwendet</a></li>
-          <li><a href="" class="desktop-menu-item">Hinweis / Status</a></li>
-        </ul>
-      </nav>
+    <div id="language-overlay">
+      <div class="language-wrapper">
+        <b-button v-b-toggle id="close-language-overlay" style="border:none;outline:none;box-shadow:none;"></b-button>
+        <div class="language-body">
+          <h3 id="language-title">Welche Sprache möchten Sie nutzen?</h3>
+          <b-form-group>
+            <b-form-radio v-model="selected" name="some-radios" value="A">Deutsch</b-form-radio>
+            <b-form-radio v-model="selected" name="some-radios" value="B">Französisch</b-form-radio>
+            <b-form-radio v-model="selected" name="some-radios" value="C">Italienisch</b-form-radio>
+          </b-form-group>
+          <div class="language-buttons">
+            <b-button class="secondary">Abbrechen</b-button>
+            <b-button class="primary">Speichern</b-button>
+          </div>
+        </div>
+      </div>
     </div>
-  </b-sidebar>
-</div>
+    <b-sidebar id="sidebar-right" right no-header>
+      <div class="menu-overlay">
+        <b-button v-b-toggle.sidebar-right id="close-menu" style="border:none;outline:none;box-shadow:none;"></b-button>
+        <nav>
+          <ul class="menu-desktop">
+            <li><a href="" class="desktop-menu-item">Über uns</a></li>
+            <li><a href="" class="desktop-menu-item">Verein entscheidsuche.ch</a></li>
+            <li><a href="" class="desktop-menu-item">Upload von Urteilen / Entscheiden</a></li>
+            <li><a href="" class="desktop-menu-item">Wer unsere Daten weiterverwendet</a></li>
+            <li><a href="" class="desktop-menu-item">Hinweis / Status</a></li>
+          </ul>
+        </nav>
+      </div>
+    </b-sidebar>
+  </div>
 </template>
 
 <style lang="scss">
@@ -97,48 +106,44 @@
           border:none;
           outline:none;
         }
-        button{
+        .primary{
           flex-shrink: 0;
           height:40px;
           width:100px;
-          border:0;
           padding:0;
-          background-color:#11a3eb;
-          color:#fff;
           font-size: 16px;
           font-weight: bold;
           position:relative;
         }
-        button:focus{
-          border:none;
-          outline:none;
-        }
-        button:hover,button:active{
-          background-color:#41b5ef;
-          cursor:pointer;
-        }
       }
     }
-    .languages{
+    #language-toggler{
       flex-shrink: 0;
+      height:40px;
+      width:80px;
       margin-bottom:0;
-      margin-right: 20px;
+      margin-right: 96px;
+      font-size: 20px;
+      //font-weight: bold;
+      color:#fff;
+      cursor:pointer;
+      display:flex;
+      align-items: center;
+      justify-content: space-between;
 
-      .bv-no-focus-ring{
-        .btn-secondary{
-          font-size: 24px;
-          font-weight: bold;
-          background-color: #191919;
-          border:none;
-          outline:none;
-          box-shadow: none;
-          padding-top:5px;
-
-          &.active{
-            text-decoration: underline #fff;
-          }
-        }
+      #current{
+        padding-top:3px;
       }
+
+      .language-icon{
+          position: absolute;
+          top:21px;
+          right:160px;
+          background: url('../assets/world2.svg') no-repeat center;
+          background-size: 26px;
+          height:30px;
+          width:30px;
+        }
     }
     #burger{
       flex-shrink: 0;
@@ -168,6 +173,69 @@
       background-size: 20px;
       height:20px;
       width:20px;
+    }
+  }
+  #language-overlay {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 2;
+    cursor: pointer;
+
+    .language-wrapper{
+      width:400px;
+      height:300px;
+      background-color: #fff;
+      position: fixed;
+      top: 50%;
+      left: 50% ;
+      margin-top: -180px;
+      margin-left: -200px;
+
+      #close-language-overlay{
+        position: absolute;
+        top:10px;
+        right:10px;
+        cursor:pointer;
+        background: url('../assets/close.svg') no-repeat center;
+        background-size: 20px;
+        height:20px;
+        width:20px;
+      }
+      .language-body{
+        height:220px;
+        width:320px;
+        margin:40px;
+        position:relative;
+
+        #language-title{
+          font-weight: bold;
+        }
+
+        .form-group{
+          text-align:left;
+          font-size:18px;
+          margin-left:40px;
+          margin-top:20px;
+        }
+        .language-buttons{
+          position:absolute;
+          bottom:0;
+
+          button{
+            width:150px;
+          }
+          .secondary{
+            margin-right: 20px;
+          }
+        }
+      }
     }
   }
   #sidebar-right{
@@ -245,16 +313,17 @@
               padding:0;
               padding-left:15px;
             }
-            button{
-            position:relative;
-            //top:0px;//0.5px mobile
-            }
           }
         }
-        .languages{
+        #language-toggler{
           position: absolute;
           top:13px;
-          right:50px;
+          right:6px;
+
+          .language-icon{
+            top:6px;
+            right:16px;
+          }
         }
         #burger{
           position: absolute;
@@ -271,18 +340,6 @@
     .header-main{
       .languages{
         display:none;
-      }
-      .languages-mobile{
-        .toggle-languages{
-          position: absolute;
-          top:21px;
-          right:80px;
-          cursor:pointer;
-          background: url('../assets/world2.svg') no-repeat center;
-          background-size: 30px;
-          height:30px;
-          width:30px;
-        }
       }
     }
     #sidebar-right{
@@ -305,13 +362,6 @@
 export default {
   data () {
     return {
-      selected: 'radio1',
-      show: false,
-      options: [
-        { text: 'DE', value: 'radio1' },
-        { text: 'FR', value: 'radio2' },
-        { text: 'IT', value: 'radio3' }
-      ]
     }
   },
   methods: {

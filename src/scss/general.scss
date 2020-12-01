@@ -39,3 +39,36 @@ h4{
     color:#000;
     font-family: 'Open Sans',sans-serif;
 }
+button{
+    outline:none !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+    font-weight: bold !important;
+    transition: none!important;
+
+    &.secondary{
+        background-color: #fff;
+        color:#000;
+        border-color:#000;
+    }
+    &.secondary:focus{
+        background-color: #fff;
+        color:#000;
+        border-color:#000;
+    }
+    &.secondary:hover,&.secondary:active{
+        background-color: #191919 !important;
+        color:#fff;
+        border-color:#000;
+    }
+    &.primary{
+        outline:none !important;
+        background-color: #11a3eb !important;
+        color:#fff;
+        border-color: #11a3eb !important;
+    }
+    &.primary:hover,&.primary:active{
+        background-color:#41b5ef !important;
+        border-color: #41b5ef !important;
+      }
+}
