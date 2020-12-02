@@ -174,6 +174,9 @@
       height:20px;
       width:20px;
     }
+    #close-optional-bar:hover{
+      transform: scale(1.1);
+    }
   }
   #language-overlay {
     position: fixed;
@@ -207,6 +210,9 @@
         height:20px;
         width:20px;
       }
+      #close-language-overlay:hover{
+        transform: scale(1.1);
+      }
       .language-body{
         height:220px;
         width:320px;
@@ -226,6 +232,8 @@
         .language-buttons{
           position:absolute;
           bottom:0;
+          display:flex;
+          justify-content: space-between;
 
           button{
             width:150px;
@@ -238,7 +246,7 @@
     }
   }
   #sidebar-right{
-    width:500px;
+    width:460px;
     .menu-overlay{
       z-index: 1001;
       height:100%;
@@ -258,26 +266,26 @@
         top:21px;
         right:20px;
         cursor:pointer;
-        background: url('../assets/close.svg') no-repeat center;
+        background: url('../assets/close-big.svg') no-repeat center;
         background-size: 30px;
         height:30px;
         width:30px;
       }
 
       #close-menu:hover{
-        transform: rotate(15deg);
+        transform: scale(1.1);
       }
       .menu-desktop{
         margin-top:70px;
 
         li{
-          padding: 15px 0 15px 0;
+          padding: 10px 0 20px 0;
           text-align: left;
 
           .desktop-menu-item{
             text-decoration: none;
             font-size:20px;
-            font-weight: bold;
+            //font-weight: bold;
             line-height: 20px;
             color:#191919;
           }
@@ -336,6 +344,45 @@
 //smartphone
 @media (max-width: 534px){
   #header{
+    #language-overlay {
+      background-color: #fff;
+      .language-wrapper{
+        width:100vw;
+        height:100vh;
+        top: 0;
+        left: 50%;
+        margin-top: 0;
+        margin-left: -50%;
+
+        .language-body{
+          top:50%;
+          margin-top:-50%;
+          width: calc(100vw - 40px);
+          margin-left: 20px;
+          margin-right: 20px;
+
+          .form-group{
+            padding-bottom:20px;
+            .custom-radio{
+              padding-top:10px;
+            }
+          }
+        }
+
+        #close-language-overlay{
+          top:20px;
+          right:20px;
+        }
+        .language-buttons{
+          width: 100%;
+
+          button{
+            flex-basis: 150px;
+            flex-grow: 1;
+          }
+        }
+      }
+    }
     #sidebar-right{
       .menu-overlay{
         width:100vw;

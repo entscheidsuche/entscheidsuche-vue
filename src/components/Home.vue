@@ -2,148 +2,207 @@
   <div id="home">
     <div class="content">
       <h1>Wer uns untersützt:</h1>
-      <div class="main-sponsors">
-          <a class="tile" href="https://my-d.org/index.php/www-my-d-org" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor1.png" class="tile-img" alt="sponsor1">
+      <b-card-group deck>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://my-d.org/index.php/www-my-d-org" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor1.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="MY-D Foundation, Geneva">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              MY-D Foundation, Geneva
+              </b-card-text>
             </div>
-            <div class="tile-footer" data-description="MY-D Foundation, Geneva">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">MY-D Foundation, Geneva</span>
-              </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www3.unifr.ch/ius/de/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor2.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Université de Fribourg Universität Freiburg">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Université de Fribourg Universität Freiburg
+              </b-card-text>
             </div>
-          </a>
-          <a class="tile" href="https://www3.unifr.ch/ius/de/" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor2.png" class="tile-img" alt="sponsor2">
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.advo-schreiber.ch/advo/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor3.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Advokatur Schreiber">
+             <div class="card-text-wrapper">
+              <b-card-text>
+              Advokatur Schreiber
+              </b-card-text>
+             </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.unisg.ch/de/universitaet/schools/law" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor4.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Universität St.Gallen, Law School">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Universität St.Gallen, Law School
+              </b-card-text>
             </div>
-            <div class="tile-footer" data-description="Université de Fribourg Universität Freiburg">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">Université de Fribourg Universität Freiburg</span>
-              </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.legalis.ch/de/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor5.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="legalis.ch">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              legalis.ch
+              </b-card-text>
             </div>
-          </a>
-          <a class="tile" href="https://www.advo-schreiber.ch/advo/" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor3.png" class="tile-img" alt="sponsor3">
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.bav-aab.ch/de/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor6.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Bernischer Anwaltsverband Association des avocats bernois">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Bernischer Anwaltsverband Association des avocats bernois
+              </b-card-text>
             </div>
-            <div class="tile-footer" data-description="Advokatur Schreiber">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">Advokatur Schreiber</span>
-              </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.zav.ch/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor7.jpg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Zürcher Anwaltsverband">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Zürcher Anwaltsverband
+              </b-card-text>
             </div>
-          </a>
-          <a class="tile" href="https://www.unisg.ch/de/universitaet/schools/law" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor4.png" class="tile-img" alt="sponsor4">
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.zhaw.ch/de/hochschule/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor8.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Züricher Hochschule für Angewandte Wissenschaften">
+            <div class="card-text-wrapper">
+              <b-card-text>
+                Züricher Hochschule für Angewandte Wissenschaften
+              </b-card-text>
             </div>
-            <div class="tile-footer" data-description="Universität St.Gallen, Law School">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">Universität St.Gallen, Law School</span>
-              </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.kellerhals-carrard.ch/de/home/index.php" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor9.svg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Kellerhals Carrard">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Kellerhals Carrard
+              </b-card-text>
             </div>
-          </a>
-          <a class="tile" href="https://www.legalis.ch/de/" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor5.png" class="tile-img" alt="sponsor5">
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.legaltechradar.com/de" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor10.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="LegalTechRadar">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              LegalTechRadar
+              </b-card-text>
             </div>
-            <div class="tile-footer" data-description="legalis.ch">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">legalis.ch</span>
-              </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www3.unifr.ch/federalism/en/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor11.jpg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Institut für Föderalismus, Universität Freiburg Institut du Fédéralisme, Université de Fribourg">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Institut für Föderalismus, Universität Freiburg Institut du Fédéralisme, Université de Fribourg
+              </b-card-text>
             </div>
-          </a>
-          <a class="tile" href="https://www.bav-aab.ch/de/" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor6.png" class="tile-img" alt="sponsor6">
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.oav.ch/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor12.jpg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Ordre des avocats vaudois">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Ordre des avocats vaudois
+              </b-card-text>
             </div>
-            <div class="tile-footer" data-description="Bernischer Anwaltsverband Association des avocats bernois">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">Bernischer Anwaltsverband Association des avocats bernois</span>
-              </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.schkg-vereinigung.ch/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor13.jpg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="SchKG-Vereinigung Association LP">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              SchKG-Vereinigung Association LP
+              </b-card-text>
             </div>
-          </a>
-          <a class="tile" href="https://www.zav.ch/" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor7.jpg" class="tile-img" alt="sponsor7">
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.sgav.ch/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor14.svg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="St.Galler Anwaltsverband">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              St.Galler Anwaltsverband
+              </b-card-text>
             </div>
-            <div class="tile-footer" data-description="Zürcher Anwaltsverband">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">Zürcher Anwaltsverband</span>
-              </div>
-            </div>
-          </a>
-          <a class="tile" href="https://www.zhaw.ch/de/hochschule/" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor8.png" class="tile-img" alt="sponsor8">
-            </div>
-            <div class="tile-footer" data-description="Züricher Hochschule für Angewandte Wissenschaften">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">Züricher Hochschule für Angewandte Wissenschaften</span>
-              </div>
-            </div>
-          </a>
-          <a class="tile" href="https://www.kellerhals-carrard.ch/de/home/index.php" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor9.svg" class="tile-img" alt="sponsor9">
-            </div>
-            <div class="tile-footer" data-description="Kellerhals Carrard">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">Kellerhals Carrard</span>
-              </div>
-            </div>
-          </a>
-          <a class="tile" href="https://www.legaltechradar.com/de" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor10.png" class="tile-img" alt="sponsor10">
-            </div>
-            <div class="tile-footer" data-description="LegalTechRadar">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">LegalTechRadar</span>
-              </div>
-            </div>
-          </a>
-          <a class="tile" href="https://www3.unifr.ch/federalism/en/" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor11.jpg" class="tile-img" alt="sponsor11">
-            </div>
-            <div class="tile-footer" data-description="Institut für Föderalismus, Universität Freiburg Institut du Fédéralisme, Université de Fribourg">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">Institut für Föderalismus, Universität Freiburg Institut du Fédéralisme, Université de Fribourg</span>
-              </div>
-            </div>
-          </a>
-          <a class="tile" href="https://www.oav.ch/" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor12.jpg" class="tile-img" alt="sponsor12">
-            </div>
-            <div class="tile-footer" data-description="Ordre des avocats vaudois">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">Ordre des avocats vaudois</span>
-              </div>
-            </div>
-          </a>
-          <a class="tile" href="https://www.schkg-vereinigung.ch/" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor13.jpg" class="tile-img" alt="sponsor13">
-            </div>
-            <div class="tile-footer" data-description="SchKG-Vereinigung Association LP">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">SchKG-Vereinigung Association LP</span>
-              </div>
-            </div>
-          </a>
-          <a class="tile" href="https://www.sgav.ch/" target="_blank">
-            <div class="tile-img-wapper">
-              <img src="./../assets/sponsors/sponsor14.svg" class="tile-img" alt="sponsor14">
-            </div>
-            <div class="tile-footer" data-description="St.Galler Anwaltsverband">
-              <div class="tile-text-wrapper">
-                <span class="tile-text">St.Galler Anwaltsverband</span>
-              </div>
-            </div>
-          </a>
-      </div>
+          </div>
+        </b-card>
+        <div class="search-placeholder"></div>
+        <div class="search-placeholder"></div>
+        <div class="search-placeholder"></div>
+      </b-card-group>
       <div class="other-sponsors">
         <h1>Weitere Unterstützung erhalten wir von:</h1>
         <ul>
@@ -202,6 +261,7 @@
 #home {
   position: relative;
   min-height: 100%;
+  //background-image: linear-gradient(to right, #cfebf9 0%,#ffffff 25%,#ffffff 75%, #cfebf9 100%);
 
   .content{
     padding-top: 120px!important; //-30px if optional bar not visible
@@ -210,8 +270,92 @@
     margin-right: 10px;
     margin: 0 auto;
     max-width: 984px;
-    //background-color:#fff;
 
+    .card-deck{
+    width:100%;
+    display:flex;
+    flex-flow:row wrap;
+    justify-content:space-between;
+    margin:0px;
+
+    .search-placeholder {
+      height: 2px;
+      width:260px;
+      flex-basis: 260px;
+      max-width:calc((100% - 40px) / 4);
+      flex-grow: 1;
+    }
+    .card{
+      background-color: #fff;
+      border:none;
+      box-shadow: 0 2px 30px rgba(0,0,0,.15);
+      border-radius: 0 0 20px 0;
+      margin: 5px 0 5px 0;
+      width: 260px;
+      max-width:calc((100% - 40px) / 4);
+      flex-basis: 260px;
+      flex-grow: 1;
+      justify-content:space-between;
+      .card-body{
+        padding:0;
+        .card-img-wapper{
+          height:100px;
+          position:relative;
+          .card-img-top{
+            max-height:calc(100% - 10px);
+            max-width:calc(100% - 10px);
+            transform: matrix(0.9,0,0,0.9,0,0);
+            object-fit: contain;
+            position: absolute;
+            margin: auto;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+          }
+        }
+        .card-footer{
+          height:60px;
+          width:100%;
+          color:#000;
+          border-radius: 0 0 20px 0;
+          border-top: 1px solid #e5e9f1;
+          background-color: #fff;
+          position:relative;
+          padding:0;
+
+          .card-text-wrapper{
+            height:60px;
+            position:absolute;
+            top:0;
+            overflow:hidden;
+            width: calc(100%);
+            display: flex;
+            justify-content: center;
+
+            .card-text{
+              line-height:60px;
+              font-size:14px;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              display: block;
+              overflow: hidden;
+              padding-left:20px;
+              padding-right:20px;
+              }
+            }
+          }
+        }
+      }
+      .card:hover{
+        .card-img-wapper{
+          .card-img-top{
+            transform: matrix(1,0,0,1,0,0);
+          }
+        }
+      }
+    }
+    //old
     .main-sponsors{
       display:flex;
       flex-flow: row wrap;
@@ -256,12 +400,11 @@
           border-top: 1px solid #e5e9f1;
 
           .tile-text-wrapper{
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            display: block;
-            overflow: hidden;
-
             .tile-text{
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              display: flex;
+              overflow: hidden;
               line-height:60px;
               font-size:14px;
               padding:10px;
@@ -347,6 +490,18 @@
       margin-left: 20px;
       margin-right: 20px;
 
+      .card-deck{
+        .search-placeholder{
+          //max-width:calc((100% - 20px) / 2);
+          max-width:calc((100% - 20px) / 3);
+        }
+        .card{
+          //min-width:160px;
+          //max-width:calc((100% - 20px) / 2);
+          max-width:calc((100% - 20px) / 3);
+        }
+      }
+
       .main-sponsors{
         .tile{
           margin:5px;
@@ -380,6 +535,16 @@
 //smartphone
 @media (max-width: 534px){
   #home{
+    .content{
+      .card-deck{
+        width:100%;
+        .card{
+          min-width:100px;
+          //max-width:160px;
+          max-width:calc((100% - 20px) / 2);
+        }
+      }
+    }
   }
 }
 </style>
