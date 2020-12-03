@@ -58,28 +58,29 @@ button{
     transition: none!important;
 
     &.secondary{
-        background-color: #fff;
-        color:#000;
-        border-color:#000;
+        background-color: #6183ec;
+        color:#fff;
+        border-color:#6183ec !important;
     }
     &.secondary:focus{
-        background-color: #fff;
-        color:#000;
-        border-color:#000;
+        background-color: #6183ec;
+        color:#fff;
+        border-color:#6183ec;
     }
     &.secondary:hover,&.secondary:active{
-        background-color: #191919 !important;
-        color:#fff;
-        border-color:#000;
+        background-color: #fff;
+        color:#6183ec;
+        border-color:#6183ec !important;
     }
     &.primary{
         outline:none !important;
-        background-color: #11a3eb !important;
-        color:#fff;
-        border-color: #11a3eb !important;
+        background-color: #e5e9f1 !important;
+        color:#000 !important;
+        border-color: #e5e9f1 !important;
     }
     &.primary:hover,&.primary:active{
-        background-color:#41b5ef !important;
-        border-color: #41b5ef !important;
+        background-color:#000 !important;
+        border-color: #000 !important;
+        color:#fff !important;
       }
 }

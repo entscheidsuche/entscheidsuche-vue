@@ -259,10 +259,6 @@
 
 <style lang="scss">
 #home {
-  position: relative;
-  min-height: 100%;
-  //background-image: linear-gradient(to right, #cfebf9 0%,#ffffff 25%,#ffffff 75%, #cfebf9 100%);
-
   .content{
     padding-top: 120px!important; //-30px if optional bar not visible
     padding-bottom: 80px;
@@ -270,6 +266,7 @@
     margin-right: 10px;
     margin: 0 auto;
     max-width: 984px;
+    background-color: #fff;
 
     .card-deck{
     width:100%;
@@ -486,7 +483,6 @@
   #home{
     .content{
       padding-top: 160px!important;
-      max-width: 1024px;
       margin-left: 20px;
       margin-right: 20px;
 

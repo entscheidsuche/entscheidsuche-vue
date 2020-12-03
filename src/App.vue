@@ -1,7 +1,11 @@
 <template>
   <div id="app">
     <Header/>
-    <router-view/>
+    <div class="app-content">
+      <div class="content-wrapper">
+        <router-view/>
+      </div>
+    </div>
     <Footer/>
   </div>
 </template>
@@ -26,5 +30,33 @@ export default class App extends Vue {}
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   height:100%;
+
+  .app-content{
+    position: relative;
+    min-height: 100%;
+    background-image: url('assets/hg-xs-25-gradient2.png');
+    background-repeat: repeat;
+    background-size: 100%;
+    display:flex;
+    justify-content: center;
+
+    .content-wrapper{
+      width: 984px;
+      -moz-box-shaow: 0 20px 0px 20px rgba(255,255,255,0.5);
+      -webkit-box-shadow: 0 20px 0px 20px rgba(255,255,255,0.5);
+      box-shadow: 0 20px 0px 20px rgba(255,255,255,0.5);
+    }
+  }
+}
+@media (max-width: 1024px){
+  #app{
+    .app-content{
+      background-image:none;
+      .content-wrapper{
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+    }
+  }
 }
 </style>

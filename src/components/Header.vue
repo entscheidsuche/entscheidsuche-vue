@@ -29,8 +29,8 @@
             <b-form-radio v-model="languageChangeSelected" name="some-radios" value="IT">Italienisch</b-form-radio>
           </b-form-group>
           <div class="language-buttons">
-            <b-button class="secondary" v-on:click="onCancelLanguageChange()">Abbrechen</b-button>
-            <b-button class="primary" v-on:click="onSaveLanguageChange()">Speichern</b-button>
+            <b-button class="primary" v-on:click="onCancelLanguageChange()">Abbrechen</b-button>
+            <b-button class="secondary" v-on:click="onSaveLanguageChange()">Speichern</b-button>
           </div>
         </div>
       </div>
@@ -59,7 +59,9 @@
   left: 0;
   position: fixed;
   width: 100%;
-  background-color: #191919;
+  //background-color: #191919;
+  background-color: #6183ec;
+  //background-color: #11569e;
 
   .header-main{
     padding-top:5px;
@@ -98,6 +100,7 @@
           padding-left:5px;
           border-radius:0;
           font-size: 16px;
+          //border: 1px solid #000,
         }
         input::placeholder{
           color:#9ca2a9;
@@ -238,7 +241,7 @@
           button{
             width:150px;
           }
-          .secondary{
+          .primary{
             margin-right: 20px;
           }
         }

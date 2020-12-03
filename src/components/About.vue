@@ -14,15 +14,16 @@
     <div class="contact">
       <h3>Koordinaten des Vereins</h3>
       <p>Postadresse des Vereins: Verein entscheidsuche.ch, 3000 Bern<br>
-      Konto des Vereins entscheidsuche.ch:<br>
-      Postfinance IBAN: CH04 0900 0000 1412 0685 4,<br>
-      Verein entscheidsuche.ch, 8000 Zürich</p>
+        Konto des Vereins entscheidsuche.ch:<br>
+        Postfinance IBAN: CH04 0900 0000 1412 0685 4,<br>
+        Verein entscheidsuche.ch, 8000 Zürich</p>
     </div>
   </div>
 </template>
 
 <style lang="scss">
 #about{
+  //height:100vh;
   position: relative;
   min-height: 100%;
   padding-top: 110px!important;
@@ -31,9 +32,7 @@
   margin: 0 auto;
   max-width: 984px;
   padding-bottom: 80px;
-
-  .contact{
-  }
+  background-color: #fff;
 }
 @media (max-width: 1024px){
   #about {
