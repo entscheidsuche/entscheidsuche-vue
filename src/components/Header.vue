@@ -5,22 +5,22 @@
       <form class="header-search" action="#">
         <div class="flex-container">
           <input type="text" placeholder="Suchbegriff" name="search" autocomplete="off">
-          <b-button class="primary">Suchen</b-button>
+          <b-button variant="secondary" id="toggle-search">Suchen</b-button>
         </div>
       </form>
       <div id="language-toggler" v-on:click="onLanguageChange()">
         <span id="current">{{language}}</span>
          <a class="language-icon"></a>
       </div>
-      <b-button v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;border-radius:0;box-shadow:none;"></b-button>
+      <b-button v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;box-shadow:none;"></b-button>
     </div>
-    <b-collapse visible id="optional-bar">
+    <b-collapse visible id="optional-bar" v-if="showOptionalBar">
       Aktuelles bei Bedarf
-      <b-button v-b-toggle.optional-bar id="close-optional-bar" style="border:none;outline:none;box-shadow:none;"></b-button>
+      <div id="close-optional-bar" v-on:click="onCloseOptionalBar()"></div>
     </b-collapse>
     <div id="language-overlay" v-if="showLanguageChange">
       <div class="language-wrapper">
-        <b-button v-b-toggle id="close-language-overlay" v-on:click="onCancelLanguageChange()" style="border:none;outline:none;box-shadow:none;"></b-button>
+        <div v-b-toggle id="close-language-overlay" v-on:click="onCancelLanguageChange()"></div>
         <div class="language-body">
           <h3 id="language-title">Welche Sprache möchten Sie nutzen?</h3>
           <b-form-group>
@@ -29,15 +29,15 @@
             <b-form-radio v-model="languageChangeSelected" name="some-radios" value="IT">Italienisch</b-form-radio>
           </b-form-group>
           <div class="language-buttons">
-            <b-button class="primary" v-on:click="onCancelLanguageChange()">Abbrechen</b-button>
-            <b-button class="secondary" v-on:click="onSaveLanguageChange()">Speichern</b-button>
+            <b-button variant="outline-primary" id="left" v-on:click="onCancelLanguageChange()">Abbrechen</b-button>
+            <b-button variant="secondary" v-on:click="onSaveLanguageChange()">Speichern</b-button>
           </div>
         </div>
       </div>
     </div>
     <b-sidebar id="sidebar-right" right no-header>
       <div class="menu-overlay">
-        <b-button v-b-toggle.sidebar-right id="close-menu" style="border:none;outline:none;box-shadow:none;"></b-button>
+        <div v-b-toggle.sidebar-right id="close-menu" style="border:none;outline:none;box-shadow:none;"></div>
         <nav>
           <ul class="menu-desktop">
             <li><router-link :to="{ name: 'About' }" class="desktop-menu-item">Über uns</router-link></li>
@@ -100,7 +100,6 @@
           padding-left:5px;
           border-radius:0;
           font-size: 16px;
-          //border: 1px solid #000,
         }
         input::placeholder{
           color:#9ca2a9;
@@ -109,7 +108,7 @@
           border:none;
           outline:none;
         }
-        .primary{
+        #toggle-search{
           flex-shrink: 0;
           height:40px;
           width:100px;
@@ -127,7 +126,6 @@
       margin-bottom:0;
       margin-right: 20px;
       font-size: 20px;
-      //font-weight: bold;
       color:#fff;
       cursor:pointer;
       display:flex;
@@ -139,14 +137,14 @@
       }
 
       .language-icon{
-          position: absolute;
-          top:21px;
-          right:85px;
-          background: url('../assets/world2.svg') no-repeat center;
-          background-size: 26px;
-          height:30px;
-          width:30px;
-        }
+        position: absolute;
+        top:21px;
+        right:85px;
+        background: url('../assets/world2.svg') no-repeat center;
+        background-size: 26px;
+        height:30px;
+        width:30px;
+      }
     }
     #burger{
       flex-shrink: 0;
@@ -165,7 +163,6 @@
     background-color: #e5e9f1;
     font-weight: bold;
     position:relative;
-    transition-duration: 0s;
 
     #close-optional-bar{
       position: absolute;
@@ -176,6 +173,7 @@
       background-size: 20px;
       height:20px;
       width:20px;
+      transition: all .2s ease-in-out;
     }
     #close-optional-bar:hover{
       transform: scale(1.1);
@@ -212,6 +210,7 @@
         background-size: 20px;
         height:20px;
         width:20px;
+        transition: all .2s ease-in-out;
       }
       #close-language-overlay:hover{
         transform: scale(1.1);
@@ -241,7 +240,7 @@
           button{
             width:150px;
           }
-          .primary{
+          #left{
             margin-right: 20px;
           }
         }
@@ -273,6 +272,7 @@
         background-size: 30px;
         height:30px;
         width:30px;
+        transition: all .2s ease-in-out;
       }
 
       #close-menu:hover{
@@ -409,6 +409,7 @@ import { AppModule } from '@/store/modules/app'
 @Component
 export default class Header extends Vue {
   private showLanguageChange = false;
+  private showOptionalBar = true;
   private languageChangeSelected!: string;
 
   public mounted () {
@@ -432,23 +433,9 @@ export default class Header extends Vue {
     AppModule.SetLanguage(this.languageChangeSelected)
     this.showLanguageChange = false
   }
-}
-/*
-export default {
-  data () {
-    return {
-    }
-  },
-  methods: {
-    onShown () {
-      // Focus the cancel button when the overlay is showing
-      this.$refs.cancel.focus()
-    },
-    onHidden () {
-      // Focus the show button when the overlay is removed
-      this.$refs.show.focus()
-    }
+
+  public onCloseOptionalBar (): void {
+    this.showOptionalBar = false
   }
 }
- */
 </script>

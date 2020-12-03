@@ -1,3 +1,21 @@
+
+//colors
+$primary: #6183ec;
+$secondary: #e5e9f1;
+$white:#ffffff;
+
+//buttons
+$btn-border-radius:0;
+$btn-box-shadow: none;
+$btn-focus-box-shadow: none;
+$btn-active-box-shadow: none;
+$btn-font-weight: bold;
+$enable-shadows: false;
+
+@import '~bootstrap/scss/bootstrap.scss';
+@import '~bootstrap-vue/src/index.scss';
+    
+
 html{
     height:100%;
     overflow:hidden;
@@ -11,7 +29,6 @@ body{
 }
 h1{
     text-align: left;
-    //margin-left:5px;
     margin-top:30px;
     font-size:26px;
     font-weight: bold;
@@ -49,38 +66,4 @@ p{
     text-align: left;
     margin-bottom: 12px;
     color:#2b2b2b;
-}
-button{
-    outline:none !important;
-    border-radius:0 !important;
-    box-shadow:none !important;
-    font-weight: bold !important;
-    transition: none!important;
-
-    &.secondary{
-        background-color: #6183ec;
-        color:#fff;
-        border-color:#6183ec !important;
-    }
-    &.secondary:focus{
-        background-color: #6183ec;
-        color:#fff;
-        border-color:#6183ec;
-    }
-    &.secondary:hover,&.secondary:active{
-        background-color: #fff;
-        color:#6183ec;
-        border-color:#6183ec !important;
-    }
-    &.primary{
-        outline:none !important;
-        background-color: #e5e9f1 !important;
-        color:#000 !important;
-        border-color: #e5e9f1 !important;
-    }
-    &.primary:hover,&.primary:active{
-        background-color:#000 !important;
-        border-color: #000 !important;
-        color:#fff !important;
-      }
 }
