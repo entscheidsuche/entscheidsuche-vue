@@ -243,8 +243,8 @@
         }
         #language-toggler{
           position: absolute;
-          top:16px;
-          right:49px;
+          top:15px;
+          right:38px;
 
           .language-icon{
             top:6px;

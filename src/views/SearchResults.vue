@@ -138,10 +138,27 @@
               <a class="link-logo"></a>
             </div>
             <div class="text-preview">
-              Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
+              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
                und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
                Unterlagen als auch die beschlagnahmten Schlüssel für die Räumlichkeiten an der V.strasse und an der
-               G.strasse nach Rechtskraft des Urteils unter
+               G.strasse nach Rechtskraft des Urteils unter sdhfbsdfsdfh usdhfushdf usfhdih
+               </p>
+            </div>
+          </div>
+        </div>
+        <div class="result-item">
+          <div class="result-body">
+            <div class="result-header">
+              <a class="canton-logo"></a>
+              <h3 class="result-title">
+                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
+              </h3>
+              <a class="link-logo"></a>
+            </div>
+            <div class="text-preview">
+              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
+               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
+               </p>
             </div>
           </div>
         </div>
@@ -157,9 +174,11 @@
 
 <style lang="scss">
 #searchResults {
-  padding-top: 110px!important; //-30px if optional bar not visible
+  background-color: #fff;
+  padding-top: 120px!important; //-30px if optional bar not visible
   //padding-bottom: 80px; //footer
   min-height: 100%;
+  display:flex;
   overflow: hidden;
   margin: 0;
   text-align: left;
@@ -168,13 +187,11 @@
     display:flex;
     margin-left:20px;
     margin-right:20px;
-    height:100%;
 
     .filter{
       width:260px;
       float: left;
       border-right:2px solid #e5e9f1;
-      height: 100%;
       overflow: auto;
       box-sizing: border-box;
       padding: 0.5em;
@@ -212,7 +229,6 @@
       max-width:35%;
       float: left;
       border-right:2px solid #e5e9f1;
-      height: 100%;
       overflow: auto;
       box-sizing: border-box;
       padding: 0.5em;
@@ -220,32 +236,45 @@
       .result-item{
         border: 1px solid rgba(0, 0, 0, 0.125);
         border-radius: 4px;
+        margin-bottom:10px;
 
         .result-body{
           padding:20px;
+          //max-height:120px;
 
           .result-header{
             display:flex;
             justify-content: space-between;
             flex-direction: row;
-/*
+            //background-color: pink;
             .canton-logo{
               background: url('../assets/cantons/AR.png') no-repeat center;
               background-size: 40px;
               height:52px;
               width:52px;
               margin-right:15px;
+              flex-shrink: 0;
             }
             .link-logo{
-              background: url('../assets/pdf.png') no-repeat center;
-              background-size: 40px;
+              flex-shrink: 0;
+              background: url('../assets/pdf.svg') no-repeat center;
+              background-size: 52px;
               height:52px;
               width:52px;
               margin-left:15px;
             }
-*/
+            .result-title{
+              margin-top: 0;
+              max-height: 52px;
+            }
           }
           .text-preview{
+            width:100%;
+            max-height:120px;
+            overflow:hidden;
+            p{
+
+            }
             .keyword{
               font-style: italic;
               background-color: #FFFF00;
@@ -258,7 +287,6 @@
       flex-grow:2;
       max-width:35%;
       float: left;
-      height: 100%;
       overflow: auto;
       box-sizing: border-box;
       padding: 0.5em;
