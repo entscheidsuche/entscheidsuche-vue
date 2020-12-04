@@ -22,15 +22,17 @@
       <div class="language-wrapper">
         <div v-b-toggle id="close-language-overlay" v-on:click="onCancelLanguageChange()"></div>
         <div class="language-body">
-          <h3 id="language-title">Welche Sprache möchten Sie nutzen?</h3>
-          <b-form-group>
-            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="de">Deutsch</b-form-radio>
-            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="fr">Französisch</b-form-radio>
-            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="it">Italienisch</b-form-radio>
-          </b-form-group>
+          <div class="dialog">
+            <h3 id="language-title">Welche Sprache möchten Sie nutzen?</h3>
+            <b-form-group>
+              <b-form-radio v-model="languageChangeSelected" name="some-radios" value="de">Deutsch</b-form-radio>
+              <b-form-radio v-model="languageChangeSelected" name="some-radios" value="fr">Französisch</b-form-radio>
+              <b-form-radio v-model="languageChangeSelected" name="some-radios" value="it">Italienisch</b-form-radio>
+            </b-form-group>
+          </div>
           <div class="language-buttons">
-            <b-button variant="outline-primary" id="left" v-on:click="onCancelLanguageChange()">Abbrechen</b-button>
-            <b-button variant="secondary" v-on:click="onSaveLanguageChange()">Speichern</b-button>
+            <b-button variant="secondary" id="left" v-on:click="onCancelLanguageChange()">Abbrechen</b-button>
+            <b-button variant="outline-primary" v-on:click="onSaveLanguageChange()">Speichern</b-button>
           </div>
         </div>
       </div>
@@ -351,23 +353,32 @@
       background-color: #fff;
       .language-wrapper{
         width:100vw;
-        height:100vh;
+        min-height: -webkit-fill-available;
         top: 0;
         left: 50%;
         margin-top: 0;
         margin-left: -50%;
 
         .language-body{
-          top:50%;
-          margin-top:-50%;
+          top:0%;
+          height: calc(100% - 60px);
+          margin-top:40px;
           width: calc(100vw - 40px);
+          padding-top: 60px;
           margin-left: 20px;
           margin-right: 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
 
-          .form-group{
-            padding-bottom:20px;
-            .custom-radio{
-              padding-top:10px;
+          .dialog{
+            position:relative;
+            top:-76px;
+            text-align: center;
+            .form-group{
+              .custom-radio{
+                padding-top:10px;
+              }
             }
           }
         }
@@ -378,6 +389,8 @@
         }
         .language-buttons{
           width: 100%;
+          position:absolute;
+          bottom:0;
 
           button{
             flex-basis: 150px;

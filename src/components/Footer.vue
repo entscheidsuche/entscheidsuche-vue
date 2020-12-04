@@ -16,7 +16,7 @@
     height:50px;
     width:100%;
     //margin-top: 50px;
-    background-color: #191919;
+    background-color: #e5e9f1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -24,7 +24,7 @@
     .logo{
       width: 200px;
       height: 20px;
-      background: url('../assets/logo-white.png') no-repeat center;
+      background: url('../assets/logo.png') no-repeat center;
       color:#fff;
       background-size: contain;
       flex-shrink: 0;
