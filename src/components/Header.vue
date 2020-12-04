@@ -8,8 +8,8 @@
           <b-button variant="secondary" id="toggle-search">Suchen</b-button>
         </div>
       </form>
-      <div id="language-toggler" v-on:click="onLanguageChange()">
-        <span id="current">{{language.toUpperCase()}}</span>
+      <div id="language-toggler" v-on:click="onLocaleChange()">
+        <span id="current">{{locale.toUpperCase()}}</span>
          <a class="language-icon"></a>
       </div>
       <b-button v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;box-shadow:none;"></b-button>
@@ -18,25 +18,7 @@
       Aktuelles bei Bedarf
       <div id="close-optional-bar" v-on:click="onCloseOptionalBar()"></div>
     </b-collapse>
-    <div id="language-overlay" v-if="showLanguageChange">
-      <div class="language-wrapper">
-        <div v-b-toggle id="close-language-overlay" v-on:click="onCancelLanguageChange()"></div>
-        <div class="language-body">
-          <div class="dialog">
-            <h3 id="language-title">Welche Sprache möchten Sie nutzen?</h3>
-            <b-form-group>
-              <b-form-radio v-model="languageChangeSelected" name="some-radios" value="de">Deutsch</b-form-radio>
-              <b-form-radio v-model="languageChangeSelected" name="some-radios" value="fr">Französisch</b-form-radio>
-              <b-form-radio v-model="languageChangeSelected" name="some-radios" value="it">Italienisch</b-form-radio>
-            </b-form-group>
-          </div>
-          <div class="language-buttons">
-            <b-button variant="secondary" id="left" v-on:click="onCancelLanguageChange()">Abbrechen</b-button>
-            <b-button variant="outline-primary" v-on:click="onSaveLanguageChange()">Speichern</b-button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <LocaleSelector/>
     <b-sidebar id="sidebar-right" right no-header>
       <div class="menu-overlay">
         <div v-b-toggle.sidebar-right id="close-menu" style="border:none;outline:none;box-shadow:none;"></div>
@@ -181,74 +163,6 @@
       transform: scale(1.1);
     }
   }
-  #language-overlay {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 2;
-    cursor: pointer;
-
-    .language-wrapper{
-      width:400px;
-      height:300px;
-      background-color: #fff;
-      position: fixed;
-      top: 50%;
-      left: 50% ;
-      margin-top: -180px;
-      margin-left: -200px;
-
-      #close-language-overlay{
-        position: absolute;
-        top:10px;
-        right:10px;
-        cursor:pointer;
-        background: url('../assets/close.svg') no-repeat center;
-        background-size: 20px;
-        height:20px;
-        width:20px;
-        transition: all .2s ease-in-out;
-      }
-      #close-language-overlay:hover{
-        transform: scale(1.1);
-      }
-      .language-body{
-        height:220px;
-        width:320px;
-        margin:40px;
-        position:relative;
-
-        #language-title{
-          font-weight: bold;
-        }
-
-        .form-group{
-          text-align:left;
-          font-size:18px;
-          margin-left:40px;
-          margin-top:20px;
-        }
-        .language-buttons{
-          position:absolute;
-          bottom:0;
-          display:flex;
-          justify-content: space-between;
-
-          button{
-            width:150px;
-          }
-          #left{
-            margin-right: 20px;
-          }
-        }
-      }
-    }
-  }
   #sidebar-right{
     width:460px;
     .menu-overlay{
@@ -349,56 +263,6 @@
 //smartphone
 @media (max-width: 534px){
   #header{
-    #language-overlay {
-      background-color: #fff;
-      .language-wrapper{
-        width:100vw;
-        min-height: -webkit-fill-available;
-        top: 0;
-        left: 50%;
-        margin-top: 0;
-        margin-left: -50%;
-
-        .language-body{
-          top:0%;
-          height: calc(100% - 60px);
-          margin-top:40px;
-          width: calc(100vw - 40px);
-          padding-top: 60px;
-          margin-left: 20px;
-          margin-right: 20px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-
-          .dialog{
-            position:relative;
-            top:-76px;
-            text-align: center;
-            .form-group{
-              .custom-radio{
-                padding-top:10px;
-              }
-            }
-          }
-        }
-
-        #close-language-overlay{
-          top:20px;
-          right:20px;
-        }
-        .language-buttons{
-          width: 100%;
-          position:absolute;
-          bottom:0;
-
-          button{
-            flex-basis: 150px;
-            flex-grow: 1;
-          }
-        }
-      }
-    }
     #sidebar-right{
       .menu-overlay{
         width:100vw;
@@ -407,8 +271,8 @@
           li{
             .desktop-menu-item{
                 font-size: 16px;
-              }
             }
+          }
         }
       }
     }
@@ -417,34 +281,23 @@
 </style>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import LocaleSelector from '@/components/LocaleSelector.vue'
 import { AppModule } from '@/store/modules/app'
 
-@Component
+@Component({
+  components: {
+    LocaleSelector
+  }
+})
 export default class Header extends Vue {
-  private showLanguageChange = false;
   private showOptionalBar = true;
-  private languageChangeSelected!: string;
 
-  public mounted () {
-    this.languageChangeSelected = this.language
+  public get locale () {
+    return AppModule.locale
   }
 
-  public get language () {
-    return AppModule.language
-  }
-
-  public onLanguageChange (): void {
-    this.languageChangeSelected = this.language
-    this.showLanguageChange = !this.showLanguageChange
-  }
-
-  public onCancelLanguageChange (): void {
-    this.showLanguageChange = false
-  }
-
-  public onSaveLanguageChange (): void {
-    AppModule.SetLanguage(this.languageChangeSelected)
-    this.showLanguageChange = false
+  public onLocaleChange (): void {
+    AppModule.SetShowLocaleSelector(!AppModule.showLocaleSelector)
   }
 
   public onCloseOptionalBar (): void {

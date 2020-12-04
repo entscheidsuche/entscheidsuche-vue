@@ -1,6 +1,6 @@
 <template>
   <div id="about">
-    <template v-if="language==='de'">
+    <template v-if="locale==='de'">
       <h1>Über uns</h1>
       <h3>Plattform entscheidsuche.ch</h3>
       <p>Die Webseite entscheidsuche.ch bietet eine unentgeltliche Suche in allen publizierten Gerichtsurteilen von Schweizer Gerichten aller Instanzen.</p>
@@ -20,7 +20,7 @@
           Verein entscheidsuche.ch, 8000 Zürich</p>
       </div>
     </template>
-    <template v-if="language==='fr'">
+    <template v-if="locale==='fr'">
       <h1>FR: Über uns</h1>
       <h3>Plattform entscheidsuche.ch</h3>
       <p>Die Webseite entscheidsuche.ch bietet eine unentgeltliche Suche in allen publizierten Gerichtsurteilen von Schweizer Gerichten aller Instanzen.</p>
@@ -40,7 +40,7 @@
           Verein entscheidsuche.ch, 8000 Zürich</p>
       </div>
     </template>
-    <template v-if="language==='it'">
+    <template v-if="locale==='it'">
       <h1>IT: Über uns</h1>
       <h3>Plattform entscheidsuche.ch</h3>
       <p>Die Webseite entscheidsuche.ch bietet eine unentgeltliche Suche in allen publizierten Gerichtsurteilen von Schweizer Gerichten aller Instanzen.</p>
@@ -94,8 +94,8 @@ import { AppModule } from '@/store/modules/app'
 })
 
 export default class About extends Vue {
-  public get language () {
-    return AppModule.language
+  public get locale () {
+    return AppModule.locale
   }
 }
 </script>

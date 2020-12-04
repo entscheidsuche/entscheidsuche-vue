@@ -5,8 +5,8 @@ import getBrowserLocale from '@/util/i18n/get-browser-locale'
 Vue.use(VueI18n)
 
 const supportedLocales = {
-  de: 'German',
-  fr: 'French',
+  de: 'german',
+  fr: 'french',
   it: 'italian'
 }
 
