@@ -9,7 +9,7 @@
         </div>
       </form>
       <div id="language-toggler" v-on:click="onLanguageChange()">
-        <span id="current">{{language}}</span>
+        <span id="current">{{language.toUpperCase()}}</span>
          <a class="language-icon"></a>
       </div>
       <b-button v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;box-shadow:none;"></b-button>
@@ -24,9 +24,9 @@
         <div class="language-body">
           <h3 id="language-title">Welche Sprache möchten Sie nutzen?</h3>
           <b-form-group>
-            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="DE">Deutsch</b-form-radio>
-            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="FR">Französisch</b-form-radio>
-            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="IT">Italienisch</b-form-radio>
+            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="de">Deutsch</b-form-radio>
+            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="fr">Französisch</b-form-radio>
+            <b-form-radio v-model="languageChangeSelected" name="some-radios" value="it">Italienisch</b-form-radio>
           </b-form-group>
           <div class="language-buttons">
             <b-button variant="outline-primary" id="left" v-on:click="onCancelLanguageChange()">Abbrechen</b-button>

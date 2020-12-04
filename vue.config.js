@@ -20,5 +20,14 @@ module.exports = {
 
         return options
       })
+  },
+
+  pluginOptions: {
+    i18n: {
+      locale: 'de',
+      fallbackLocale: 'fr',
+      localeDir: 'locales',
+      enableInSFC: true
+    }
   }
 }
