@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '@/views/Home.vue'
-import HelloI18n from '@/components/HelloI18n.vue'
 
 Vue.use(VueRouter)
 
@@ -10,11 +9,6 @@ const routes: Array<RouteConfig> = [
     path: '/',
     name: 'Home',
     component: Home
-  },
-  {
-    path: '/i18n',
-    name: 'I18N',
-    component: HelloI18n
   },
   {
     path: '/about',
