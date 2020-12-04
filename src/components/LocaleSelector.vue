@@ -108,23 +108,6 @@
     }
   }
 }
-//tablet
-@media (max-width: 1024px){
-  #header{
-    .header-main{
-      #language-toggler{
-        position: absolute;
-        top:16px;
-        right:49px;
-
-        .language-icon{
-          top:6px;
-          right:16px;
-        }
-      }
-    }
-  }
-}
 //smartphone
 @media (max-width: 534px){
   #header{

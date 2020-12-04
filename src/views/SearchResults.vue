@@ -228,6 +228,7 @@
             display:flex;
             justify-content: space-between;
             flex-direction: row;
+/*
             .canton-logo{
               background: url('../assets/cantons/AR.png') no-repeat center;
               background-size: 40px;
@@ -242,6 +243,7 @@
               width:52px;
               margin-left:15px;
             }
+*/
           }
           .text-preview{
             .keyword{
