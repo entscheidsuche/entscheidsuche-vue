@@ -2,7 +2,7 @@
   <div id="app">
     <Header/>
     <div class="app-content">
-      <div class="content-wrapper">
+      <div v-bind:class="[this.$router.currentRoute.path == '/search' ? 'content-wrapper full-width' : 'content-wrapper']">
         <router-view/>
       </div>
     </div>
@@ -45,6 +45,11 @@ export default class App extends Vue {}
       -moz-box-shaow: 0 20px 0px 20px rgba(255,255,255,0.5);
       -webkit-box-shadow: 0 20px 0px 20px rgba(255,255,255,0.5);
       box-shadow: 0 20px 0px 20px rgba(255,255,255,0.5);
+
+      &.full-width{
+        width:100%;
+        box-shadow:none;
+      }
     }
   }
 }

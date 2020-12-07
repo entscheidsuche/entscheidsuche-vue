@@ -128,20 +128,21 @@
         </div>
       </div>
       <div class="results">
-        <div class="result-item">
+        <div class="result-item selected">
           <div class="result-body">
             <div class="result-header">
               <a class="canton-logo"></a>
-              <h3 class="result-title">
+              <h4 class="result-title">
                 Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
-              </h3>
+              </h4>
               <a class="link-logo"></a>
             </div>
             <div class="text-preview">
-              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
-               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
-               Unterlagen als auch die beschlagnahmten Schlüssel für die Räumlichkeiten an der V.strasse und an der
-               G.strasse nach Rechtskraft des Urteils unter sdhfbsdfsdfh usdhfushdf usfhdih
+              <p>Strafanzeige wegen Widerhandlung gegen die Lebensmittelgesetzgebung ein, da sie im Winter 1995/96 <span class="keyword">Hanföl</span>
+                Zudem war Ende der 90er Jahre die Diskussion um die Zulässigkeit von <span class="keyword">Hanfgeschäften</span> in aller Munde
+                Gleichzeitig war die Rechtslage bezüglich der Bewirtschaftung von <span class="keyword">Hanffeldern</span> Ende der 90er Jahre alles
+                Mai 1997 beschlossenen Haltung, grundsätzlich nur die subventionierten Hanfanfplanzungen für legal zu
+                Die Tatsache, dass der Berufungsgegner die Polizei über seine <span class="keyword">Hanffelder</span> informierte und ihnen Personen
                </p>
             </div>
           </div>
@@ -150,9 +151,137 @@
           <div class="result-body">
             <div class="result-header">
               <a class="canton-logo"></a>
-              <h3 class="result-title">
+              <h4 class="result-title">
                 Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
-              </h3>
+              </h4>
+              <a class="link-logo"></a>
+            </div>
+            <div class="text-preview">
+              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
+               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
+               </p>
+            </div>
+          </div>
+        </div>
+        <div class="result-item">
+          <div class="result-body">
+            <div class="result-header">
+              <a class="canton-logo"></a>
+              <h4 class="result-title">
+                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
+              </h4>
+              <a class="link-logo"></a>
+            </div>
+            <div class="text-preview">
+              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
+               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
+               </p>
+            </div>
+          </div>
+        </div>
+        <div class="result-item">
+          <div class="result-body">
+            <div class="result-header">
+              <a class="canton-logo"></a>
+              <h4 class="result-title">
+                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
+              </h4>
+              <a class="link-logo"></a>
+            </div>
+            <div class="text-preview">
+              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
+               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
+               </p>
+            </div>
+          </div>
+        </div>
+        <div class="result-item">
+          <div class="result-body">
+            <div class="result-header">
+              <a class="canton-logo"></a>
+              <h4 class="result-title">
+                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
+              </h4>
+              <a class="link-logo"></a>
+            </div>
+            <div class="text-preview">
+              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
+               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
+               </p>
+            </div>
+          </div>
+        </div>
+        <div class="result-item">
+          <div class="result-body">
+            <div class="result-header">
+              <a class="canton-logo"></a>
+              <h4 class="result-title">
+                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
+              </h4>
+              <a class="link-logo"></a>
+            </div>
+            <div class="text-preview">
+              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
+               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
+               </p>
+            </div>
+          </div>
+        </div>
+        <div class="result-item">
+          <div class="result-body">
+            <div class="result-header">
+              <a class="canton-logo"></a>
+              <h4 class="result-title">
+                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
+              </h4>
+              <a class="link-logo"></a>
+            </div>
+            <div class="text-preview">
+              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
+               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
+               </p>
+            </div>
+          </div>
+        </div>
+        <div class="result-item">
+          <div class="result-body">
+            <div class="result-header">
+              <a class="canton-logo"></a>
+              <h4 class="result-title">
+                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
+              </h4>
+              <a class="link-logo"></a>
+            </div>
+            <div class="text-preview">
+              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
+               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
+               </p>
+            </div>
+          </div>
+        </div>
+        <div class="result-item">
+          <div class="result-body">
+            <div class="result-header">
+              <a class="canton-logo"></a>
+              <h4 class="result-title">
+                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
+              </h4>
+              <a class="link-logo"></a>
+            </div>
+            <div class="text-preview">
+              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
+               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
+               </p>
+            </div>
+          </div>
+        </div>
+        <div class="result-item">
+          <div class="result-body">
+            <div class="result-header">
+              <a class="canton-logo"></a>
+              <h4 class="result-title">
+                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
+              </h4>
               <a class="link-logo"></a>
             </div>
             <div class="text-preview">
@@ -163,9 +292,22 @@
           </div>
         </div>
       </div>
-      <div class="preview">
-        <div class="doc-title">Preview
+      <div class="preview show">
+        <div class="doc-info">
+          <div class="doc-header">
+            <a class="canton-logo"></a>
+            <a class="link-logo"></a>
+            <h4 class="result-title">
+            Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
+            </h4>
+            <a class="maximize-logo"></a>
+          </div>
+        <!--<b-button class="maximize" variant="primary">Zum Vollbildmodus</b-button>-->
         </div>
+        <iframe class="pdf-viewer"
+          src="https://entscheidsuche.ch/direkt_kantone%2Ffr_kg2011%2Fcap_2002_9_24_02_03.pdf"
+          style="border:none;">
+        </iframe>
       </div>
     </div>
   <router-view/>
@@ -175,28 +317,30 @@
 <style lang="scss">
 #searchResults {
   background-color: #fff;
-  padding-top: 120px!important; //-30px if optional bar not visible
-  //padding-bottom: 80px; //footer
+  padding-top: 110px!important; //-30px if optional bar not visible
   min-height: 100%;
+  height: calc(100vh - 110px);
   display:flex;
   overflow: hidden;
   margin: 0;
   text-align: left;
+  padding-bottom: 50px;
 
   .flex-row{
     display:flex;
-    margin-left:20px;
-    margin-right:20px;
+    width:100%;
 
     .filter{
-      width:260px;
+      width:300px;
       float: left;
       border-right:2px solid #e5e9f1;
       overflow: auto;
       box-sizing: border-box;
       padding: 0.5em;
       padding-right:20px;
-      //padding-left: 0;
+      padding-left:20px;
+      overflow:scroll;
+      overflow-x: hidden;
 
       .title{
         font-weight: bold
@@ -226,10 +370,12 @@
     }
     .results{
       flex-grow:2;
-      max-width:35%;
+      max-width: calc(100vw - 300px);
+      width:35%;
       float: left;
       border-right:2px solid #e5e9f1;
-      overflow: auto;
+      overflow:scroll;
+      overflow-x: hidden;
       box-sizing: border-box;
       padding: 0.5em;
 
@@ -240,56 +386,129 @@
 
         .result-body{
           padding:20px;
-          //max-height:120px;
 
           .result-header{
+            width:100%;
             display:flex;
             justify-content: space-between;
             flex-direction: row;
-            //background-color: pink;
+            margin-bottom: 12px;
             .canton-logo{
               background: url('../assets/cantons/AR.png') no-repeat center;
-              background-size: 40px;
-              height:52px;
-              width:52px;
-              margin-right:15px;
+              background-size: contain;
+              background-position: left center;
+              height:40px;
+              width:40px;
+              margin-right:10px;
               flex-shrink: 0;
             }
             .link-logo{
               flex-shrink: 0;
-              background: url('../assets/pdf.svg') no-repeat center;
-              background-size: 52px;
-              height:52px;
-              width:52px;
-              margin-left:15px;
+              background: url('../assets/pdf.png') no-repeat center;
+              background-size: contain;
+              background-position: right center;
+              height:40px;
+              width:40px;
+              margin-left:10px;
             }
             .result-title{
+              font-size: 16px;
               margin-top: 0;
-              max-height: 52px;
+              text-align: left;
+              width:100%;
+              margin-bottom: 0;
+              word-break: break-all;
             }
           }
           .text-preview{
-            width:100%;
-            max-height:120px;
-            overflow:hidden;
-            p{
-
-            }
+            font-size: 14px;
             .keyword{
               font-style: italic;
               background-color: #FFFF00;
             }
           }
         }
+        &.selected{
+          background-color: rgba(97, 131, 236, 0.2);
+        }
       }
     }
     .preview{
-      flex-grow:2;
-      max-width:35%;
+      display:none;
       float: left;
       overflow: auto;
       box-sizing: border-box;
       padding: 0.5em;
+      overflow-x: hidden;
+      flex-grow:2;
+      width:35%;
+      &.show{
+        display: block;
+      }
+      .doc-info{
+        //height:80px;
+        max-height: 104px;
+        width:100%;
+        padding:20px;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        border-radius: 4px;
+        margin-bottom: 0.5em;
+        position:relative;
+
+        .doc-header{
+          width:100%;
+          display: flex;
+          justify-content: space-between;
+          flex-direction: row;
+          //background-color: yellow;
+          .canton-logo{
+            background: url('../assets/cantons/AR.png') no-repeat center;
+            background-size: contain;
+            background-position: left top;
+            height:43px;
+            width:43px;
+            margin-right:10px;
+          }
+          .link-logo{
+            background: url('../assets/pdf.png') no-repeat center;
+            background-size: contain;
+            background-position: right top;
+            height:43px;
+            width:43px;
+            margin-right:10px;
+          }
+          .maximize-logo{
+            background: url('../assets/maximize1.svg') no-repeat center;
+            background-size: contain;
+            background-position: right center;
+            height:30px;
+            width:30px;
+            //margin-top:5px;
+            margin-left: 10px;
+          }
+        }
+        .result-title{
+          font-size:18px;
+          margin-top: 0;
+          text-align: left;
+          width:100%;
+          margin-bottom: 0;
+          word-break: break-all;
+        }
+      }
+      .maximize{
+        position: absolute;
+        left: 50%;
+        -ms-transform: translateX(-50%);
+        transform: translateX(-50%);
+      }
+    }
+    .pdf-viewer{
+      bottom:0;
+      //padding-right: 0.5em;
+      height:calc(100% - 80px);
+      width:100%;
+      //height:90%;
     }
   }
 }
