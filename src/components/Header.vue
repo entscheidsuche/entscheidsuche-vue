@@ -2,17 +2,17 @@
   <div id="header">
     <div class="header-main">
       <router-link :to="{ name: 'Home' }" class="logo"></router-link>
-      <form class="header-search" action="#">
-        <div class="flex-container">
-          <input type="text" placeholder="Suchbegriff" name="search" autocomplete="off">
-          <b-button variant="secondary" id="toggle-search">Suchen</b-button>
-        </div>
-      </form>
+       <b-input-group id="header-search" class="mt">
+            <b-form-input is-text placeholder="Suchbegriff"></b-form-input>
+            <b-input-group-append>
+              <b-button variant="secondary" id="toggle-search">Suchen</b-button>
+            </b-input-group-append>
+      </b-input-group>
       <div id="language-toggler" v-on:click="onLocaleChange()">
         <span id="current">{{locale.toUpperCase()}}</span>
          <a class="language-icon"></a>
       </div>
-      <b-button v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;box-shadow:none;"></b-button>
+      <div v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;box-shadow:none;"></div>
     </div>
     <Message/>
     <LocaleSelector/>
@@ -40,9 +40,7 @@
   left: 0;
   position: fixed;
   width: 100%;
-  //background-color: #191919;
   background-color: #6183ec;
-  //background-color: #11569e;
 
   .header-main{
     padding-top:5px;
@@ -61,30 +59,28 @@
       flex-shrink: 0;
     }
 
-    .header-search{
+    #header-search{
       height:40px;
       width:100%;
       flex-grow:1;
       margin-right: 160px;
+      margin-top: 0;
+      width:100%;
+      height:40px;
+      align-items: center;
+      justify-content: center;
+      display:flex;
 
-      .flex-container{
-        height:40px;
-        align-items: center;
-        justify-content: center;
-        display:flex;
         input{
           height:40px;
           width: calc(100% - 140px);
           max-width: 379px;
           border:0;
           padding:0;
-          padding-left:5px;
-          border-radius:0;
+          //border-radius:0;
           font-size: 16px;
+          padding-left:15px;
         }
-        input::placeholder{
-          color:#9ca2a9;
-          }
         input:focus{
           border:none;
           outline:none;
@@ -98,7 +94,6 @@
           font-weight: bold;
           position:relative;
         }
-      }
     }
     #language-toggler{
       flex-shrink: 0;
@@ -203,17 +198,15 @@
         max-width:50%;
       }
 
-      .header-search{
+      #header-search{
         position: absolute;
         bottom:15px;
         width: 100%;
-        .flex-container{
           input{
               max-width: calc(100% - 140px);
               padding:0;
               padding-left:15px;
             }
-          }
         }
         #language-toggler{
           position: absolute;

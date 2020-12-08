@@ -71,6 +71,7 @@
     left: 50% ;
     margin-top: -180px;
     margin-left: -200px;
+    border-radius: 4px;
 
     #close-language-overlay{
       position: absolute;
