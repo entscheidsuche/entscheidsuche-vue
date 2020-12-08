@@ -2,7 +2,9 @@
   <div id="app">
     <Header/>
     <div class="app-content">
-      <div v-bind:class="[this.$router.currentRoute.path == '/search' ? 'content-wrapper full-width' : 'content-wrapper']">
+      <div v-bind:class="['content-wrapper',
+                          this.inSearch ? 'full-width' : '',
+                          this.showMessage ? 'messageOffset' : 'noMessageOffset']">
         <router-view/>
       </div>
     </div>
@@ -10,19 +12,6 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import Header from './components/Header.vue'
-import Footer from './components/Footer.vue'
-
-@Component({
-  components: {
-    Header,
-    Footer
-  }
-})
-export default class App extends Vue {}
-</script>
 <style lang="scss">
 #app {
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
@@ -65,3 +54,26 @@ export default class App extends Vue {}
   }
 }
 </style>
+
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
+import { AppModule, MessageState } from '@/store/modules/app'
+
+@Component({
+  components: {
+    Header,
+    Footer
+  }
+})
+export default class App extends Vue {
+  public get showMessage () {
+    return AppModule.showMessage === MessageState.VISIBLE
+  }
+
+  public get inSearch () {
+    return this.$router.currentRoute.path === '/search'
+  }
+}
+</script>

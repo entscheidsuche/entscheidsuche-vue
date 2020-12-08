@@ -14,10 +14,7 @@
       </div>
       <b-button v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;box-shadow:none;"></b-button>
     </div>
-    <b-collapse visible id="optional-bar" v-if="showOptionalBar">
-      Aktuelles bei Bedarf
-      <div id="close-optional-bar" v-on:click="onCloseOptionalBar()"></div>
-    </b-collapse>
+    <Message/>
     <LocaleSelector/>
     <b-sidebar id="sidebar-right" right no-header>
       <div class="menu-overlay">
@@ -140,29 +137,6 @@
       width:30px;
     }
   }
-  #optional-bar{
-    height: 40px;
-    padding-top:10px;
-    color: #000;
-    background-color: #e5e9f1;
-    font-weight: bold;
-    position:relative;
-
-    #close-optional-bar{
-      position: absolute;
-      top:10px;
-      right:20px;
-      cursor:pointer;
-      background: url('../assets/close.svg') no-repeat center;
-      background-size: 20px;
-      height:20px;
-      width:20px;
-      transition: all .2s ease-in-out;
-    }
-    #close-optional-bar:hover{
-      transform: scale(1.1);
-    }
-  }
   #sidebar-right{
     width:460px;
     .menu-overlay{
@@ -282,11 +256,13 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import LocaleSelector from '@/components/LocaleSelector.vue'
+import Message from '@/components/Message.vue'
 import { AppModule } from '@/store/modules/app'
 
 @Component({
   components: {
-    LocaleSelector
+    LocaleSelector,
+    Message
   }
 })
 export default class Header extends Vue {
