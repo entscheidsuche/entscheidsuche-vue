@@ -34,10 +34,21 @@
       -moz-box-shaow: 0 20px 0px 20px rgba(255,255,255,0.5);
       -webkit-box-shadow: 0 20px 0px 20px rgba(255,255,255,0.5);
       box-shadow: 0 20px 0px 20px rgba(255,255,255,0.5);
+      background-color: #fff;
+      margin-left: 10px;
+      margin-right: 10px;
+      margin: 0 auto;
 
       &.full-width{
         width:100%;
         box-shadow:none;
+        margin-left:0;
+      }
+      &.messageOffset{
+        padding-top: 110px;
+      }
+      &.noMessageOffset{
+        padding-top: 70px;
       }
     }
   }
@@ -49,6 +60,13 @@
       .content-wrapper{
         margin-left: 20px;
         margin-right: 20px;
+
+        &.messageOffset{
+        padding-top: 160px;
+        }
+        &.noMessageOffset{
+          padding-top: 120px;
+        }
       }
     }
   }

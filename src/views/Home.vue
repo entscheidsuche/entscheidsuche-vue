@@ -260,98 +260,92 @@
 <style lang="scss">
 #home {
   .content{
-    padding-top: 120px!important; //-30px if optional bar not visible
     padding-bottom: 80px;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin: 0 auto;
-    max-width: 984px;
-    background-color: #fff;
 
     .card-deck{
-    width:100%;
-    display:flex;
-    flex-flow:row wrap;
-    justify-content:space-between;
-    margin:0px;
-
-    .search-placeholder {
-      height: 2px;
-      width:260px;
-      flex-basis: 260px;
-      max-width:calc((100% - 40px) / 4);
-      flex-grow: 1;
-    }
-    .card{
-      background-color: #fff;
-      border:none;
-      box-shadow: 0 2px 30px rgba(0,0,0,.15);
-      border-radius: 0 0 20px 0;
-      margin: 5px 0 5px 0;
-      width: 260px;
-      max-width:calc((100% - 40px) / 4);
-      flex-basis: 260px;
-      flex-grow: 1;
+      width:100%;
+      display:flex;
+      flex-flow:row wrap;
       justify-content:space-between;
-      .card-body{
-        padding:0;
-        .card-img-wapper{
-          height:100px;
-          position:relative;
-          .card-img-top{
-            max-height:calc(100% - 10px);
-            max-width:calc(100% - 10px);
-            transform: matrix(0.9,0,0,0.9,0,0);
-            object-fit: contain;
-            position: absolute;
-            margin: auto;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-          }
-        }
-        .card-footer{
-          height:60px;
-          width:100%;
-          color:#000;
-          border-radius: 0 0 20px 0;
-          border-top: 1px solid #e5e9f1;
-          background-color: #fff;
-          position:relative;
+      margin:0px;
+
+      .search-placeholder {
+        height: 2px;
+        width:260px;
+        flex-basis: 260px;
+        max-width:calc((100% - 40px) / 4);
+        flex-grow: 1;
+      }
+      .card{
+        background-color: #fff;
+        border:none;
+        box-shadow: 0 2px 30px rgba(0,0,0,.15);
+        border-radius: 0 0 20px 0;
+        margin: 5px 0 5px 0;
+        width: 260px;
+        max-width:calc((100% - 40px) / 4);
+        flex-basis: 260px;
+        flex-grow: 1;
+        justify-content:space-between;
+        .card-body{
           padding:0;
-
-          .card-text-wrapper{
+          .card-img-wapper{
+            height:100px;
+            position:relative;
+            .card-img-top{
+              max-height:calc(100% - 10px);
+              max-width:calc(100% - 10px);
+              transform: matrix(0.9,0,0,0.9,0,0);
+              object-fit: contain;
+              position: absolute;
+              margin: auto;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+            }
+          }
+          .card-footer{
             height:60px;
-            position:absolute;
-            top:0;
-            overflow:hidden;
-            width: calc(100%);
-            display: flex;
-            justify-content: center;
+            width:100%;
+            color:#000;
+            border-radius: 0 0 20px 0;
+            border-top: 1px solid #e5e9f1;
+            background-color: #fff;
+            position:relative;
+            padding:0;
 
-            .card-text{
-              line-height:60px;
-              font-size:14px;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-              display: block;
-              overflow: hidden;
-              padding-left:20px;
-              padding-right:20px;
+            .card-text-wrapper{
+              height:60px;
+              position:absolute;
+              top:0;
+              overflow:hidden;
+              width: calc(100%);
+              display: flex;
+              justify-content: center;
+
+              .card-text{
+                line-height:60px;
+                font-size:14px;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                display: block;
+                overflow: hidden;
+                padding-left:20px;
+                padding-right:20px;
+                }
               }
             }
           }
         }
-      }
-      .card:hover{
-        .card-img-wapper{
-          .card-img-top{
-            transform: matrix(1,0,0,1,0,0);
+        .card:hover{
+          .card-img-wapper{
+            .card-img-top{
+              transform: matrix(1,0,0,1,0,0);
+            }
           }
         }
       }
-    }
     //old
     .main-sponsors{
       display:flex;
@@ -482,18 +476,12 @@
 @media (max-width: 1024px){
   #home{
     .content{
-      padding-top: 160px!important;
-      margin-left: 20px;
-      margin-right: 20px;
 
       .card-deck{
         .search-placeholder{
-          //max-width:calc((100% - 20px) / 2);
           max-width:calc((100% - 20px) / 3);
         }
         .card{
-          //min-width:160px;
-          //max-width:calc((100% - 20px) / 2);
           max-width:calc((100% - 20px) / 3);
         }
       }

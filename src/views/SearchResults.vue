@@ -2,6 +2,12 @@
   <div id="searchResults">
     <div class="flex-row">
       <div class="filter">
+        <div class="hide-wrapper">
+          <b-button id="hide-button" variant="primary">
+            <b-icon icon="caret-left-fill" aria-hidden="true"></b-icon>
+            Filter einklappen
+          </b-button>
+        </div>
         <div class="year-range">
           <label class="title" for="range-1">Jahr</label>
           <b-form-input id="range-1" type="range" min="0" max="5"></b-form-input>
@@ -302,7 +308,6 @@
             </h4>
             <a class="maximize-logo"></a>
           </div>
-        <!--<b-button class="maximize" variant="primary">Zum Vollbildmodus</b-button>-->
         </div>
         <iframe class="pdf-viewer"
           src="https://entscheidsuche.ch/direkt_kantone%2Ffr_kg2011%2Fcap_2002_9_24_02_03.pdf"
@@ -316,8 +321,6 @@
 
 <style lang="scss">
 #searchResults {
-  background-color: #fff;
-  padding-top: 110px!important; //-30px if optional bar not visible
   min-height: 100%;
   height: calc(100vh - 110px);
   display:flex;
@@ -341,6 +344,19 @@
       padding-left:20px;
       overflow:scroll;
       overflow-x: hidden;
+
+      .hide-wrapper{
+        //height:30px;
+        width:100%;
+        padding:0.5rem;
+        position:relative;
+        display:flex;
+        justify-content: center;
+        .hide-button{
+          //border-radius: 4px;
+          //width:258px;
+        }
+      }
 
       .title{
         font-weight: bold
@@ -496,12 +512,6 @@
           word-break: break-all;
         }
       }
-      .maximize{
-        position: absolute;
-        left: 50%;
-        -ms-transform: translateX(-50%);
-        transform: translateX(-50%);
-      }
     }
     .pdf-viewer{
       bottom:0;
@@ -510,12 +520,6 @@
       width:100%;
       //height:90%;
     }
-  }
-}
-//tablet
-@media (max-width: 1024px){
-  #searchResults {
-    padding-top: 160px!important;
   }
 }
 </style>
