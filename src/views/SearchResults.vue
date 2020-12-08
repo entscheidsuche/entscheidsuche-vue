@@ -321,8 +321,6 @@
 
 <style lang="scss">
 #searchResults {
-  background-color: #fff;
-  padding-top: 110px!important; //-30px if optional bar not visible
   min-height: 100%;
   height: calc(100vh - 110px);
   display:flex;
@@ -522,12 +520,6 @@
       width:100%;
       //height:90%;
     }
-  }
-}
-//tablet
-@media (max-width: 1024px){
-  #searchResults {
-    padding-top: 160px!important;
   }
 }
 </style>

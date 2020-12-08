@@ -68,20 +68,8 @@
   //height:100vh;
   position: relative;
   min-height: 100%;
-  padding-top: 110px!important;
-  margin-left: 10px;
-  margin-right: 10px;
-  margin: 0 auto;
   max-width: 984px;
   padding-bottom: 80px;
-  background-color: #fff;
-}
-@media (max-width: 1024px){
-  #about {
-    padding-top: 160px!important;
-    margin-left: 20px;
-    margin-right: 20px;
-  }
 }
 </style>
 <script lang="ts">
