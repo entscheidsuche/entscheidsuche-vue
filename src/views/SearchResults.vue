@@ -1,9 +1,9 @@
 <template>
   <div id="searchResults">
     <div class="flex-row">
-      <div class="filter">
+      <div v-bind:class="['filter', this.showFilter ? '' : 'hidden']">
         <div class="hide-wrapper">
-          <b-button id="hide-button" variant="primary">
+          <b-button id="hide-filter" variant="primary" v-on:click="onFilterClose()">
             <b-icon icon="caret-left-fill" aria-hidden="true"></b-icon>
             Filter einklappen
           </b-button>
@@ -19,8 +19,7 @@
               v-model="selected"
               :key="option.value"
               :value="option.value"
-              name="flavour-3a"
-            >
+              name="flavour-3a">
               {{ option.text }}
             </b-form-checkbox>
           </b-form-group>
@@ -35,9 +34,9 @@
                 <b-form-checkbox>Bundesverwaltungsgericht</b-form-checkbox>
               </div>
               <b-collapse id="collapse-1-1" class="third">
-                 <b-form-checkbox>Abteilung I</b-form-checkbox>
-                 <b-form-checkbox>Abteilung II</b-form-checkbox>
-                 <b-form-checkbox>Abteilung III</b-form-checkbox>
+                <b-form-checkbox>Abteilung I</b-form-checkbox>
+                <b-form-checkbox>Abteilung II</b-form-checkbox>
+                <b-form-checkbox>Abteilung III</b-form-checkbox>
               </b-collapse>
               <div v-b-toggle="'collapse-1-2'" class="second">
                 <b-form-checkbox>Bundesgericht</b-form-checkbox>
@@ -134,6 +133,9 @@
         </div>
       </div>
       <div class="results">
+        <div v-on:click="onFilterClose()" v-bind:class="['show-filter', this.showFilter ? '' : 'visible']">
+          <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
+        </div>
         <div class="result-item selected">
           <div class="result-body">
             <div class="result-header">
@@ -327,7 +329,7 @@
   overflow: hidden;
   margin: 0;
   text-align: left;
-  padding-bottom: 50px;
+  padding-bottom:8px;
 
   .flex-row{
     display:flex;
@@ -344,42 +346,45 @@
       padding-left:20px;
       overflow:scroll;
       overflow-x: hidden;
+      transition: all 0.2s linear;
+
+      &.hidden{
+        width:0;
+        padding: 8px 0 8px 0;
+      }
 
       .hide-wrapper{
-        //height:30px;
         width:100%;
-        padding:0.5rem;
+        padding:10px 0 20px 0;
         position:relative;
         display:flex;
         justify-content: center;
-        .hide-button{
-          //border-radius: 4px;
-          //width:258px;
+
+        #hide-filter{
+          width:100%;
+          height: 38px;
+          overflow:hidden;
         }
       }
-
       .title{
         font-weight: bold
       }
       .custom-control{
         font-weight:normal;
+        max-height:24px;
+        overflow:hidden;
       }
       .authority{
+        overflow: hidden;
         .first{
-          border:none;
-          box-shadow: none;
           outline:none;
         }
         .second{
           padding-left:20px;
-          border:none;
-          box-shadow: none;
           outline:none;
         }
         .third{
           padding-left:40px;
-          border:none;
-          box-shadow: none;
           outline:none;
         }
       }
@@ -394,6 +399,35 @@
       overflow-x: hidden;
       box-sizing: border-box;
       padding: 0.5em;
+      position: relative;
+
+       .show-filter{
+        display:flex;
+        position: fixed;
+        height:38px;
+        width:26px;
+        //border-radius:0 100% 100% 0;
+        border-radius: 0 4px 4px 0;
+        background-color: #6183ec;
+        color:#fff;
+        left:0;
+        top: calc((100% - 38px) / 2);
+        //top:15px;
+        z-index:100;
+        justify-content: center;
+        align-items: center;
+        transition: all .2s linear;
+        opacity:0;
+
+        &.visible{
+          display:flex;
+          opacity:1;
+        }
+
+        svg{
+          font-size:20px;
+        }
+      }
 
       .result-item{
         border: 1px solid rgba(0, 0, 0, 0.125);
@@ -456,13 +490,13 @@
       box-sizing: border-box;
       padding: 0.5em;
       overflow-x: hidden;
+      overflow-y: hidden;
       flex-grow:2;
       width:35%;
       &.show{
         display: block;
       }
       .doc-info{
-        //height:80px;
         max-height: 104px;
         width:100%;
         padding:20px;
@@ -518,7 +552,6 @@
       //padding-right: 0.5em;
       height:calc(100% - 80px);
       width:100%;
-      //height:90%;
     }
   }
 }
@@ -533,14 +566,24 @@ import { Component } from 'vue-property-decorator'
 })
 
 export default class SearchResults extends Vue {
+  private showFilter = true;
+
   data () {
     return {
-      selected: [], // Must be an array reference!
+      selected: [],
       options: [
-        { text: 'Deutsch', value: 'de' },
-        { text: 'Französisch', value: 'fr' },
-        { text: 'Italienisch', value: 'it' }
+        { text: 'DE', value: 'de' },
+        { text: 'FR', value: 'fr' },
+        { text: 'IT', value: 'it' }
       ]
+    }
+  }
+
+  public onFilterClose (): void {
+    if (this.showFilter === true) {
+      this.showFilter = false
+    } else {
+      this.showFilter = true
     }
   }
 }
