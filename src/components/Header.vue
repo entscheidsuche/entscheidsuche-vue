@@ -64,6 +64,7 @@
       width:100%;
       flex-grow:1;
       margin-right: 160px;
+      margin-left:20px;
       margin-top: 0;
       width:100%;
       height:40px;
@@ -202,6 +203,7 @@
         position: absolute;
         bottom:15px;
         width: 100%;
+        margin-left:0;
           input{
               max-width: calc(100% - 140px);
               padding:0;

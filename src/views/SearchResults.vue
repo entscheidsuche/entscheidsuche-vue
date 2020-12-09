@@ -308,7 +308,7 @@
             <h4 class="result-title">
             Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
             </h4>
-            <a class="maximize-logo"></a>
+            <b-icon class="maximize-logo" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
           </div>
         </div>
         <iframe class="pdf-viewer"
@@ -412,7 +412,7 @@
         color:#fff;
         left:0;
         top: calc((100% - 38px) / 2);
-        //top:15px;
+        //top:128px; //Message beachten
         z-index:100;
         justify-content: center;
         align-items: center;
@@ -510,7 +510,6 @@
           display: flex;
           justify-content: space-between;
           flex-direction: row;
-          //background-color: yellow;
           .canton-logo{
             background: url('../assets/cantons/AR.png') no-repeat center;
             background-size: contain;
@@ -528,13 +527,14 @@
             margin-right:10px;
           }
           .maximize-logo{
-            background: url('../assets/maximize1.svg') no-repeat center;
-            background-size: contain;
-            background-position: right center;
-            height:30px;
-            width:30px;
-            //margin-top:5px;
-            margin-left: 10px;
+            height:25px;
+            width:25px;
+            margin-left: 20px;
+            cursor:pointer;
+            transition: all .2s ease-in-out;
+          }
+          .maximize-logo:hover{
+            transform: scale(1.1);
           }
         }
         .result-title{
@@ -552,6 +552,39 @@
       //padding-right: 0.5em;
       height:calc(100% - 80px);
       width:100%;
+    }
+  }
+}
+//smartphone
+@media (max-width: 534px){
+  #searchResults{
+    .flex-row{
+      .filter{
+        width:0;
+        padding:8px 0 8px 0;
+        border:0;
+        &.hidden{
+          width:100vw;
+          padding: 8px 20px 8px 20px;
+        }
+      }
+      .results{
+        max-width: 100vw;
+        width: 0;
+        padding:10px 0  0  0;
+        border:0;
+        .show-filter{
+          opacity:1;
+          &.visible{
+            opacity:0;
+          }
+        }
+      }
+      .preview{
+        &.show{
+          display:none;
+        }
+      }
     }
   }
 }

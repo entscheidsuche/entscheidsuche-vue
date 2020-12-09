@@ -43,6 +43,7 @@
         width:100%;
         box-shadow:none;
         margin-left:0;
+        margin-right:0;
       }
       &.messageOffset{
         padding-top: 110px;
@@ -62,10 +63,26 @@
         margin-right: 20px;
 
         &.messageOffset{
-        padding-top: 160px;
+          padding-top: 160px;
         }
         &.noMessageOffset{
           padding-top: 120px;
+        }
+      }
+    }
+  }
+}
+//smartphone
+@media (max-width: 534px){
+  #app{
+    .app-content{
+      .content-wrapper{
+        margin-left: 20px;
+        margin-right: 20px;
+
+        &.full-width{
+        margin-left: 20px;
+        margin-right: 20px;
         }
       }
     }
