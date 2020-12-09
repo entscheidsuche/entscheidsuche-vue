@@ -1,7 +1,7 @@
 <template>
   <div id="searchResults">
     <div class="flex-row">
-      <div v-bind:class="['filter', this.showFilter ? '' : 'hidden']">
+      <div v-bind:class="['filter', this.filterVisible ? '' : 'hidden', this.fullScreen ? 'hidden' : '']">
         <div class="hide-wrapper">
           <b-button id="hide-filter" variant="primary" v-on:click="onFilterClose()">
             <b-icon icon="caret-left-fill" aria-hidden="true"></b-icon>
@@ -132,8 +132,8 @@
           </b-form-group>
         </div>
       </div>
-      <div class="results">
-        <div v-on:click="onFilterClose()" v-bind:class="['show-filter', this.showFilter ? '' : 'visible']">
+      <div v-bind:class="['results', this.fullScreen ? 'hidden' : '', this.filterVisible ? 'noPadding' : '']">
+        <div v-on:click="onFilterClose()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible']">
           <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
         </div>
         <div class="result-item selected">
@@ -300,7 +300,7 @@
           </div>
         </div>
       </div>
-      <div class="preview show">
+      <div v-bind:class="['preview', this.fullScreen ? 'show' : '', this.filterVisible ? 'noPadding' : '']">
         <div class="doc-info">
           <div class="doc-header">
             <a class="canton-logo"></a>
@@ -308,7 +308,8 @@
             <h4 class="result-title">
             Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
             </h4>
-            <b-icon class="maximize-logo" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
+            <b-icon v-on:click="onFullScreen()" id="maximize-logo" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
+            <b-icon v-on:click="onFullScreen()" id="minimize-logo" icon="fullscreen-exit" aria-hidden="true"></b-icon>
           </div>
         </div>
         <iframe class="pdf-viewer"
@@ -351,6 +352,7 @@
       &.hidden{
         width:0;
         padding: 8px 0 8px 0;
+        border:0;
       }
 
       .hide-wrapper{
@@ -391,7 +393,7 @@
     }
     .results{
       flex-grow:2;
-      max-width: calc(100vw - 300px);
+      min-width: 0;
       width:35%;
       float: left;
       border-right:2px solid #e5e9f1;
@@ -400,6 +402,7 @@
       box-sizing: border-box;
       padding: 0.5em;
       position: relative;
+      transition: all 0.2s linear;
 
        .show-filter{
         display:flex;
@@ -418,15 +421,20 @@
         align-items: center;
         transition: all .2s linear;
         opacity:0;
+        pointer-events: none;
 
         &.visible{
-          display:flex;
+          pointer-events: auto;
           opacity:1;
         }
-
         svg{
           font-size:20px;
         }
+      }
+      &.hidden{
+        width:0;
+        padding: 8px 0 8px 0;
+        border:0;
       }
 
       .result-item{
@@ -484,7 +492,7 @@
       }
     }
     .preview{
-      display:none;
+      //display:none;
       float: left;
       overflow: auto;
       box-sizing: border-box;
@@ -493,11 +501,24 @@
       overflow-y: hidden;
       flex-grow:2;
       width:35%;
+      transition: all 0.2s linear;
+
       &.show{
         display: block;
+        width:100vw;
+
+        .doc-info{
+          .doc-header{
+            #minimize-logo{
+              display:block;
+            }
+            #maximize-logo{
+              display:none;
+            }
+          }
+        }
       }
       .doc-info{
-        max-height: 104px;
         width:100%;
         padding:20px;
         border: 1px solid rgba(0, 0, 0, 0.125);
@@ -526,14 +547,25 @@
             width:43px;
             margin-right:10px;
           }
-          .maximize-logo{
+          #maximize-logo{
             height:25px;
             width:25px;
             margin-left: 20px;
             cursor:pointer;
             transition: all .2s ease-in-out;
           }
-          .maximize-logo:hover{
+          #maximize-logo:hover{
+            transform: scale(1.1);
+          }
+          #minimize-logo{
+            height:25px;
+            width:25px;
+            margin-left: 20px;
+            cursor:pointer;
+            transition: all .2s ease-in-out;
+            display:none;
+          }
+          #minimize-logo:hover{
             transform: scale(1.1);
           }
         }
@@ -549,9 +581,50 @@
     }
     .pdf-viewer{
       bottom:0;
-      //padding-right: 0.5em;
       height:calc(100% - 80px);
       width:100%;
+    }
+  }
+}
+//tablet
+@media (max-width: 1024px){
+  #searchResults{
+    .flex-row{
+      .filter{
+        width:100vw;
+        padding: 8px 20px 8px 20px;
+        border:0;
+
+        &.hidden{
+        width:0;
+        padding:8px 0 8px 0;
+        }
+      }
+      .results{
+        width: 0;
+        max-width: 100vw;
+        &.hidden{
+          padding:8px 0 8px 0;
+          border:none;
+          .show-filter{
+            display:none;
+          }
+        }
+        &.noPadding{
+          padding:8px 0 8px 0;
+          border:0;
+        }
+      }
+      .preview{
+        width:0;
+        &.show{
+          //display:none;
+        }
+        &.noPadding{
+          padding:8px 0 8px 0;
+          border:0;
+        }
+      }
     }
   }
 }
@@ -560,12 +633,12 @@
   #searchResults{
     .flex-row{
       .filter{
-        width:0;
-        padding:8px 0 8px 0;
-        border:0;
+        width:100vw;
+        padding: 8px 20px 8px 20px;
         &.hidden{
-          width:100vw;
-          padding: 8px 20px 8px 20px;
+          padding:8px 0 8px 0;
+          border:0;
+          width:0;
         }
       }
       .results{
@@ -574,16 +647,14 @@
         padding:10px 0  0  0;
         border:0;
         .show-filter{
-          opacity:1;
+          opacity:0;
           &.visible{
-            opacity:0;
+            opacity:1;
           }
         }
       }
       .preview{
-        &.show{
-          display:none;
-        }
+        display:none;
       }
     }
   }
@@ -599,7 +670,9 @@ import { Component } from 'vue-property-decorator'
 })
 
 export default class SearchResults extends Vue {
-  private showFilter = true;
+  private filterVisible = true;
+  private fullScreen = false;
+  private windowWidth = 0;
 
   data () {
     return {
@@ -612,11 +685,37 @@ export default class SearchResults extends Vue {
     }
   }
 
-  public onFilterClose (): void {
-    if (this.showFilter === true) {
-      this.showFilter = false
+  created () {
+    window.addEventListener('resize', this.handleResize)
+    this.handleResize()
+  }
+
+  destroyed () {
+    window.removeEventListener('resize', this.handleResize)
+  }
+
+  handleResize () {
+    this.windowWidth = window.innerWidth
+    if (this.windowWidth <= 1024) {
+      this.filterVisible = false
     } else {
-      this.showFilter = true
+      this.filterVisible = true
+    }
+  }
+
+  public onFilterClose (): void {
+    if (this.filterVisible === true) {
+      this.filterVisible = false
+    } else {
+      this.filterVisible = true
+    }
+  }
+
+  public onFullScreen (): void{
+    if (this.fullScreen === false) {
+      this.fullScreen = true
+    } else {
+      this.fullScreen = false
     }
   }
 }
