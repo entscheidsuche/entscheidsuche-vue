@@ -136,171 +136,20 @@
         <div v-on:click="onFilterClose()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible']">
           <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
         </div>
-        <div class="result-item selected">
+        <div v-for="result in results" :key="result.message" class="result-item" v-on:click="onOpenPreview()">
           <div class="result-body">
             <div class="result-header">
               <a class="canton-logo"></a>
-              <h4 class="result-title">
-                Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
-              </h4>
+              <h4 class="result-title">{{ result.title }}</h4>
               <a class="link-logo"></a>
             </div>
             <div class="text-preview">
-              <p>Strafanzeige wegen Widerhandlung gegen die Lebensmittelgesetzgebung ein, da sie im Winter 1995/96 <span class="keyword">Hanföl</span>
-                Zudem war Ende der 90er Jahre die Diskussion um die Zulässigkeit von <span class="keyword">Hanfgeschäften</span> in aller Munde
-                Gleichzeitig war die Rechtslage bezüglich der Bewirtschaftung von <span class="keyword">Hanffeldern</span> Ende der 90er Jahre alles
-                Mai 1997 beschlossenen Haltung, grundsätzlich nur die subventionierten Hanfanfplanzungen für legal zu
-                Die Tatsache, dass der Berufungsgegner die Polizei über seine <span class="keyword">Hanffelder</span> informierte und ihnen Personen
-               </p>
-            </div>
-          </div>
-        </div>
-        <div class="result-item">
-          <div class="result-body">
-            <div class="result-header">
-              <a class="canton-logo"></a>
-              <h4 class="result-title">
-                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
-              </h4>
-              <a class="link-logo"></a>
-            </div>
-            <div class="text-preview">
-              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
-               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
-               </p>
-            </div>
-          </div>
-        </div>
-        <div class="result-item">
-          <div class="result-body">
-            <div class="result-header">
-              <a class="canton-logo"></a>
-              <h4 class="result-title">
-                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
-              </h4>
-              <a class="link-logo"></a>
-            </div>
-            <div class="text-preview">
-              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
-               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
-               </p>
-            </div>
-          </div>
-        </div>
-        <div class="result-item">
-          <div class="result-body">
-            <div class="result-header">
-              <a class="canton-logo"></a>
-              <h4 class="result-title">
-                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
-              </h4>
-              <a class="link-logo"></a>
-            </div>
-            <div class="text-preview">
-              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
-               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
-               </p>
-            </div>
-          </div>
-        </div>
-        <div class="result-item">
-          <div class="result-body">
-            <div class="result-header">
-              <a class="canton-logo"></a>
-              <h4 class="result-title">
-                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
-              </h4>
-              <a class="link-logo"></a>
-            </div>
-            <div class="text-preview">
-              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
-               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
-               </p>
-            </div>
-          </div>
-        </div>
-        <div class="result-item">
-          <div class="result-body">
-            <div class="result-header">
-              <a class="canton-logo"></a>
-              <h4 class="result-title">
-                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
-              </h4>
-              <a class="link-logo"></a>
-            </div>
-            <div class="text-preview">
-              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
-               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
-               </p>
-            </div>
-          </div>
-        </div>
-        <div class="result-item">
-          <div class="result-body">
-            <div class="result-header">
-              <a class="canton-logo"></a>
-              <h4 class="result-title">
-                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
-              </h4>
-              <a class="link-logo"></a>
-            </div>
-            <div class="text-preview">
-              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
-               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
-               </p>
-            </div>
-          </div>
-        </div>
-        <div class="result-item">
-          <div class="result-body">
-            <div class="result-header">
-              <a class="canton-logo"></a>
-              <h4 class="result-title">
-                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
-              </h4>
-              <a class="link-logo"></a>
-            </div>
-            <div class="text-preview">
-              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
-               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
-               </p>
-            </div>
-          </div>
-        </div>
-        <div class="result-item">
-          <div class="result-body">
-            <div class="result-header">
-              <a class="canton-logo"></a>
-              <h4 class="result-title">
-                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
-              </h4>
-              <a class="link-logo"></a>
-            </div>
-            <div class="text-preview">
-              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
-               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
-               </p>
-            </div>
-          </div>
-        </div>
-        <div class="result-item">
-          <div class="result-body">
-            <div class="result-header">
-              <a class="canton-logo"></a>
-              <h4 class="result-title">
-                Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011
-              </h4>
-              <a class="link-logo"></a>
-            </div>
-            <div class="text-preview">
-              <p>Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien
-               und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten <span class="keyword">Hanfpflanzen</span> und
-               </p>
+              <p>{{ result.message }}</p>
             </div>
           </div>
         </div>
       </div>
-      <div v-bind:class="['preview', this.fullScreen ? 'show' : '', this.filterVisible ? 'noPadding' : '']">
+      <div v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '', this.filterVisible ? 'noPadding' : '']">
         <div class="doc-info">
           <div class="doc-header">
             <a class="canton-logo"></a>
@@ -441,6 +290,7 @@
         border: 1px solid rgba(0, 0, 0, 0.125);
         border-radius: 4px;
         margin-bottom:10px;
+        cursor: pointer;
 
         .result-body{
           padding:20px;
@@ -486,13 +336,13 @@
             }
           }
         }
-        &.selected{
-          background-color: rgba(97, 131, 236, 0.2);
-        }
+      }
+      .result-item:hover{
+        background-color: rgba(97, 131, 236, 0.2);
       }
     }
     .preview{
-      //display:none;
+      display:none;
       float: left;
       overflow: auto;
       box-sizing: border-box;
@@ -503,7 +353,11 @@
       width:35%;
       transition: all 0.2s linear;
 
-      &.show{
+      &.visible{
+        display:block;
+      }
+
+      &.fullScreen{
         display: block;
         width:100vw;
 
@@ -616,10 +470,6 @@
         }
       }
       .preview{
-        width:0;
-        &.show{
-          //display:none;
-        }
         &.noPadding{
           padding:8px 0 8px 0;
           border:0;
@@ -654,7 +504,6 @@
         }
       }
       .preview{
-        display:none;
       }
     }
   }
@@ -673,6 +522,7 @@ export default class SearchResults extends Vue {
   private filterVisible = true;
   private fullScreen = false;
   private windowWidth = 0;
+  private previewVisible = false;
 
   data () {
     return {
@@ -681,6 +531,10 @@ export default class SearchResults extends Vue {
         { text: 'DE', value: 'de' },
         { text: 'FR', value: 'fr' },
         { text: 'IT', value: 'it' }
+      ],
+      results: [
+        { title: 'Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018', message: 'Strafanzeige wegen Widerhandlung gegen die Lebensmittelgesetzgebung ein, da sie im Winter 1995/96 Hanföl. Zudem war Ende der 90er Jahre die Diskussion um die Zulässigkeit von Hanfgeschäften in aller Munde Gleichzeitig war die Rechtslage bezüglich der Bewirtschaftung von Hanffeldern Ende der 90er Jahre alles Mai 1997 beschlossenen Haltung, grundsätzlich nur die subventionierten Hanfanfplanzungen für legal zu Die Tatsache, dass der Berufungsgegner die Polizei über seine Hanffelder informierte und ihnen Personen' },
+        { title: 'Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011', message: 'Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten Hanfpflanzen und' }
       ]
     }
   }
@@ -714,8 +568,18 @@ export default class SearchResults extends Vue {
   public onFullScreen (): void{
     if (this.fullScreen === false) {
       this.fullScreen = true
+    } else if (this.fullScreen === true && this.windowWidth <= 534) {
+      this.previewVisible = false
+      this.fullScreen = false
     } else {
       this.fullScreen = false
+    }
+  }
+
+  public onOpenPreview (): void{
+    this.previewVisible = true
+    if (this.windowWidth <= 534) {
+      this.fullScreen = true
     }
   }
 }
