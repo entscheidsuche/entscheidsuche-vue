@@ -1,5 +1,5 @@
 <template>
-  <div id="footer">
+  <div id="footer" v-bind:class="this.inSearch ? 'hidden' : ''">
     <footer>
       <a class="logo" href="#" onclick=""></a>
     </footer>
@@ -15,7 +15,6 @@
     left:0;
     height:50px;
     width:100%;
-    //margin-top: 50px;
     background-color: #e5e9f1;
     display: flex;
     align-items: center;
@@ -30,6 +29,9 @@
       flex-shrink: 0;
     }
   }
+  &.hidden{
+    display:none;
+  }
 }
 </style>
 <script lang="ts">
@@ -40,5 +42,9 @@ import { Component } from 'vue-property-decorator'
   name: 'Footer'
 })
 
-export default class Footer extends Vue {}
+export default class Footer extends Vue {
+  public get inSearch () {
+    return this.$router.currentRoute.path === '/search'
+  }
+}
 </script>
