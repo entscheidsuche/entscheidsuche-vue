@@ -52,7 +52,7 @@ export default class LocaleSelector extends Vue {
   }
 
   @Watch('locale')
-  public onLocaleChange (locale: string) {
+  public onLocaleChange () {
     if (AppModule.showMessage === MessageState.VISIBLE && this.$t('message') === '') {
       AppModule.SetShowMessage(MessageState.EMPTY)
     } else if (AppModule.showMessage === MessageState.EMPTY && this.$t('message') !== '') {

@@ -95,6 +95,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import { AppModule, MessageState } from '@/store/modules/app'
+import { store } from '@/store'
 
 @Component({
   components: {
@@ -108,7 +109,7 @@ export default class App extends Vue {
   }
 
   public get inSearch () {
-    return this.$router.currentRoute.path === '/search'
+    return store.state.route.path === '/search'
   }
 }
 </script>
