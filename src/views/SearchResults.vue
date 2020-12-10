@@ -2,11 +2,9 @@
   <div id="searchResults">
     <div class="flex-row">
       <div v-bind:class="['filter', this.filterVisible ? '' : 'hidden', this.fullScreen ? 'hidden' : '']">
-        <div class="hide-wrapper">
-          <b-button id="hide-filter" variant="primary" v-on:click="onFilterClose()">
-            <b-icon icon="caret-left-fill" aria-hidden="true"></b-icon>
-            Filter einklappen
-          </b-button>
+        <div v-on:click="onFilterClose()" v-bind:class="['hide-filter',
+                          this.showMessage ? 'messageOffset' : '']">
+          <b-icon icon="caret-left-fill" aria-hidden="true"></b-icon>
         </div>
         <div class="year-range">
           <label class="title" for="range-1">Jahr</label>
@@ -133,7 +131,7 @@
         </div>
       </div>
       <div v-bind:class="['results', this.fullScreen ? 'hidden' : '', this.filterVisible ? 'noPadding' : '']">
-        <div v-on:click="onFilterClose()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible']">
+        <div v-on:click="onFilterClose()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible',this.showMessage ? 'messageOffset' : '']">
           <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
         </div>
         <div v-for="result in results" :key="result.message" class="result-item" v-on:click="onOpenPreview()">
@@ -197,6 +195,7 @@
       overflow:scroll;
       overflow-x: hidden;
       transition: all 0.2s linear;
+      position: relative;
 
       &.hidden{
         width:0;
@@ -204,17 +203,27 @@
         border:0;
       }
 
-      .hide-wrapper{
-        width:100%;
-        padding:10px 0 20px 0;
-        position:relative;
+      .hide-filter{
         display:flex;
+        position: absolute;
+        height:38px;
+        width:26px;
+        border-radius: 4px 0 0 4px;
+        background-color: #6183ec;
+        color:#fff;
+        right:0;
+        top: calc(((100vh - 38px) / 2) - 70px );
+        z-index:100;
         justify-content: center;
+        align-items: center;
+        cursor:pointer;
 
-        #hide-filter{
-          width:100%;
-          height: 38px;
-          overflow:hidden;
+        svg{
+          font-size:20px;
+        }
+
+        &.messageOffset{
+          top: calc(((100vh - 38px) / 2) - 110px );
         }
       }
       .title{
@@ -254,27 +263,26 @@
       transition: all 0.2s linear;
 
        .show-filter{
-        display:flex;
-        position: fixed;
+        position: absolute;
         height:38px;
         width:26px;
-        //border-radius:0 100% 100% 0;
         border-radius: 0 4px 4px 0;
         background-color: #6183ec;
         color:#fff;
         left:0;
-        top: calc((100% - 38px) / 2);
-        //top:128px; //Message beachten
+        top: calc(((100vh - 38px) / 2) - 70px );
         z-index:100;
         justify-content: center;
         align-items: center;
-        transition: all .2s linear;
-        opacity:0;
-        pointer-events: none;
+        cursor: pointer;
+        display: none;
+
+        &.messageOffset{
+          top: calc(((100vh - 38px) / 2) - 110px );
+        }
 
         &.visible{
-          pointer-events: auto;
-          opacity:1;
+          display:flex;
         }
         svg{
           font-size:20px;
@@ -284,6 +292,7 @@
         width:0;
         padding: 8px 0 8px 0;
         border:0;
+        overflow:none;
       }
 
       .result-item{
@@ -453,10 +462,25 @@
         width:0;
         padding:8px 0 8px 0;
         }
+        .hide-filter{
+          top: calc(((100vh - 38px) / 2) - 120px );
+
+          &.messageOffset{
+            top: calc(((100vh - 38px) / 2) - 160px );
+          }
+        }
       }
       .results{
         width: 0;
         max-width: 100vw;
+
+        .show-filter{
+          top: calc(((100vh - 38px) / 2) - 120px );
+
+          &.messageOffset{
+            top: calc(((100vh - 38px) / 2) - 160px );
+          }
+        }
         &.hidden{
           padding:8px 0 8px 0;
           border:none;
@@ -497,13 +521,13 @@
         padding:10px 0  0  0;
         border:0;
         .show-filter{
-          opacity:0;
+          position:fixed;
+          left:0;
+
           &.visible{
-            opacity:1;
+          top: calc((100vh - 38px) / 2);
           }
         }
-      }
-      .preview{
       }
     }
   }
@@ -513,6 +537,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
+import { AppModule, MessageState } from '@/store/modules/app'
 
 @Component({
   name: 'SearchResult'
@@ -560,6 +585,9 @@ export default class SearchResults extends Vue {
   public onFilterClose (): void {
     if (this.filterVisible === true) {
       this.filterVisible = false
+    } else if (this.previewVisible === true) {
+      this.previewVisible = false
+      this.filterVisible = true
     } else {
       this.filterVisible = true
     }
@@ -581,6 +609,10 @@ export default class SearchResults extends Vue {
     if (this.windowWidth <= 534) {
       this.fullScreen = true
     }
+  }
+
+  public get showMessage () {
+    return AppModule.showMessage === MessageState.VISIBLE
   }
 }
 </script>
