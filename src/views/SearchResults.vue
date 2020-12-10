@@ -130,7 +130,7 @@
           </b-form-group>
         </div>
       </div>
-      <div v-bind:class="['results', this.fullScreen ? 'hidden' : '', this.filterVisible ? 'noPadding' : '']">
+      <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']">
         <div v-on:click="onFilterClose()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible',this.showMessage ? 'messageOffset' : '']">
           <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
         </div>
@@ -147,7 +147,7 @@
           </div>
         </div>
       </div>
-      <div v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '', this.filterVisible ? 'noPadding' : '']">
+      <div v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '']">
         <div class="doc-info">
           <div class="doc-header">
             <a class="canton-logo"></a>
@@ -454,13 +454,11 @@
   #searchResults{
     .flex-row{
       .filter{
-        width:100vw;
         padding: 8px 20px 8px 20px;
-        border:0;
 
         &.hidden{
-        width:0;
-        padding:8px 0 8px 0;
+          width:0;
+          padding:8px 0 8px 0;
         }
         .hide-filter{
           top: calc(((100vh - 38px) / 2) - 120px );
@@ -471,8 +469,6 @@
         }
       }
       .results{
-        width: 0;
-        max-width: 100vw;
 
         .show-filter{
           top: calc(((100vh - 38px) / 2) - 120px );
@@ -487,16 +483,6 @@
           .show-filter{
             display:none;
           }
-        }
-        &.noPadding{
-          padding:8px 0 8px 0;
-          border:0;
-        }
-      }
-      .preview{
-        &.noPadding{
-          padding:8px 0 8px 0;
-          border:0;
         }
       }
     }
