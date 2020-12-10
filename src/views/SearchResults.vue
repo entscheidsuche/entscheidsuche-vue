@@ -2,9 +2,10 @@
   <div id="searchResults">
     <div class="flex-row">
       <div v-bind:class="['filter', this.filterVisible ? '' : 'hidden', this.fullScreen ? 'hidden' : '']">
-        <div v-on:click="onToggleFilter()" v-bind:class="['hide-filter',
-                          this.showMessage ? 'messageOffset' : '']">
-          <b-icon icon="caret-left-fill" aria-hidden="true"></b-icon>
+        <div v-bind:class="['button-wrapper', this.showMessage ? 'messageOffset' : '']">
+          <div v-on:click="onToggleFilter()" class="hide-filter">
+            <b-icon icon="caret-left-fill" aria-hidden="true"></b-icon>
+          </div>
         </div>
         <div class="year-range">
           <label class="title" for="range-1">Jahr</label>
@@ -131,8 +132,10 @@
         </div>
       </div>
       <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']">
-        <div v-on:click="onToggleFilter()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible',this.showMessage ? 'messageOffset' : '']">
-          <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
+        <div v-bind:class="['button-wrapper', this.showMessage ? 'messageOffset' : '']">
+          <div v-on:click="onToggleFilter()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible']">
+            <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
+          </div>
         </div>
         <div v-for="result in results" :key="result.message" class="result-item" v-on:click="onOpenPreview()">
           <div class="result-body">
@@ -151,7 +154,6 @@
         <div class="doc-info">
           <div class="doc-header">
             <a class="canton-logo"></a>
-            <a class="link-logo"></a>
             <h4 class="result-title">
             Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
             </h4>
@@ -203,28 +205,32 @@
         padding: 8px 0 8px 0;
         border:0;
       }
-
-      .hide-filter{
-        display:flex;
-        position: absolute;
-        height:38px;
+      .button-wrapper{
+        position:absolute;
         width:26px;
-        border-radius: 4px 0 0 4px;
-        background-color: #6183ec;
-        color:#fff;
+        top:calc(((100vh - 38px) / 2) - 70px );
         right:0;
-        top: calc(((100vh - 38px) / 2) - 70px );
-        z-index:100;
-        justify-content: center;
-        align-items: center;
-        cursor:pointer;
-
-        svg{
-          font-size:20px;
-        }
 
         &.messageOffset{
           top: calc(((100vh - 38px) / 2) - 110px );
+        }
+
+        .hide-filter{
+          display:flex;
+          position: fixed;
+          height:38px;
+          width:26px;
+          border-radius: 4px 0 0 4px;
+          background-color: #6183ec;
+          color:#fff;
+          z-index:100;
+          justify-content: center;
+          align-items: center;
+          cursor:pointer;
+
+          svg{
+            font-size:20px;
+          }
         }
       }
       .title{
@@ -263,37 +269,41 @@
       position: relative;
       transition: all 0.2s linear;
 
-       .show-filter{
-        position: absolute;
-        height:38px;
+      .button-wrapper{
+        position:absolute;
         width:26px;
-        border-radius: 0 4px 4px 0;
-        background-color: #6183ec;
-        color:#fff;
         left:0;
         top: calc(((100vh - 38px) / 2) - 70px );
-        z-index:100;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        display: none;
 
         &.messageOffset{
           top: calc(((100vh - 38px) / 2) - 110px );
         }
+        .show-filter{
+          position: fixed;
+          height:38px;
+          width:26px;
+          border-radius: 0 4px 4px 0;
+          background-color: #6183ec;
+          color:#fff;
+          z-index:100;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          display: none;
 
-        &.visible{
-          display:flex;
+          &.visible{
+            display:flex;
+          }
+          svg{
+            font-size:20px;
+          }
         }
-        svg{
-          font-size:20px;
+        &.hidden{
+          width:0;
+          padding: 8px 0 8px 0;
+          border:0;
+          overflow:none;
         }
-      }
-      &.hidden{
-        width:0;
-        padding: 8px 0 8px 0;
-        border:0;
-        overflow:none;
       }
 
       .result-item{
@@ -403,14 +413,6 @@
             width:43px;
             margin-right:10px;
           }
-          .link-logo{
-            background: url('../assets/pdf.png') no-repeat center;
-            background-size: contain;
-            background-position: right top;
-            height:43px;
-            width:43px;
-            margin-right:10px;
-          }
           #close-preview{
             background: url('../assets/bootstrap-close-big.svg') no-repeat center;
             cursor:pointer;
@@ -473,7 +475,7 @@
           width:0;
           padding:8px 0 8px 0;
         }
-        .hide-filter{
+        .button-wrapper{
           top: calc(((100vh - 38px) / 2) - 120px );
 
           &.messageOffset{
@@ -482,8 +484,7 @@
         }
       }
       .results{
-
-        .show-filter{
+        .button-wrapper{
           top: calc(((100vh - 38px) / 2) - 120px );
 
           &.messageOffset{
@@ -495,6 +496,15 @@
           border:none;
           .show-filter{
             display:none;
+          }
+        }
+      }
+      .preview{
+        .doc-info{
+          .doc-header{
+            .result-title{
+              font-size: 16px;
+            }
           }
         }
       }
@@ -517,7 +527,7 @@
       .results{
         max-width: 100vw;
         width: 0;
-        padding:10px 0  0  0;
+        padding:8px 0  0  0;
         border:0;
         .show-filter{
           position:fixed;
@@ -525,6 +535,17 @@
 
           &.visible{
           top: calc((100vh - 38px) / 2);
+          }
+        }
+      }
+      .preview{
+        &.fullScreen{
+          .doc-info{
+            .doc-header{
+              #minimize-preview{
+                display:none;
+              }
+            }
           }
         }
       }
