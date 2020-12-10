@@ -2,7 +2,7 @@
   <div id="searchResults">
     <div class="flex-row">
       <div v-bind:class="['filter', this.filterVisible ? '' : 'hidden', this.fullScreen ? 'hidden' : '']">
-        <div v-on:click="onFilterClose()" v-bind:class="['hide-filter',
+        <div v-on:click="onToggleFilter()" v-bind:class="['hide-filter',
                           this.showMessage ? 'messageOffset' : '']">
           <b-icon icon="caret-left-fill" aria-hidden="true"></b-icon>
         </div>
@@ -131,7 +131,7 @@
         </div>
       </div>
       <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']">
-        <div v-on:click="onFilterClose()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible',this.showMessage ? 'messageOffset' : '']">
+        <div v-on:click="onToggleFilter()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible',this.showMessage ? 'messageOffset' : '']">
           <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
         </div>
         <div v-for="result in results" :key="result.message" class="result-item" v-on:click="onOpenPreview()">
@@ -155,8 +155,9 @@
             <h4 class="result-title">
             Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
             </h4>
-            <b-icon v-on:click="onFullScreen()" id="maximize-logo" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
-            <b-icon v-on:click="onFullScreen()" id="minimize-logo" icon="fullscreen-exit" aria-hidden="true"></b-icon>
+            <b-icon v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
+            <b-icon v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
+            <b-icon v-on:click="onClosePreview()" id="close-preview" icon="x" aria-hidden="true"></b-icon>
           </div>
         </div>
         <iframe class="pdf-viewer"
@@ -372,10 +373,10 @@
 
         .doc-info{
           .doc-header{
-            #minimize-logo{
+            #minimize-preview{
               display:block;
             }
-            #maximize-logo{
+            #maximize-preview{
               display:none;
             }
           }
@@ -410,25 +411,37 @@
             width:43px;
             margin-right:10px;
           }
-          #maximize-logo{
-            height:25px;
-            width:25px;
+          #close-preview{
+            background: url('../assets/bootstrap-close-big.svg') no-repeat center;
+            cursor:pointer;
+            height:20px;
+            width:20px;
+            margin-left: 20px;
+            cursor:pointer;
+            transition: all .2s ease-in-out;;
+          }
+          #close-preview:hover{
+            transform: scale(1.1);
+          }
+          #maximize-preview{
+            height:20px;
+            width:20px;
             margin-left: 20px;
             cursor:pointer;
             transition: all .2s ease-in-out;
           }
-          #maximize-logo:hover{
+          #maximize-preview:hover{
             transform: scale(1.1);
           }
-          #minimize-logo{
-            height:25px;
-            width:25px;
+          #minimize-preview{
+            height:20px;
+            width:20px;
             margin-left: 20px;
             cursor:pointer;
             transition: all .2s ease-in-out;
             display:none;
           }
-          #minimize-logo:hover{
+          #minimize-preview:hover{
             transform: scale(1.1);
           }
         }
@@ -568,7 +581,7 @@ export default class SearchResults extends Vue {
     }
   }
 
-  public onFilterClose (): void {
+  public onToggleFilter (): void {
     if (this.filterVisible === true) {
       this.filterVisible = false
     } else if (this.previewVisible === true) {
@@ -599,6 +612,13 @@ export default class SearchResults extends Vue {
 
   public get showMessage () {
     return AppModule.showMessage === MessageState.VISIBLE
+  }
+
+  public onClosePreview (): void{
+    this.previewVisible = false
+    if (this.fullScreen === true) {
+      this.fullScreen = false
+    }
   }
 }
 </script>
