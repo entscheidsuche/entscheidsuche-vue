@@ -133,7 +133,7 @@
       </div>
       <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']">
         <div v-bind:class="['button-wrapper', this.showMessage ? 'messageOffset' : '']">
-          <div v-on:click="onToggleFilter()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible']">
+          <div v-on:click="onToggleFilter()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible', this.fullScreen ? 'fullScreen' : '']">
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
@@ -153,13 +153,20 @@
       <div v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '']">
         <div class="doc-info">
           <div class="doc-header">
-            <a class="canton-logo"></a>
-            <h4 class="result-title">
+            <div class="flex-row">
+              <a class="canton-logo"></a>
+              <h4 class="result-title">
+              Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
+              </h4>
+              <div class="controls-wrapper">
+                <b-icon v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
+                <b-icon v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
+                <b-icon v-on:click="onClosePreview()" id="close-preview" icon="x" aria-hidden="true"></b-icon>
+              </div>
+            </div>
+            <h4 class="result-title-mobile">
             Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
             </h4>
-            <b-icon v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
-            <b-icon v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
-            <b-icon v-on:click="onClosePreview()" id="close-preview" icon="x" aria-hidden="true"></b-icon>
           </div>
         </div>
         <iframe class="pdf-viewer"
@@ -269,6 +276,12 @@
       position: relative;
       transition: all 0.2s linear;
 
+      &.hidden{
+        width:0;
+        padding: 8px 0 8px 0;
+        border:0;
+        overflow:none;
+      }
       .button-wrapper{
         position:absolute;
         width:26px;
@@ -290,22 +303,17 @@
           align-items: center;
           cursor: pointer;
           display: none;
-
           &.visible{
             display:flex;
+          }
+          &.fullScreen{
+            display:none;
           }
           svg{
             font-size:20px;
           }
         }
-        &.hidden{
-          width:0;
-          padding: 8px 0 8px 0;
-          border:0;
-          overflow:none;
-        }
       }
-
       .result-item{
         border: 1px solid rgba(0, 0, 0, 0.125);
         border-radius: 4px;
@@ -321,12 +329,13 @@
             justify-content: space-between;
             flex-direction: row;
             margin-bottom: 12px;
+
             .canton-logo{
               background: url('../assets/cantons/AR.png') no-repeat center;
               background-size: contain;
               background-position: left center;
-              height:40px;
-              width:40px;
+              height:36px;
+              width:36px;
               margin-right:10px;
               flex-shrink: 0;
             }
@@ -335,8 +344,8 @@
               background: url('../assets/pdf.png') no-repeat center;
               background-size: contain;
               background-position: right center;
-              height:40px;
-              width:40px;
+              height:36px;
+              width:36px;
               margin-left:10px;
             }
             .result-title{
@@ -402,58 +411,86 @@
 
         .doc-header{
           width:100%;
+          height:100%;
           display: flex;
+          flex-direction: column;
           justify-content: space-between;
-          flex-direction: row;
-          .canton-logo{
-            background: url('../assets/cantons/AR.png') no-repeat center;
-            background-size: contain;
-            background-position: left top;
-            height:43px;
-            width:43px;
-            margin-right:10px;
+
+          .flex-row{
+            width:100%;
+            display: flex;
+            justify-content: space-between;
+            flex-direction: row;
+
+            .canton-logo{
+              background: url('../assets/cantons/AR.png') no-repeat center;
+              background-size: contain;
+              background-position: left top;
+              height:38px;
+              width:38px;
+              margin-right:10px;
+              margin-top: 3px;
+              flex-shrink: 0;
+            }
+            .controls-wrapper{
+              width:60px;
+              height:20px;
+              margin-left: 20px;
+              position:relative;
+              flex-shrink:0;
+
+              #close-preview{
+                background: url('../assets/bootstrap-close-big.svg') no-repeat center;
+                cursor:pointer;
+                height:20px;
+                width:20px;
+                margin-left: 20px;
+                cursor:pointer;
+                transition: all .2s ease-in-out;;
+                position:absolute;
+                top:0;
+                right:0;
+              }
+              #close-preview:hover{
+                transform: scale(1.1);
+              }
+              #maximize-preview{
+                height:20px;
+                width:20px;
+                cursor:pointer;
+                transition: all .2s ease-in-out;
+              }
+              #maximize-preview:hover{
+                transform: scale(1.1);
+              }
+              #minimize-preview{
+                height:20px;
+                width:20px;
+                cursor:pointer;
+                transition: all .2s ease-in-out;
+                display:none;
+              }
+              #minimize-preview:hover{
+                transform: scale(1.1);
+              }
+            }
+            .result-title{
+              font-size:18px;
+              margin-top: 0;
+              text-align: left;
+              width:100%;
+              margin-bottom: 0;
+              word-break: break-all;
+            }
           }
-          #close-preview{
-            background: url('../assets/bootstrap-close-big.svg') no-repeat center;
-            cursor:pointer;
-            height:20px;
-            width:20px;
-            margin-left: 20px;
-            cursor:pointer;
-            transition: all .2s ease-in-out;;
-          }
-          #close-preview:hover{
-            transform: scale(1.1);
-          }
-          #maximize-preview{
-            height:20px;
-            width:20px;
-            margin-left: 20px;
-            cursor:pointer;
-            transition: all .2s ease-in-out;
-          }
-          #maximize-preview:hover{
-            transform: scale(1.1);
-          }
-          #minimize-preview{
-            height:20px;
-            width:20px;
-            margin-left: 20px;
-            cursor:pointer;
-            transition: all .2s ease-in-out;
+          .result-title-mobile{
+            margin-top: 0;
+            text-align: left;
+            width:100%;
+            margin-bottom: 0;
+            word-break: break-all;
             display:none;
           }
-          #minimize-preview:hover{
-            transform: scale(1.1);
-          }
-        }
-        .result-title{
-          font-size:18px;
-          margin-top: 0;
-          text-align: left;
-          width:100%;
-          margin-bottom: 0;
-          word-break: break-all;
         }
       }
     }
@@ -502,8 +539,19 @@
       .preview{
         .doc-info{
           .doc-header{
-            .result-title{
+            .flex-row{
+              padding-bottom: 10px;
+              .canton-logo{
+                width:25px;
+                height:25px;
+              }
+              .result-title{
+                display: none;
+              }
+            }
+            .result-title-mobile{
               font-size: 16px;
+              display:block;
             }
           }
         }
