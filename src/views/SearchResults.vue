@@ -287,6 +287,7 @@
         width:26px;
         left:0;
         top: calc(((100vh - 38px) / 2) - 70px );
+        clip:rect(0px,26px,38px,0px);
 
         &.messageOffset{
           top: calc(((100vh - 38px) / 2) - 110px );
@@ -302,14 +303,17 @@
           justify-content: center;
           align-items: center;
           cursor: pointer;
-          display: none;
+          display: flex;
+          width:0;
+          transition: all 0.2s linear;
           &.visible{
-            display:flex;
+            width:26px;
           }
           &.fullScreen{
             display:none;
           }
           svg{
+            flex-shrink: 0;
             font-size:20px;
           }
         }
@@ -371,19 +375,21 @@
       }
     }
     .preview{
-      display:none;
+      min-width:0;
+      width:0;
       float: left;
       overflow: auto;
       box-sizing: border-box;
-      padding: 0.5em;
+      //padding:0.5em;
       overflow-x: hidden;
       overflow-y: hidden;
-      flex-grow:2;
-      width:35%;
-      transition: all 0.2s linear;
+      flex-grow:0;
+      transition: width 0 linear;
 
       &.visible{
-        display:block;
+        width:35%;
+        padding:0.5em;
+        flex-grow:2;
       }
 
       &.fullScreen{
@@ -562,9 +568,11 @@
 //smartphone
 @media (max-width: 534px){
   #searchResults{
+    width: 100vw;
     .flex-row{
       .filter{
         width:100vw;
+        flex-shrink: 0;
         padding: 8px 20px 8px 20px;
         &.hidden{
           padding:8px 0 8px 0;
@@ -573,20 +581,22 @@
         }
       }
       .results{
-        max-width: 100vw;
-        width: 0;
+        transition: width 0.2s linear;
+        width:100vw;
+        min-width: 0;
         padding:8px 0  0  0;
         border:0;
+        padding-left: 20px;
+        padding-right: 20px;
         .show-filter{
-          position:fixed;
-          left:0;
-
           &.visible{
           top: calc((100vh - 38px) / 2);
           }
         }
       }
       .preview{
+      padding-left:0;
+      padding-right:0;
         &.fullScreen{
           .doc-info{
             .doc-header{
