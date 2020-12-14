@@ -284,9 +284,9 @@
       .button-wrapper{
         position:absolute;
         width:26px;
+        height:38px;
         left:0;
         top: calc(((100vh - 38px) / 2) - 70px );
-        clip:rect(0px,26px,38px,0px);
 
         &.messageOffset{
           top: calc(((100vh - 38px) / 2) - 110px );
@@ -304,6 +304,7 @@
           cursor: pointer;
           display: flex;
           width:0;
+          clip:rect(0px,26px,38px,0px);
           transition: all 0.2s linear;
           &.visible{
             width:26px;
