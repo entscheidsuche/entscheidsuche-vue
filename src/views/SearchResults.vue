@@ -169,10 +169,14 @@
             </h4>
           </div>
         </div>
-        <iframe class="pdf-viewer"
-          src="https://entscheidsuche.ch/direkt_kantone%2Ffr_kg2011%2Fcap_2002_9_24_02_03.pdf"
-          style="border:none;">
-        </iframe>
+        <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
+          <iframe class="desktop-pdf" scrolling="auto" src="https://entscheidsuche.ch/direkt_kantone%2Ffr_kg2011%2Fcap_2002_9_24_02_03.pdf" width="100%" height="100%" type='application/pdf' title="Title">
+            <p style="font-size: 110%;"><em>There is content being displayed here that your browser doesn't support.</em> <a href="URL HERE" target="_blank"> Please click here to attempt to view the information in a separate browser window. </a> Thanks for your patience!</p>
+          </iframe>
+          <iframe class="mobile-pdf" scrolling="auto" src="https://drive.google.com/viewerng/viewer?embedded=true&url=https://entscheidsuche.ch/direkt_kantone%2Ffr_kg2011%2Fcap_2002_9_24_02_03.pdf" width="100%" height="100%" type='application/pdf' title="Title">
+            <p style="font-size: 110%;"><em>There is content being displayed here that your browser doesn't support.</em> <a href="URL HERE" target="_blank"> Please click here to attempt to view the information in a separate browser window. </a> Thanks for your patience!</p>
+          </iframe>
+        </div>
       </div>
     </div>
   <router-view/>
@@ -181,8 +185,7 @@
 
 <style lang="scss">
 #searchResults {
-  min-height: 100%;
-  height: calc(100vh - 110px);
+  height: 100%;
   display:flex;
   overflow: hidden;
   margin: 0;
@@ -500,10 +503,18 @@
         }
       }
     }
-    .pdf-viewer{
+    .outer-pdf{
       bottom:0;
-      height:calc(100% - 80px);
+      height:calc(100% - 85px);
       width:100%;
+      overflow-x: hidden;
+
+      .desktop-pdf {
+        display: block;
+      }
+      .mobile-pdf {
+        display: none;
+      }
     }
   }
 }
@@ -560,6 +571,14 @@
               font-size: 16px;
               display:block;
             }
+          }
+        }
+        .outer-pdf{
+          .mobile-pdf {
+            display: block;
+          }
+          .desktop-pdf {
+              display: none;
           }
         }
       }

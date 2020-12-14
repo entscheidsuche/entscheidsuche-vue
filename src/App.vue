@@ -33,7 +33,7 @@
 
     .content-wrapper{
       width: 984px;
-      -moz-box-shaow: 0 20px 0px 20px rgba(255,255,255,0.5);
+      -moz-box-shadow: 0 20px 0px 20px rgba(255,255,255,0.5);
       -webkit-box-shadow: 0 20px 0px 20px rgba(255,255,255,0.5);
       box-shadow: 0 20px 0px 20px rgba(255,255,255,0.5);
       background-color: #fff;
@@ -48,6 +48,17 @@
         margin-left:0;
         margin-right:0;
         padding-bottom:0;
+        position:relative;
+        &.messageOffset{
+          padding-top: 0;
+          top:110px;
+          height: calc(100vh - 110px);
+        }
+        &.noMessageOffset{
+          padding-top: 0;
+          top:70px;
+          height: calc(100vh - 70px);
+        }
       }
       &.messageOffset{
         padding-top: 110px;
@@ -70,6 +81,17 @@
       .content-wrapper{
         margin-left: 20px;
         margin-right: 20px;
+
+        &.full-width{
+          &.messageOffset{
+            top:160px;
+            height: calc(100vh - 160px);
+          }
+          &.noMessageOffset{
+            top:120px;
+            height: calc(100vh - 120px);
+          }
+        }
 
         &.messageOffset{
           padding-top: 160px;
