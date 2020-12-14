@@ -260,8 +260,6 @@
 <style lang="scss">
 #home {
   .content{
-    padding-bottom: 80px;
-
     .card-deck{
       width:100%;
       display:flex;

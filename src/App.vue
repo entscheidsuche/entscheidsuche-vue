@@ -38,12 +38,14 @@
       margin-left: 10px;
       margin-right: 10px;
       margin: 0 auto;
+      padding-bottom:80px;
 
       &.full-width{
         width:100%;
         box-shadow:none;
         margin-left:0;
         margin-right:0;
+        padding-bottom:0;
       }
       &.messageOffset{
         padding-top: 110px;

@@ -8,7 +8,10 @@
 
 <style lang="scss">
 #footer{
+  clear: both;
   position: relative;
+  height: 50px;
+  margin-top: -50px;
   footer{
     position:absolute;
     bottom: 0;

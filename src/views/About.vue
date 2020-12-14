@@ -146,11 +146,6 @@
 
 <style lang="scss">
 #about {
-  //height:100vh;
-  position: relative;
-  min-height: 100%;
-  max-width: 984px;
-  padding-bottom: 80px;
 }
 </style>
 
