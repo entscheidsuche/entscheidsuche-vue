@@ -274,7 +274,6 @@
       box-sizing: border-box;
       padding: 0.5em;
       position: relative;
-      transition: all 0.2s linear;
 
       &.hidden{
         width:0;
@@ -550,6 +549,7 @@
               .canton-logo{
                 width:25px;
                 height:25px;
+                margin-top:0;
               }
               .result-title{
                 display: none;
@@ -581,7 +581,6 @@
         }
       }
       .results{
-        transition: width 0.2s linear;
         width:100vw;
         min-width: 0;
         padding:8px 0  0  0;
