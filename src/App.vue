@@ -8,7 +8,9 @@
         <router-view/>
       </div>
     </div>
-    <Footer/>
+    <div v-bind:class="['footer-wrapper', this.inSearch ? 'hidden' : '']">
+      <Footer/>
+    </div>
   </div>
 </template>
 
@@ -53,6 +55,11 @@
       &.noMessageOffset{
         padding-top: 70px;
       }
+    }
+  }
+  .footer-wrapper{
+    &.hidden{
+      display:none;
     }
   }
 }
