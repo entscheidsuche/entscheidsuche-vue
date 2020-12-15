@@ -2,12 +2,7 @@
   <div id="header">
     <div class="header-main">
       <router-link :to="{ name: 'Home' }" class="logo"></router-link>
-       <b-input-group id="header-search" class="mt">
-            <b-form-input is-text placeholder="Suchbegriff"></b-form-input>
-            <b-input-group-append>
-              <b-button variant="secondary" id="toggle-search">Suchen</b-button>
-            </b-input-group-append>
-      </b-input-group>
+      <Search/>
       <div id="language-toggler" v-on:click="onLocaleChange()">
         <span id="current">{{locale.toUpperCase()}}</span>
          <a class="language-icon"></a>
@@ -34,7 +29,7 @@
 </template>
 
 <style lang="scss">
-#header{
+#header {
   z-index: 1000;
   top: 0;
   left: 0;
@@ -42,204 +37,164 @@
   width: 100%;
   background-color: #6183ec;
 
-  .header-main{
-    padding-top:5px;
-    padding-bottom:5px;
+  .header-main {
+    padding-top: 5px;
+    padding-bottom: 5px;
     display: flex;
     align-items: center;
 
-    .logo{
-      margin-left:20px;
+    .logo {
+      margin-left: 20px;
       z-index: 10;
       width: 290px;
       height: 60px;
       background: url('../assets/logo-white.png') no-repeat center;
-      color:#fff;
+      color: #fff;
       background-size: contain;
       flex-shrink: 0;
     }
 
-    #header-search{
-      height:40px;
-      width:100%;
-      flex-grow:1;
-      margin-right: 160px;
-      margin-left:20px;
-      margin-top: 0;
-      width:100%;
-      height:40px;
-      align-items: center;
-      justify-content: center;
-      display:flex;
-
-        input{
-          height:40px;
-          width: calc(100% - 140px);
-          max-width: 379px;
-          border:0;
-          padding:0;
-          //border-radius:0;
-          font-size: 16px;
-          padding-left:15px;
-        }
-        input:focus{
-          border:none;
-          outline:none;
-        }
-        #toggle-search{
-          flex-shrink: 0;
-          height:40px;
-          width:100px;
-          padding:0;
-          font-size: 16px;
-          font-weight: bold;
-          position:relative;
-        }
-    }
-    #language-toggler{
+    #language-toggler {
       flex-shrink: 0;
-      height:40px;
-      width:80px;
-      margin-bottom:0;
+      height: 40px;
+      width: 80px;
+      margin-bottom: 0;
       margin-right: 20px;
       font-size: 20px;
-      color:#fff;
-      cursor:pointer;
-      display:flex;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
       align-items: center;
       justify-content: space-between;
 
-      #current{
-        padding-top:3px;
+      #current {
+        padding-top: 3px;
       }
 
-      .language-icon{
+      .language-icon {
         position: absolute;
-        top:21px;
-        right:85px;
+        top: 21px;
+        right: 85px;
         background: url('../assets/world2.svg') no-repeat center;
         background-size: 26px;
-        height:30px;
-        width:30px;
+        height: 30px;
+        width: 30px;
       }
     }
-    #burger{
+
+    #burger {
       flex-shrink: 0;
-      margin-right:20px;
-      cursor:pointer;
+      margin-right: 20px;
+      cursor: pointer;
       background: url('../assets/menu-white.svg') no-repeat center;
       background-size: 30px;
-      height:30px;
-      width:30px;
+      height: 30px;
+      width: 30px;
     }
   }
-  #sidebar-right{
-    width:460px;
-    .menu-overlay{
+
+  #sidebar-right {
+    width: 460px;
+
+    .menu-overlay {
       z-index: 1001;
-      height:100%;
-      width:100%;
-      position:fixed;
-      top:0;
-      right:0;
-      background-color:#fff;
+      height: 100%;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      right: 0;
+      background-color: #fff;
       box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 25px 0px;
 
-      ul{
-        list-style-type:none;
-        }
+      ul {
+        list-style-type: none;
+      }
 
-      #close-menu{
+      #close-menu {
         position: absolute;
-        top:21px;
-        right:20px;
-        cursor:pointer;
+        top: 21px;
+        right: 20px;
+        cursor: pointer;
         background: url('../assets/close-big.svg') no-repeat center;
         background-size: 30px;
-        height:30px;
-        width:30px;
+        height: 30px;
+        width: 30px;
         transition: all .2s ease-in-out;
       }
 
-      #close-menu:hover{
+      #close-menu:hover {
         transform: scale(1.1);
       }
-      .menu-desktop{
-        margin-top:70px;
 
-        li{
+      .menu-desktop {
+        margin-top: 70px;
+
+        li {
           padding: 10px 0 20px 0;
           text-align: left;
 
-          .desktop-menu-item{
+          .desktop-menu-item {
             text-decoration: none;
-            font-size:20px;
+            font-size: 20px;
             //font-weight: bold;
             line-height: 20px;
-            color:#191919;
+            color: #191919;
           }
         }
       }
     }
   }
 }
+
 //tablet
-@media (max-width: 1024px){
-  #header{
-    .header-main{
-      height:120px;
+@media (max-width: 1024px) {
+  #header {
+    .header-main {
+      height: 120px;
       position: relative;
       display: flex;
 
-      .logo{
+      .logo {
         position: absolute;
-        margin:0;
-        top:5px;
-        margin-left:20px;
-        max-width:50%;
+        margin: 0;
+        top: 5px;
+        margin-left: 20px;
+        max-width: 50%;
       }
 
-      #header-search{
+      #language-toggler {
         position: absolute;
-        bottom:15px;
-        width: 100%;
-        margin-left:0;
-          input{
-              max-width: calc(100% - 140px);
-              padding:0;
-              padding-left:15px;
-            }
-        }
-        #language-toggler{
-          position: absolute;
-          top:15px;
-          right:38px;
+        top: 15px;
+        right: 38px;
 
-          .language-icon{
-            top:6px;
-            right:16px;
-          }
+        .language-icon {
+          top: 6px;
+          right: 16px;
         }
-        #burger{
-          position: absolute;
-          margin:0;
-          top:21px;
-          right:20px;
-        }
+      }
+
+      #burger {
+        position: absolute;
+        margin: 0;
+        top: 21px;
+        right: 20px;
       }
     }
   }
+}
+
 //smartphone
-@media (max-width: 534px){
-  #header{
-    #sidebar-right{
-      .menu-overlay{
-        width:100vw;
-        height:100vh;
-        .menu-desktop{
-          li{
-            .desktop-menu-item{
-                font-size: 16px;
+@media (max-width: 534px) {
+  #header {
+    #sidebar-right {
+      .menu-overlay {
+        width: 100vw;
+        height: 100vh;
+
+        .menu-desktop {
+          li {
+            .desktop-menu-item {
+              font-size: 16px;
             }
           }
         }
@@ -250,12 +205,14 @@
 </style>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import { AppModule } from '@/store/modules/app'
+import Search from '@/components/Search.vue'
 import LocaleSelector from '@/components/LocaleSelector.vue'
 import Message from '@/components/Message.vue'
-import { AppModule } from '@/store/modules/app'
 
 @Component({
   components: {
+    Search,
     LocaleSelector,
     Message
   }

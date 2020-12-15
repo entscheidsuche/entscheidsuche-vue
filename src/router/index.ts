@@ -2,6 +2,9 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '@/views/Home.vue'
 import SearchResults from '@/views/SearchResults.vue'
+import { SearchModule } from '@/store/modules/search'
+import { sync } from 'vuex-router-sync'
+import { store } from '@/store'
 
 Vue.use(VueRouter)
 
@@ -14,7 +17,13 @@ const routes: Array<RouteConfig> = [
   {
     path: '/search',
     name: 'Search',
-    component: SearchResults
+    component: SearchResults,
+    beforeEnter: (to, from, next) => {
+      if (to.query.query !== undefined && typeof to.query.query === 'string') {
+        SearchModule.SetQuery(to.query.query)
+      }
+      next()
+    }
   },
   {
     path: '/about',
@@ -53,3 +62,5 @@ const router = new VueRouter({
 })
 
 export default router
+
+sync(store, router)

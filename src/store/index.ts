@@ -1,8 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { AppState } from '@/store/modules/app'
-import router from '@/router'
-import { sync } from 'vuex-router-sync'
+import { SearchState } from '@/store/modules/search'
 
 Vue.use(Vuex)
 
@@ -18,11 +17,10 @@ export interface RouteState {
 
 export interface RootState {
   app: AppState;
+  search: SearchState;
   route: RouteState;
 }
 
 export const store = new Vuex.Store<RootState>({
   strict: true
 })
-
-sync(store, router)
