@@ -32,14 +32,31 @@ export class SearchUtil {
 
   private static extractSearchResults (resp: any): Array<SearchResult> {
     const results: Array<SearchResult> = []
+    console.log(resp)
     if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
       const hits: Array<any> = resp.data.hits.hits
       for (const hit of hits) {
+        let text = ''
+        if (hit.highlight !== undefined) {
+          text = text.concat(SearchUtil.getExtract(hit.highlight.titel), SearchUtil.getExtract(hit.highlight.leitsatz),
+            SearchUtil.getExtract(hit.highlight['attachment.author']), SearchUtil.getExtract(hit.highlight['attachment.content']))
+        }
         results.push({
-          id: hit._id
+          id: hit._id,
+          text
         })
       }
     }
     return results
+  }
+
+  private static getExtract (highlight: Array<string>): string {
+    let text = ''
+    if (highlight !== undefined) {
+      for (const a of highlight) {
+        text = text.concat(a, ' ')
+      }
+    }
+    return text
   }
 }

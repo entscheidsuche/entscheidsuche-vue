@@ -137,15 +137,15 @@
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
-        <div v-for="result in results" :key="result.message" class="result-item" v-on:click="onOpenPreview()">
+        <div v-for="result in results" :key="result.id" class="result-item" v-on:click="onOpenPreview()">
           <div class="result-body">
             <div class="result-header">
               <a class="canton-logo"></a>
-              <h4 class="result-title">{{ result.title }}</h4>
+              <h4 class="result-title">{{ result.id }}</h4>
               <a class="link-logo"></a>
             </div>
             <div class="text-preview">
-              <p>{{ result.message }}</p>
+              <p v-html="result.text"/>
             </div>
           </div>
         </div>
@@ -635,6 +635,7 @@
 import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
+import { SearchModule } from '@/store/modules/search'
 
 @Component({
   name: 'SearchResult'
@@ -653,12 +654,12 @@ export default class SearchResults extends Vue {
         { text: 'DE', value: 'de' },
         { text: 'FR', value: 'fr' },
         { text: 'IT', value: 'it' }
-      ],
-      results: [
-        { title: 'Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018', message: 'Strafanzeige wegen Widerhandlung gegen die Lebensmittelgesetzgebung ein, da sie im Winter 1995/96 Hanföl. Zudem war Ende der 90er Jahre die Diskussion um die Zulässigkeit von Hanfgeschäften in aller Munde Gleichzeitig war die Rechtslage bezüglich der Bewirtschaftung von Hanffeldern Ende der 90er Jahre alles Mai 1997 beschlossenen Haltung, grundsätzlich nur die subventionierten Hanfanfplanzungen für legal zu Die Tatsache, dass der Berufungsgegner die Polizei über seine Hanffelder informierte und ihnen Personen' },
-        { title: 'Bundesverwaltungsgericht, I. Abteilung, A-100/2011, Urteil vom 24.5.2011', message: 'Des Weiteren wurde erkannt, dass die örtlich beschlagnahmten Pflanzen in unterschiedlichen Wachstumsstadien und die örtlich beschlagnahmten Gegenstände sowie die von der Polizei beschlagnahmten Hanfpflanzen und' }
       ]
     }
+  }
+
+  get results () {
+    return SearchModule.searchResults
   }
 
   created () {
