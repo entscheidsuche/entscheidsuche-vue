@@ -1,6 +1,6 @@
 <template>
   <b-input-group id="header-search" class="mt">
-    <b-form-input is-text v-model="searchterm" :placeholder="$t('searchterm')"/>
+    <b-form-input v-on:keyup.enter="onSearch($event)" is-text v-model="searchterm" :placeholder="$t('searchterm')"/>
     <b-input-group-append>
       <b-button variant="secondary" id="toggle-search" v-on:click="onSearch($event)">{{ $t('search') }}</b-button>
     </b-input-group-append>

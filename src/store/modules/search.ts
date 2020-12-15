@@ -6,6 +6,8 @@ import { SearchUtil } from '@/util/search/search'
 export interface SearchResult {
   id: string;
   text: string;
+  title: string;
+  date: string;
 }
 
 export interface SearchState {

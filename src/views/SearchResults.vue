@@ -141,7 +141,7 @@
           <div class="result-body">
             <div class="result-header">
               <a class="canton-logo"></a>
-              <h4 class="result-title">{{ result.id }}</h4>
+              <h4 class="result-title">{{ result.title }} vom {{ result.date }}</h4>
               <a class="link-logo"></a>
             </div>
             <div class="text-preview">

@@ -41,9 +41,17 @@ export class SearchUtil {
           text = text.concat(SearchUtil.getExtract(hit.highlight.titel), SearchUtil.getExtract(hit.highlight.leitsatz),
             SearchUtil.getExtract(hit.highlight['attachment.author']), SearchUtil.getExtract(hit.highlight['attachment.content']))
         }
+        let date = ''
+        if (hit.highlight !== undefined) {
+          if (hit._source.edatum.length === 10) {
+            date = SearchUtil.formatDate(hit._source.edatum)
+          }
+        }
         results.push({
           id: hit._id,
-          text
+          text,
+          title: hit._source.titel,
+          date
         })
       }
     }
@@ -58,5 +66,11 @@ export class SearchUtil {
       }
     }
     return text
+  }
+
+  private static formatDate (date: string): string {
+    let newDate = ''
+    newDate = date.slice(8, 10) + '.' + date.slice(5, 7) + '.' + date.slice(0, 4)
+    return newDate
   }
 }
