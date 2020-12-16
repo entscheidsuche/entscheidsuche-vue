@@ -42,16 +42,15 @@ export class SearchUtil {
             SearchUtil.getExtract(hit.highlight['attachment.author']), SearchUtil.getExtract(hit.highlight['attachment.content']))
         }
         let date = ''
-        if (hit.highlight !== undefined) {
-          if (hit._source.edatum.length === 10) {
-            date = SearchUtil.formatDate(hit._source.edatum)
-          }
+        if (hit._source.edatum !== undefined && hit._source.edatum.length === 10) {
+          date = SearchUtil.formatDate(hit._source.edatum)
         }
         results.push({
           id: hit._id,
           text,
           title: hit._source.titel,
-          date
+          date,
+          canton: hit._source.kanton.toUpperCase()
         })
       }
     }

@@ -140,7 +140,7 @@
         <div v-for="result in results" :key="result.id" class="result-item" v-on:click="onOpenPreview()">
           <div class="result-body">
             <div class="result-header">
-              <a class="canton-logo"></a>
+              <img :src="getImgUrl(result.canton)" class="canton-logo">
               <h4 class="result-title">{{ result.title }} vom {{ result.date }}</h4>
               <a class="link-logo"></a>
             </div>
@@ -338,11 +338,9 @@
             margin-bottom: 12px;
 
             .canton-logo{
-              background: url('../assets/cantons/AR.png') no-repeat center;
-              background-size: contain;
-              background-position: left center;
-              height:36px;
-              width:36px;
+              max-height:36px;
+              width: auto;
+              height: auto;
               margin-right:10px;
               flex-shrink: 0;
             }
@@ -351,6 +349,7 @@
               background: url('../assets/pdf.png') no-repeat center;
               background-size: contain;
               background-position: right center;
+              background-repeat: no-repeat;
               height:36px;
               width:36px;
               margin-left:10px;
@@ -366,7 +365,7 @@
           }
           .text-preview{
             font-size: 14px;
-            .keyword{
+            em{
               font-style: italic;
               background-color: #FFFF00;
             }
@@ -718,6 +717,10 @@ export default class SearchResults extends Vue {
     if (this.fullScreen === true) {
       this.fullScreen = false
     }
+  }
+
+  public getImgUrl (pic) {
+    return require('../assets/cantons/' + pic + '.png')
   }
 }
 </script>

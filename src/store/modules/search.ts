@@ -8,6 +8,7 @@ export interface SearchResult {
   text: string;
   title: string;
   date: string;
+  canton: string;
 }
 
 export interface SearchState {
