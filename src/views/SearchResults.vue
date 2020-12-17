@@ -131,7 +131,7 @@
           </b-form-group>
         </div>
       </div>
-      <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']">
+      <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']" @scroll="handleScroll" id="results">
         <div v-bind:class="['button-wrapper', this.showMessage ? 'messageOffset' : '']">
           <div v-on:click="onToggleFilter()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible', this.fullScreen ? 'fullScreen' : '']">
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
@@ -149,7 +149,10 @@
             </div>
           </div>
         </div>
-        <a v-on:click="getMoreResults()">mehr ...</a>
+        <!--<a v-on:click="getMoreResults()">mehr ...</a>-->
+        <div v-if="this.resultsPending" id="spinner-wrapper" class="d-flex justify-content-center mb-3">
+          <b-spinner variant="primary" label="Loading..."></b-spinner>
+        </div>
       </div>
       <div v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '']">
         <div class="doc-info">
@@ -314,6 +317,9 @@
             flex-shrink: 0;
             font-size:20px;
           }
+        }
+        #spinner-wrapper{
+          //display:none;
         }
       }
       .result-item{
@@ -655,6 +661,10 @@ export default class SearchResults extends Vue {
     return SearchModule.selectedResult
   }
 
+  get resultsPending () {
+    return SearchModule.resultsPending
+  }
+
   created () {
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
@@ -670,6 +680,13 @@ export default class SearchResults extends Vue {
       this.filterVisible = false
     } else {
       this.filterVisible = true
+    }
+  }
+
+  handleScroll () {
+    const searchResultsDiv = document.getElementById('results')!
+    if (searchResultsDiv.scrollTop + searchResultsDiv.clientHeight >= searchResultsDiv.scrollHeight) {
+      this.getMoreResults()
     }
   }
 
