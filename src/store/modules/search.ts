@@ -10,6 +10,7 @@ export interface SearchResult {
   canton: string;
   pdf: boolean;
   url: string;
+  sort: Array<any>;
 }
 
 export interface SearchState {
@@ -48,11 +49,26 @@ export class Search extends VuexModule implements SearchState {
     this.results = results
   }
 
+  @Mutation
+  public SET_MORE_RESULTS (results: Array<SearchResult>) {
+    this.results = [...this.results, ...results]
+  }
+
   @Action({ commit: 'SET_RESULTS' })
   public async SetResults () {
     this.context.commit('RESULTS_PENDING', true)
     return SearchUtil.search(this.queryString)
       .finally(() => this.context.commit('RESULTS_PENDING', false))
+  }
+
+  @Action({ commit: 'SET_MORE_RESULTS' })
+  public async SetMoreResults () {
+    if (this.results.length > 0) {
+      const sort = this.results[this.results.length - 1].sort
+      this.context.commit('RESULTS_PENDING', true)
+      return SearchUtil.search(this.queryString, sort)
+        .finally(() => this.context.commit('RESULTS_PENDING', false))
+    }
   }
 
   public get searchResults (): Array<SearchResult> {

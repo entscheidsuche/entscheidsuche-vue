@@ -2,28 +2,33 @@ import { SearchResult } from '@/store/modules/search'
 import axios from 'axios'
 
 export class SearchUtil {
-  public static async search (query: string): Promise<Array<SearchResult>> {
-    return axios.post('https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search',
-      {
-        query: {
-          // eslint-disable-next-line @typescript-eslint/camelcase
-          query_string: {
-            query: query
-          }
-        },
-        sort: [
-          { _score: 'desc' },
-          { id: 'desc' }
-        ],
-        highlight: {
-          fields: {
-            titel: {},
-            leitsatz: {},
-            'attachment.author': {},
-            'attachment.content': {}
-          }
+  public static async search (query: string, searchAfter?: Array<any>): Promise<Array<SearchResult>> {
+    const search: any = {
+      query: {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        query_string: {
+          query: query
         }
       },
+      sort: [
+        { _score: 'desc' },
+        { id: 'desc' }
+      ],
+      highlight: {
+        fields: {
+          titel: {},
+          leitsatz: {},
+          'attachment.author': {},
+          'attachment.content': {}
+        }
+      }
+    }
+    if (searchAfter !== undefined) {
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      search.search_after = searchAfter
+    }
+    return axios.post('https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search',
+      search,
       {
         maxContentLength: Infinity,
         maxBodyLength: Infinity
@@ -54,7 +59,8 @@ export class SearchUtil {
           date,
           canton: hit._source.kanton.toUpperCase(),
           pdf,
-          url: hit._source.attachment.content_url
+          url: hit._source.attachment.content_url,
+          sort: hit.sort
         })
       }
     }

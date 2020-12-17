@@ -149,6 +149,7 @@
             </div>
           </div>
         </div>
+        <a v-on:click="getMoreResults()">mehr ...</a>
       </div>
       <div v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '']">
         <div class="doc-info">
@@ -726,6 +727,10 @@ export default class SearchResults extends Vue {
 
   public getMobileDocUrl (url: string) {
     return 'https://drive.google.com/viewerng/viewer?embedded=true&url=' + url
+  }
+
+  public getMoreResults () {
+    SearchModule.SetMoreResults()
   }
 }
 </script>
