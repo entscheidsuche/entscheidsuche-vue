@@ -14,14 +14,14 @@ export interface SearchResult {
 export interface SearchState {
   query: string;
   searchResults: Array<SearchResult>;
-  selectedResult?: SearchResult;
+  selectedResult: SearchResult | {};
 }
 
 @Module({ dynamic: true, store, name: 'search' })
 export class Search extends VuexModule implements SearchState {
   private queryString = ''
   private results: Array<SearchResult> = []
-  private selectedRes?: SearchResult
+  private selectedRes: SearchResult | {} = {}
 
   @Mutation
   public SET_QUERY (query: string) {
@@ -65,7 +65,7 @@ export class Search extends VuexModule implements SearchState {
     return selectedResult
   }
 
-  public get selectedResult (): SearchResult | undefined {
+  public get selectedResult (): SearchResult | {} {
     window.console.log('IN isSelected')
     return this.selectedRes
   }
