@@ -9,6 +9,7 @@ export interface SearchResult {
   date: string;
   canton: string;
   pdf: boolean;
+  url: string;
 }
 
 export interface SearchState {
@@ -66,7 +67,6 @@ export class Search extends VuexModule implements SearchState {
   }
 
   public get selectedResult (): SearchResult | {} {
-    window.console.log('IN isSelected')
     return this.selectedRes
   }
 }

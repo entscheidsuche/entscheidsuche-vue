@@ -151,33 +151,25 @@
         </div>
       </div>
       <div v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '']">
-        <div v-if="selectedResult !== undefined">
-          <div class="doc-info">
-            <div class="doc-header">
-              <div class="flex-row">
-                <a class="canton-logo"></a>
-                <h4 class="result-title">
-                Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
-                </h4>
-                <div class="controls-wrapper">
-                  <b-icon v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
-                  <b-icon v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
-                  <div v-on:click="onClosePreview()" id="close-preview"></div>
-                </div>
+        <div class="doc-info">
+          <div class="doc-header">
+            <div class="flex-row">
+              <div v-if="selectedResult.canton != undefined">
+                <img :src="getImgUrl(selectedResult.canton)" class="canton-logo">
               </div>
-              <h4 class="result-title-mobile">
-              Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
-              </h4>
+              <h4 v-if="this.windowWidth > 1024" class="result-title">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
+              <div class="controls-wrapper">
+                <b-icon v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
+                <b-icon v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
+                <div v-on:click="onClosePreview()" id="close-preview"></div>
+              </div>
             </div>
+            <h4 v-if="this.windowWidth <= 1024" class="result-title-mobile">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
           </div>
-          <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
-            <iframe class="desktop-pdf" scrolling="auto" src="https://entscheidsuche.ch/direkt_kantone%2Ffr_kg2011%2Fcap_2002_9_24_02_03.pdf" width="100%" height="100%" type='application/pdf' title="Title">
-              <p style="font-size: 110%;"><em>There is content being displayed here that your browser doesn't support.</em> <a href="URL HERE" target="_blank"> Please click here to attempt to view the information in a separate browser window. </a> Thanks for your patience!</p>
-            </iframe>
-            <iframe class="mobile-pdf" scrolling="auto" src="https://drive.google.com/viewerng/viewer?embedded=true&url=https://entscheidsuche.ch/direkt_kantone%2Ffr_kg2011%2Fcap_2002_9_24_02_03.pdf" width="100%" height="100%" type='application/pdf' title="Title">
-              <p style="font-size: 110%;"><em>There is content being displayed here that your browser doesn't support.</em> <a href="URL HERE" target="_blank"> Please click here to attempt to view the information in a separate browser window. </a> Thanks for your patience!</p>
-            </iframe>
-          </div>
+        </div>
+        <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
+          <iframe v-if="this.windowWidth > 1024" class="desktop-pdf" scrolling="auto" :src="selectedResult.url" width="100%" height="100%" type='application/pdf' title="Title"></iframe>
+          <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" scrolling="auto" :src="getMobileDocUrl(selectedResult.url)" width="100%" height="100%" type='application/pdf' title="Title"></iframe>
         </div>
       </div>
     </div>
@@ -439,13 +431,10 @@
             flex-direction: row;
 
             .canton-logo{
-              background: url('../assets/cantons/AR.png') no-repeat center;
-              background-size: contain;
-              background-position: left top;
-              height:38px;
-              width:38px;
+              max-height:36px;
+              width: auto;
+              height: auto;
               margin-right:10px;
-              margin-top: 3px;
               flex-shrink: 0;
             }
             .controls-wrapper{
@@ -520,7 +509,7 @@
         display: block;
       }
       .mobile-pdf {
-        display: none;
+        display: block;
       }
     }
   }
@@ -578,14 +567,6 @@
               font-size: 16px;
               display:block;
             }
-          }
-        }
-        .outer-pdf{
-          .mobile-pdf {
-            display: block;
-          }
-          .desktop-pdf {
-              display: none;
           }
         }
       }
@@ -741,6 +722,10 @@ export default class SearchResults extends Vue {
 
   public isSelected (result: SearchResult): boolean {
     return SearchModule.selectedResult === result
+  }
+
+  public getMobileDocUrl (url: string) {
+    return 'https://drive.google.com/viewerng/viewer?embedded=true&url=' + url
   }
 }
 </script>

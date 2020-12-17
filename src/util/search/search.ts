@@ -53,7 +53,8 @@ export class SearchUtil {
           title: hit._source.titel,
           date,
           canton: hit._source.kanton.toUpperCase(),
-          pdf
+          pdf,
+          url: hit._source.attachment.content_url
         })
       }
     }
