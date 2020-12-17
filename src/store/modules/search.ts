@@ -14,12 +14,14 @@ export interface SearchResult {
 export interface SearchState {
   query: string;
   searchResults: Array<SearchResult>;
+  resultsPending: boolean;
   selectedResult: SearchResult | {};
 }
 
 @Module({ dynamic: true, store, name: 'search' })
 export class Search extends VuexModule implements SearchState {
   private queryString = ''
+  private resPending = false
   private results: Array<SearchResult> = []
   private selectedRes: SearchResult | {} = {}
 
@@ -47,7 +49,9 @@ export class Search extends VuexModule implements SearchState {
 
   @Action({ commit: 'SET_RESULTS' })
   public async SetResults () {
+    this.context.commit('RESULTS_PENDING', true)
     return SearchUtil.search(this.queryString)
+      .finally(() => this.context.commit('RESULTS_PENDING', false))
   }
 
   public get searchResults (): Array<SearchResult> {
@@ -68,6 +72,15 @@ export class Search extends VuexModule implements SearchState {
   public get selectedResult (): SearchResult | {} {
     window.console.log('IN isSelected')
     return this.selectedRes
+  }
+
+  @Mutation
+  public RESULTS_PENDING (pending: boolean) {
+    this.selectedRes = pending
+  }
+
+  public get resultsPending (): boolean {
+    return this.resPending
   }
 }
 
