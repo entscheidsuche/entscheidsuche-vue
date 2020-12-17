@@ -30,6 +30,7 @@ export class Search extends VuexModule implements SearchState {
   @Mutation
   public SET_QUERY (query: string) {
     this.queryString = query
+    this.results = []
   }
 
   @Action
