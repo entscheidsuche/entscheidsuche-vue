@@ -45,12 +45,15 @@ export class SearchUtil {
         if (hit._source.edatum !== undefined && hit._source.edatum.length === 10) {
           date = SearchUtil.formatDate(hit._source.edatum)
         }
+        let pdf = false
+        pdf = SearchUtil.getDocType(hit._source.attachment.content_type)
         results.push({
           id: hit._id,
           text,
           title: hit._source.titel,
           date,
-          canton: hit._source.kanton.toUpperCase()
+          canton: hit._source.kanton.toUpperCase(),
+          pdf
         })
       }
     }
@@ -71,5 +74,15 @@ export class SearchUtil {
     let newDate = ''
     newDate = date.slice(8, 10) + '.' + date.slice(5, 7) + '.' + date.slice(0, 4)
     return newDate
+  }
+
+  private static getDocType (type: string): boolean {
+    let docType = false
+    if (type !== undefined) {
+      if (type === 'application/pdf') {
+        docType = true
+      }
+    }
+    return docType
   }
 }

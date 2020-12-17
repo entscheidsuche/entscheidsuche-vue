@@ -1,6 +1,5 @@
 import { VuexModule, Module, Mutation, Action, getModule } from 'vuex-module-decorators'
 import { store } from '@/store'
-import axios from 'axios'
 import { SearchUtil } from '@/util/search/search'
 
 export interface SearchResult {
@@ -9,17 +8,20 @@ export interface SearchResult {
   title: string;
   date: string;
   canton: string;
+  pdf: boolean;
 }
 
 export interface SearchState {
   query: string;
   searchResults: Array<SearchResult>;
+  selectedResult?: SearchResult;
 }
 
 @Module({ dynamic: true, store, name: 'search' })
 export class Search extends VuexModule implements SearchState {
   private queryString = ''
   private results: Array<SearchResult> = []
+  private selectedRes?: SearchResult
 
   @Mutation
   public SET_QUERY (query: string) {
@@ -50,6 +52,22 @@ export class Search extends VuexModule implements SearchState {
 
   public get searchResults (): Array<SearchResult> {
     return this.results
+  }
+
+  @Mutation
+  public SELECT_RESULT (selectedResult: SearchResult) {
+    this.selectedRes = selectedResult
+    this.results = [...this.results]
+  }
+
+  @Action({ commit: 'SELECT_RESULT' })
+  public Select (selectedResult: SearchResult) {
+    return selectedResult
+  }
+
+  public get selectedResult (): SearchResult | undefined {
+    window.console.log('IN isSelected')
+    return this.selectedRes
   }
 }
 

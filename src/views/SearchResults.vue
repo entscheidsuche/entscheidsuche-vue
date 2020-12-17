@@ -137,12 +137,12 @@
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
-        <div v-for="result in results" :key="result.id" class="result-item" v-on:click="onOpenPreview()">
+        <div v-for="result in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
               <h4 class="result-title">{{ result.title }} vom {{ result.date }}</h4>
-              <a class="link-logo"></a>
+              <img v-bind:class="['link-logo', result.pdf ? 'pdf' : 'html']">
             </div>
             <div class="text-preview">
               <p v-html="result.text"/>
@@ -151,31 +151,33 @@
         </div>
       </div>
       <div v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '']">
-        <div class="doc-info">
-          <div class="doc-header">
-            <div class="flex-row">
-              <a class="canton-logo"></a>
-              <h4 class="result-title">
+        <div v-if="selectedResult !== undefined">
+          <div class="doc-info">
+            <div class="doc-header">
+              <div class="flex-row">
+                <a class="canton-logo"></a>
+                <h4 class="result-title">
+                Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
+                </h4>
+                <div class="controls-wrapper">
+                  <b-icon v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
+                  <b-icon v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
+                  <div v-on:click="onClosePreview()" id="close-preview"></div>
+                </div>
+              </div>
+              <h4 class="result-title-mobile">
               Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
               </h4>
-              <div class="controls-wrapper">
-                <b-icon v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
-                <b-icon v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
-                <div v-on:click="onClosePreview()" id="close-preview"></div>
-              </div>
             </div>
-            <h4 class="result-title-mobile">
-            Obergericht, Zivilkammern, 27 II 2018, Urteil vom 11.12.2018
-            </h4>
           </div>
-        </div>
-        <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
-          <iframe class="desktop-pdf" scrolling="auto" src="https://entscheidsuche.ch/direkt_kantone%2Ffr_kg2011%2Fcap_2002_9_24_02_03.pdf" width="100%" height="100%" type='application/pdf' title="Title">
-            <p style="font-size: 110%;"><em>There is content being displayed here that your browser doesn't support.</em> <a href="URL HERE" target="_blank"> Please click here to attempt to view the information in a separate browser window. </a> Thanks for your patience!</p>
-          </iframe>
-          <iframe class="mobile-pdf" scrolling="auto" src="https://drive.google.com/viewerng/viewer?embedded=true&url=https://entscheidsuche.ch/direkt_kantone%2Ffr_kg2011%2Fcap_2002_9_24_02_03.pdf" width="100%" height="100%" type='application/pdf' title="Title">
-            <p style="font-size: 110%;"><em>There is content being displayed here that your browser doesn't support.</em> <a href="URL HERE" target="_blank"> Please click here to attempt to view the information in a separate browser window. </a> Thanks for your patience!</p>
-          </iframe>
+          <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
+            <iframe class="desktop-pdf" scrolling="auto" src="https://entscheidsuche.ch/direkt_kantone%2Ffr_kg2011%2Fcap_2002_9_24_02_03.pdf" width="100%" height="100%" type='application/pdf' title="Title">
+              <p style="font-size: 110%;"><em>There is content being displayed here that your browser doesn't support.</em> <a href="URL HERE" target="_blank"> Please click here to attempt to view the information in a separate browser window. </a> Thanks for your patience!</p>
+            </iframe>
+            <iframe class="mobile-pdf" scrolling="auto" src="https://drive.google.com/viewerng/viewer?embedded=true&url=https://entscheidsuche.ch/direkt_kantone%2Ffr_kg2011%2Fcap_2002_9_24_02_03.pdf" width="100%" height="100%" type='application/pdf' title="Title">
+              <p style="font-size: 110%;"><em>There is content being displayed here that your browser doesn't support.</em> <a href="URL HERE" target="_blank"> Please click here to attempt to view the information in a separate browser window. </a> Thanks for your patience!</p>
+            </iframe>
+          </div>
         </div>
       </div>
     </div>
@@ -345,14 +347,17 @@
               flex-shrink: 0;
             }
             .link-logo{
-              flex-shrink: 0;
-              background: url('../assets/pdf.png') no-repeat center;
-              background-size: contain;
-              background-position: right center;
-              background-repeat: no-repeat;
-              height:36px;
-              width:36px;
+              max-height:36px;
+              width:auto;
+              height: auto;
               margin-left:10px;
+
+              &.pdf{
+                content: url('../assets/pdf.png');
+              }
+              &.html{
+                content: url('../assets/html.png');
+              }
             }
             .result-title{
               font-size: 16px;
@@ -370,6 +375,9 @@
               background-color: #FFFF00;
             }
           }
+        }
+        &.selected{
+          background-color: rgba(97, 131, 236, 0.2);
         }
       }
       .result-item:hover{
@@ -634,7 +642,7 @@
 import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
-import { SearchModule } from '@/store/modules/search'
+import { SearchModule, SearchResult } from '@/store/modules/search'
 
 @Component({
   name: 'SearchResult'
@@ -659,6 +667,10 @@ export default class SearchResults extends Vue {
 
   get results () {
     return SearchModule.searchResults
+  }
+
+  get selectedResult () {
+    return SearchModule.selectedResult
   }
 
   created () {
@@ -719,8 +731,16 @@ export default class SearchResults extends Vue {
     }
   }
 
-  public getImgUrl (pic) {
-    return require('../assets/cantons/' + pic + '.png')
+  public getImgUrl (canton: string) {
+    return require('../assets/cantons/' + canton + '.png')
+  }
+
+  public onSelectResult (result: SearchResult): void {
+    SearchModule.Select(result)
+  }
+
+  public isSelected (result: SearchResult): boolean {
+    return SearchModule.selectedResult === result
   }
 }
 </script>
