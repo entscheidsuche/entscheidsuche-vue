@@ -35,7 +35,7 @@ export class Search extends VuexModule implements SearchState {
 
   @Action
   public SetQuery (query: string) {
-    if (query !== '' && query !== this.queryString) {
+    if (query !== this.queryString) {
       this.context.commit('SET_QUERY', query)
       return this.context.dispatch('SetResults')
     }
@@ -79,7 +79,6 @@ export class Search extends VuexModule implements SearchState {
   @Mutation
   public SELECT_RESULT (selectedResult: SearchResult) {
     this.selectedRes = selectedResult
-    // this.results = [...this.results]
   }
 
   @Action({ commit: 'SELECT_RESULT' })

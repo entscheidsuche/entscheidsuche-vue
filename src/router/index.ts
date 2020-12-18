@@ -61,6 +61,19 @@ const router = new VueRouter({
   routes
 })
 
+router.beforeEach((to, from, next) => {
+  if (to.name !== 'Search' && from.name === 'Search') {
+    const clearQuery = SearchModule.SetQuery('')
+    if (clearQuery !== undefined) {
+      clearQuery.then(() => next())
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
+
 export default router
 
 sync(store, router)

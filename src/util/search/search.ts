@@ -38,7 +38,6 @@ export class SearchUtil {
 
   private static extractSearchResults (resp: any): Array<SearchResult> {
     const results: Array<SearchResult> = []
-    console.log(resp)
     if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
       const hits: Array<any> = resp.data.hits.hits
       for (const hit of hits) {
