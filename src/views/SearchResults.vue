@@ -163,9 +163,9 @@
               </div>
               <h4 v-if="this.windowWidth > 1024" class="result-title">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
               <div class="controls-wrapper">
-                <b-icon v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
-                <b-icon v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
-                <div v-on:click="onClosePreview()" id="close-preview"></div>
+                <b-icon class="rounded bg-primary p-1" variant="light" v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
+                <b-icon class="rounded bg-primary p-1" variant="light"  v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
+                <b-icon class="rounded bg-primary p-1" variant="light" v-on:click="onClosePreview()" id="close-preview"></b-icon>
               </div>
             </div>
             <h4 v-if="this.windowWidth <= 1024" class="result-title-mobile">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
@@ -394,27 +394,6 @@
       flex-grow:0;
       transition: width 0 linear;
 
-      &.visible{
-        width:35%;
-        padding:0.5em;
-        flex-grow:2;
-      }
-
-      &.fullScreen{
-        display: block;
-        width:100vw;
-
-        .doc-info{
-          .doc-header{
-            #minimize-preview{
-              display:block;
-            }
-            #maximize-preview{
-              display:none;
-            }
-          }
-        }
-      }
       .preview-content{
         height:100%;
         width:auto;
@@ -447,45 +426,32 @@
                 flex-shrink: 0;
               }
               .controls-wrapper{
-                width:60px;
-                height:20px;
+                width:70px;
+                height:30px;
                 margin-left: 20px;
                 position:relative;
                 flex-shrink:0;
 
                 #close-preview{
-                  background: url('../assets/bootstrap-close-big.svg') no-repeat center;
+                  background: url('../assets/bootstrap-close-big-white.svg') no-repeat center;
                   cursor:pointer;
-                  height:20px;
-                  width:20px;
-                  margin-left: 20px;
+                  height:30px;
+                  width:30px;
                   cursor:pointer;
-                  transition: all .2s ease-in-out;;
                   position:absolute;
                   top:0;
                   right:0;
                 }
-                #close-preview:hover{
-                  transform: scale(1.1);
-                }
                 #maximize-preview{
-                  height:20px;
-                  width:20px;
+                  height:30px;
+                  width:30px;
                   cursor:pointer;
-                  transition: all .2s ease-in-out;
-                }
-                #maximize-preview:hover{
-                  transform: scale(1.1);
                 }
                 #minimize-preview{
-                  height:20px;
-                  width:20px;
+                  height:30px;
+                  width:30px;
                   cursor:pointer;
-                  transition: all .2s ease-in-out;
                   display:none;
-                }
-                #minimize-preview:hover{
-                  transform: scale(1.1);
                 }
               }
               .result-title{
@@ -504,6 +470,36 @@
               margin-bottom: 0;
               word-break: break-all;
               display:none;
+            }
+          }
+        }
+      }
+      &.visible{
+        width:35%;
+        padding:0.5em;
+        flex-grow:2;
+      }
+      &.fullScreen{
+        display: block;
+        width:100vw;
+
+        .preview-content{
+          .doc-info{
+            .doc-header{
+              .flex-row{
+                .controls-wrapper{
+                  #minimize-preview{
+                    display:block;
+                    float:right;
+                  }
+                  #maximize-preview{
+                    display:none;
+                  }
+                  #close-preview{
+                    display:none;
+                  }
+                }
+              }
             }
           }
         }
@@ -566,7 +562,7 @@
               .flex-row{
                 padding-bottom: 10px;
                 .canton-logo{
-                  max-height:25px;
+                  max-height:30px;
                   width: auto;
                   height: auto;
                   margin-top:0;
@@ -615,16 +611,9 @@
         }
       }
       .preview{
-        padding-left:0;
-        padding-right:0;
-        &.fullScreen{
-          .doc-info{
-            .doc-header{
-              #minimize-preview{
-                display:none;
-              }
-            }
-          }
+        .preview-content{
+          padding-left:0;
+          padding-right:0;
         }
       }
     }
