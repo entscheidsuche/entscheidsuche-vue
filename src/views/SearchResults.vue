@@ -698,9 +698,6 @@ export default class SearchResults extends Vue {
   public onToggleFilter (): void {
     if (this.filterVisible === true) {
       this.filterVisible = false
-    } else if (this.previewVisible === true) {
-      this.previewVisible = false
-      this.filterVisible = true
     } else {
       this.filterVisible = true
     }
