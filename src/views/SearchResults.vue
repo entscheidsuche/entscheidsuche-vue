@@ -149,8 +149,7 @@
             </div>
           </div>
         </div>
-        <!--<a v-on:click="getMoreResults()">mehr ...</a>-->
-        <div v-if="this.resultsPending" id="spinner-wrapper" class="d-flex justify-content-center mb-3">
+        <div v-show="this.resultsPending" id="spinner-wrapper" class="d-flex justify-content-center mb-3">
           <b-spinner variant="primary" label="Loading..."></b-spinner>
         </div>
       </div>
@@ -317,9 +316,6 @@
             flex-shrink: 0;
             font-size:20px;
           }
-        }
-        #spinner-wrapper{
-          //display:none;
         }
       }
       .result-item{
