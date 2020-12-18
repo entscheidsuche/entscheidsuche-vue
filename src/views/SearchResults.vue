@@ -172,7 +172,7 @@
           </div>
         </div>
         <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
-          <iframe v-if="this.windowWidth > 1024" class="desktop-pdf" scrolling="auto" :src="selectedResult.url" width="100%" height="100%" type='application/pdf' title="Title"></iframe>
+          <iframe v-if="this.windowWidth > 1024" frameborder="0"  class="desktop-pdf" scrolling="auto" :src="selectedResult.url + (this.fullScreen ? '' : '#view=FitH')" width="100%" height="100%" type='application/pdf' title="Title"></iframe>
           <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" scrolling="auto" :src="getMobileDocUrl(selectedResult.url)" width="100%" height="100%" type='application/pdf' title="Title"></iframe>
         </div>
       </div>
