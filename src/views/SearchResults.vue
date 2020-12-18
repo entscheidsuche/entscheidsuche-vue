@@ -320,6 +320,9 @@
           }
         }
       }
+      .result-item:hover{
+        background-color: #f6f8fa;
+      }
       .result-item{
         border: 1px solid rgba(0, 0, 0, 0.125);
         border-radius: 4px;
@@ -375,10 +378,8 @@
         }
         &.selected{
           background-color: rgba(97, 131, 236, 0.2);
+          border-color: rgba(97, 131, 236, 0.2);
         }
-      }
-      .result-item:hover{
-        background-color: rgba(97, 131, 236, 0.2);
       }
     }
     .preview{
