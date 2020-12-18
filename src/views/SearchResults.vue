@@ -154,6 +154,7 @@
         </div>
       </div>
       <div v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '']">
+        <div class="preview-content" v-show="this.selectedResult">
         <div class="doc-info">
           <div class="doc-header">
             <div class="flex-row">
@@ -174,6 +175,7 @@
           <iframe v-if="this.windowWidth > 1024" class="desktop-pdf" scrolling="auto" :src="selectedResult.url" width="100%" height="100%" type='application/pdf' title="Title"></iframe>
           <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" scrolling="auto" :src="getMobileDocUrl(selectedResult.url)" width="100%" height="100%" type='application/pdf' title="Title"></iframe>
         </div>
+      </div>
       </div>
     </div>
   <router-view/>
@@ -412,92 +414,96 @@
           }
         }
       }
-      .doc-info{
-        width:100%;
-        padding:20px;
-        border: 1px solid rgba(0, 0, 0, 0.125);
-        border-radius: 4px;
-        margin-bottom: 0.5em;
-        position:relative;
-
-        .doc-header{
+      .preview-content{
+        height:100%;
+        width:auto;
+        .doc-info{
           width:100%;
-          height:100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
+          padding:20px;
+          border: 1px solid rgba(0, 0, 0, 0.125);
+          border-radius: 4px;
+          margin-bottom: 0.5em;
+          position:relative;
 
-          .flex-row{
+          .doc-header{
             width:100%;
+            height:100%;
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            flex-direction: row;
 
-            .canton-logo{
-              max-height:36px;
-              width: auto;
-              height: auto;
-              margin-right:10px;
-              flex-shrink: 0;
-            }
-            .controls-wrapper{
-              width:60px;
-              height:20px;
-              margin-left: 20px;
-              position:relative;
-              flex-shrink:0;
+            .flex-row{
+              width:100%;
+              display: flex;
+              justify-content: space-between;
+              flex-direction: row;
 
-              #close-preview{
-                background: url('../assets/bootstrap-close-big.svg') no-repeat center;
-                cursor:pointer;
+              .canton-logo{
+                max-height:36px;
+                width: auto;
+                height: auto;
+                margin-right:10px;
+                flex-shrink: 0;
+              }
+              .controls-wrapper{
+                width:60px;
                 height:20px;
-                width:20px;
                 margin-left: 20px;
-                cursor:pointer;
-                transition: all .2s ease-in-out;;
-                position:absolute;
-                top:0;
-                right:0;
+                position:relative;
+                flex-shrink:0;
+
+                #close-preview{
+                  background: url('../assets/bootstrap-close-big.svg') no-repeat center;
+                  cursor:pointer;
+                  height:20px;
+                  width:20px;
+                  margin-left: 20px;
+                  cursor:pointer;
+                  transition: all .2s ease-in-out;;
+                  position:absolute;
+                  top:0;
+                  right:0;
+                }
+                #close-preview:hover{
+                  transform: scale(1.1);
+                }
+                #maximize-preview{
+                  height:20px;
+                  width:20px;
+                  cursor:pointer;
+                  transition: all .2s ease-in-out;
+                }
+                #maximize-preview:hover{
+                  transform: scale(1.1);
+                }
+                #minimize-preview{
+                  height:20px;
+                  width:20px;
+                  cursor:pointer;
+                  transition: all .2s ease-in-out;
+                  display:none;
+                }
+                #minimize-preview:hover{
+                  transform: scale(1.1);
+                }
               }
-              #close-preview:hover{
-                transform: scale(1.1);
-              }
-              #maximize-preview{
-                height:20px;
-                width:20px;
-                cursor:pointer;
-                transition: all .2s ease-in-out;
-              }
-              #maximize-preview:hover{
-                transform: scale(1.1);
-              }
-              #minimize-preview{
-                height:20px;
-                width:20px;
-                cursor:pointer;
-                transition: all .2s ease-in-out;
-                display:none;
-              }
-              #minimize-preview:hover{
-                transform: scale(1.1);
+              .result-title{
+                font-size:18px;
+                margin-top: 0;
+                text-align: left;
+                width:100%;
+                margin-bottom: 0;
+                word-break: break-all;
               }
             }
-            .result-title{
-              font-size:18px;
+            .result-title-mobile{
               margin-top: 0;
               text-align: left;
               width:100%;
               margin-bottom: 0;
               word-break: break-all;
+              display:none;
             }
-          }
-          .result-title-mobile{
-            margin-top: 0;
-            text-align: left;
-            width:100%;
-            margin-bottom: 0;
-            word-break: break-all;
-            display:none;
           }
         }
       }
@@ -553,22 +559,25 @@
         }
       }
       .preview{
-        .doc-info{
-          .doc-header{
-            .flex-row{
-              padding-bottom: 10px;
-              .canton-logo{
-                width:25px;
-                height:25px;
-                margin-top:0;
+        .preview-content{
+          .doc-info{
+            .doc-header{
+              .flex-row{
+                padding-bottom: 10px;
+                .canton-logo{
+                  max-height:25px;
+                  width: auto;
+                  height: auto;
+                  margin-top:0;
+                }
+                .result-title{
+                  display: none;
+                }
               }
-              .result-title{
-                display: none;
+              .result-title-mobile{
+                font-size: 16px;
+                display:block;
               }
-            }
-            .result-title-mobile{
-              font-size: 16px;
-              display:block;
             }
           }
         }
@@ -605,8 +614,8 @@
         }
       }
       .preview{
-      padding-left:0;
-      padding-right:0;
+        padding-left:0;
+        padding-right:0;
         &.fullScreen{
           .doc-info{
             .doc-header{
