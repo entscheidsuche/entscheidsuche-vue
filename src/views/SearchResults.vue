@@ -730,6 +730,9 @@ export default class SearchResults extends Vue {
     this.previewVisible = false
     if (this.fullScreen === true) {
       this.fullScreen = false
+      if (this.windowWidth > 534) {
+        this.previewVisible = true
+      }
     }
   }
 
