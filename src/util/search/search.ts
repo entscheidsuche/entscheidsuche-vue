@@ -4,6 +4,7 @@ import axios from 'axios'
 export class SearchUtil {
   public static async search (query: string, searchAfter?: Array<any>): Promise<Array<SearchResult>> {
     const search: any = {
+      size: 20,
       query: {
         // eslint-disable-next-line @typescript-eslint/camelcase
         query_string: {

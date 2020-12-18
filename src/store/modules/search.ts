@@ -79,7 +79,7 @@ export class Search extends VuexModule implements SearchState {
   @Mutation
   public SELECT_RESULT (selectedResult: SearchResult) {
     this.selectedRes = selectedResult
-    this.results = [...this.results]
+    // this.results = [...this.results]
   }
 
   @Action({ commit: 'SELECT_RESULT' })
@@ -93,7 +93,7 @@ export class Search extends VuexModule implements SearchState {
 
   @Mutation
   public RESULTS_PENDING (pending: boolean) {
-    this.selectedRes = pending
+    this.resPending = pending
   }
 
   public get resultsPending (): boolean {
