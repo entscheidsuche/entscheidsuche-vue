@@ -18,6 +18,7 @@ export interface SearchState {
   searchResults: Array<SearchResult>;
   resultsPending: boolean;
   selectedResult: SearchResult | {};
+  allResultsLoaded: boolean;
 }
 
 @Module({ dynamic: true, store, name: 'search' })
@@ -26,6 +27,7 @@ export class Search extends VuexModule implements SearchState {
   private resPending = false
   private results: Array<SearchResult> = []
   private selectedRes: SearchResult | {} = {}
+  private allResLoaded = false
 
   @Mutation
   public SET_QUERY (query: string) {
@@ -52,6 +54,11 @@ export class Search extends VuexModule implements SearchState {
 
   @Mutation
   public SET_MORE_RESULTS (results: Array<SearchResult>) {
+    if (results.length === 0) {
+      this.allResLoaded = true
+    } else {
+      this.allResLoaded = false
+    }
     this.results = [...this.results, ...results]
   }
 
@@ -97,6 +104,10 @@ export class Search extends VuexModule implements SearchState {
 
   public get resultsPending (): boolean {
     return this.resPending
+  }
+
+  public get allResultsLoaded (): boolean {
+    return this.allResLoaded
   }
 }
 

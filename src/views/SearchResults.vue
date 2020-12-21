@@ -149,7 +149,7 @@
             </div>
           </div>
         </div>
-        <div v-show="this.resultsPending" id="spinner-wrapper" class="d-flex justify-content-center mb-3">
+        <div v-if="this.resultsPending" id="spinner-wrapper" class="d-flex justify-content-center mb-3">
           <b-spinner variant="primary" label="Loading..."></b-spinner>
         </div>
       </div>
@@ -680,8 +680,10 @@ export default class SearchResults extends Vue {
 
   handleScroll () {
     const searchResultsDiv = document.getElementById('results')!
-    if (searchResultsDiv.scrollTop + searchResultsDiv.clientHeight >= searchResultsDiv.scrollHeight) {
-      this.getMoreResults()
+    if (!SearchModule.allResultsLoaded) {
+      if (searchResultsDiv.scrollTop + searchResultsDiv.clientHeight >= searchResultsDiv.scrollHeight) {
+        this.getMoreResults()
+      }
     }
   }
 
