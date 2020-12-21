@@ -13,7 +13,9 @@
     <LocaleSelector/>
     <b-sidebar id="sidebar-right" right no-header>
       <div class="menu-overlay">
-        <div v-b-toggle.sidebar-right id="close-menu" style="border:none;outline:none;box-shadow:none;"></div>
+        <b-button v-b-toggle.sidebar-right variant="primary" id="close-menu-btn">
+          <b-icon id="close-menu"></b-icon>
+        </b-button>
         <nav>
           <ul class="menu-desktop">
             <li><router-link :to="{ name: 'About' }" class="desktop-menu-item">Über uns</router-link></li>
@@ -110,20 +112,20 @@
         list-style-type: none;
       }
 
-      #close-menu {
+      #close-menu-btn{
         position: absolute;
         top: 21px;
         right: 20px;
-        cursor: pointer;
-        background: url('../assets/close-big.svg') no-repeat center;
-        background-size: 30px;
-        height: 30px;
-        width: 30px;
-        transition: all .2s ease-in-out;
-      }
-
-      #close-menu:hover {
-        transform: scale(1.1);
+        height:30px;
+        width:30px;
+        #close-menu {
+          background: url('../assets/bootstrap-close-big-white.svg') no-repeat center;
+          position:absolute;
+          height:28px;
+          width:28px;
+          top:0;
+          left:0;
+        }
       }
 
       .menu-desktop {

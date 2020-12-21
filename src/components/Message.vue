@@ -1,7 +1,9 @@
 <template>
   <b-collapse visible id="optional-bar" v-if="showMessage">
     {{ $t('message') }}
-    <div id="close-optional-bar" v-on:click="onCloseMessageBar()"></div>
+    <b-button variant="primary" v-on:click="onCloseMessageBar()" id="close-bar-btn">
+      <b-icon id="close-optional-bar"></b-icon>
+    </b-button>
   </b-collapse>
 </template>
 
@@ -14,19 +16,21 @@
   font-weight: bold;
   position:relative;
 
-  #close-optional-bar{
+  #close-bar-btn{
     position: absolute;
     top:10px;
     right:20px;
-    cursor:pointer;
-    background: url('../assets/close.svg') no-repeat center;
-    background-size: 20px;
     height:20px;
     width:20px;
-    transition: all .2s ease-in-out;
-  }
-  #close-optional-bar:hover{
-    transform: scale(1.1);
+    padding:0;
+    #close-optional-bar{
+      background: url('../assets/bootstrap-close-medium-white.svg') no-repeat center;
+      height:16px;
+      width:16px;
+      position:absolute;
+      top:1px;
+      left:1px;
+    }
   }
 }
 </style>

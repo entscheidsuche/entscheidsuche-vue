@@ -166,9 +166,15 @@
               </div>
               <h4 v-if="this.windowWidth > 1024" class="result-title">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
               <div class="controls-wrapper">
-                <b-icon class="rounded bg-primary p-1" variant="light" v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
-                <b-icon class="rounded bg-primary p-1" variant="light"  v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
-                <b-icon class="rounded bg-primary p-1" variant="light" v-on:click="onClosePreview()" id="close-preview"></b-icon>
+                <b-button variant="primary"  v-on:click="onFullScreen()" id="maximize-preview-btn">
+                  <b-icon id="maximize-preview" icon="arrows-fullscreen"></b-icon>
+                </b-button>
+                <b-button variant="primary"  v-on:click="onFullScreen()" id="minimize-preview-btn">
+                  <b-icon id="minimize-preview" icon="fullscreen-exit"></b-icon>
+                </b-button>
+                <b-button variant="primary" v-on:click="onClosePreview()" id="close-preview-btn">
+                  <b-icon id="close-preview"></b-icon>
+                </b-button>
               </div>
             </div>
             <h4 v-if="this.windowWidth <= 1024" class="result-title-mobile">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
@@ -412,7 +418,7 @@
         width:auto;
         .doc-info{
           width:100%;
-          padding:20px;
+          padding:15px 11px 15px 11px;
           border: 1px solid rgba(0, 0, 0, 0.125);
           border-radius: 4px;
           margin-bottom: 0.5em;
@@ -445,26 +451,45 @@
                 position:relative;
                 flex-shrink:0;
 
-                #close-preview{
-                  background: url('../assets/bootstrap-close-big-white.svg') no-repeat center;
-                  cursor:pointer;
+                #close-preview-btn{
                   height:30px;
                   width:30px;
-                  cursor:pointer;
                   position:absolute;
                   top:0;
                   right:0;
+                  #close-preview{
+                    background: url('../assets/bootstrap-close-big-white.svg') no-repeat center;
+                    height:28px;
+                    width:28px;
+                    position:absolute;
+                    top:0;
+                    left:0;
+                  }
                 }
-                #maximize-preview{
+                #maximize-preview-btn{
                   height:30px;
                   width:30px;
-                  cursor:pointer;
+                  #maximize-preview{
+                    height:22px;
+                    width:22px;
+                    position:absolute;
+                    top:4px;
+                    left:4px;
+                  }
                 }
-                #minimize-preview{
+                #minimize-preview-btn{
                   height:30px;
                   width:30px;
-                  cursor:pointer;
                   display:none;
+                  position: absolute;
+                  right:0;
+                  #minimize-preview{
+                    height:22px;
+                    width:22px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
+                  }
                 }
               }
               .result-title{
@@ -501,14 +526,14 @@
             .doc-header{
               .flex-row{
                 .controls-wrapper{
-                  #minimize-preview{
+                  #minimize-preview-btn{
                     display:block;
                     float:right;
                   }
-                  #maximize-preview{
+                  #maximize-preview-btn{
                     display:none;
                   }
-                  #close-preview{
+                  #close-preview-btn{
                     display:none;
                   }
                 }
@@ -520,7 +545,7 @@
     }
     .outer-pdf{
       bottom:0;
-      height:calc(100% - 85px);
+      height:calc(100% - 75px);
       width:100%;
       overflow-x: hidden;
 
