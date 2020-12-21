@@ -137,8 +137,11 @@
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
-        <div v-for="result in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
+        <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
+            <div class="result-index">
+              <p>Treffer {{ index + 1}} von {{ result.totalHits }}</p>
+            </div>
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
               <h4 class="result-title">{{ result.title }} vom {{ result.date }}</h4>
@@ -149,7 +152,7 @@
             </div>
           </div>
         </div>
-        <div v-show="this.resultsPending" id="spinner-wrapper" class="d-flex justify-content-center mb-3">
+        <div v-if="this.resultsPending" id="spinner-wrapper" class="d-flex justify-content-center mb-3">
           <b-spinner variant="primary" label="Loading..."></b-spinner>
         </div>
       </div>
@@ -163,9 +166,9 @@
               </div>
               <h4 v-if="this.windowWidth > 1024" class="result-title">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
               <div class="controls-wrapper">
-                <b-icon v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
-                <b-icon v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
-                <div v-on:click="onClosePreview()" id="close-preview"></div>
+                <b-icon class="rounded bg-primary p-1" variant="light" v-on:click="onFullScreen()" id="maximize-preview" icon="arrows-fullscreen" aria-hidden="true"></b-icon>
+                <b-icon class="rounded bg-primary p-1" variant="light"  v-on:click="onFullScreen()" id="minimize-preview" icon="fullscreen-exit" aria-hidden="true"></b-icon>
+                <b-icon class="rounded bg-primary p-1" variant="light" v-on:click="onClosePreview()" id="close-preview"></b-icon>
               </div>
             </div>
             <h4 v-if="this.windowWidth <= 1024" class="result-title-mobile">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
@@ -374,6 +377,17 @@
               font-style: italic;
               background-color: #FFFF00;
             }
+            p{
+              margin-bottom:0;
+            }
+          }
+          .result-index{
+            font-size: 12px;
+            p{
+              //text-align: right;
+              //margin-bottom:0;
+              color: #6f757c;
+            }
           }
         }
         &.selected{
@@ -394,27 +408,6 @@
       flex-grow:0;
       transition: width 0 linear;
 
-      &.visible{
-        width:35%;
-        padding:0.5em;
-        flex-grow:2;
-      }
-
-      &.fullScreen{
-        display: block;
-        width:100vw;
-
-        .doc-info{
-          .doc-header{
-            #minimize-preview{
-              display:block;
-            }
-            #maximize-preview{
-              display:none;
-            }
-          }
-        }
-      }
       .preview-content{
         height:100%;
         width:auto;
@@ -447,45 +440,32 @@
                 flex-shrink: 0;
               }
               .controls-wrapper{
-                width:60px;
-                height:20px;
+                width:70px;
+                height:30px;
                 margin-left: 20px;
                 position:relative;
                 flex-shrink:0;
 
                 #close-preview{
-                  background: url('../assets/bootstrap-close-big.svg') no-repeat center;
+                  background: url('../assets/bootstrap-close-big-white.svg') no-repeat center;
                   cursor:pointer;
-                  height:20px;
-                  width:20px;
-                  margin-left: 20px;
+                  height:30px;
+                  width:30px;
                   cursor:pointer;
-                  transition: all .2s ease-in-out;;
                   position:absolute;
                   top:0;
                   right:0;
                 }
-                #close-preview:hover{
-                  transform: scale(1.1);
-                }
                 #maximize-preview{
-                  height:20px;
-                  width:20px;
+                  height:30px;
+                  width:30px;
                   cursor:pointer;
-                  transition: all .2s ease-in-out;
-                }
-                #maximize-preview:hover{
-                  transform: scale(1.1);
                 }
                 #minimize-preview{
-                  height:20px;
-                  width:20px;
+                  height:30px;
+                  width:30px;
                   cursor:pointer;
-                  transition: all .2s ease-in-out;
                   display:none;
-                }
-                #minimize-preview:hover{
-                  transform: scale(1.1);
                 }
               }
               .result-title{
@@ -504,6 +484,36 @@
               margin-bottom: 0;
               word-break: break-all;
               display:none;
+            }
+          }
+        }
+      }
+      &.visible{
+        width:35%;
+        padding:0.5em;
+        flex-grow:2;
+      }
+      &.fullScreen{
+        display: block;
+        width:100vw;
+
+        .preview-content{
+          .doc-info{
+            .doc-header{
+              .flex-row{
+                .controls-wrapper{
+                  #minimize-preview{
+                    display:block;
+                    float:right;
+                  }
+                  #maximize-preview{
+                    display:none;
+                  }
+                  #close-preview{
+                    display:none;
+                  }
+                }
+              }
             }
           }
         }
@@ -566,7 +576,7 @@
               .flex-row{
                 padding-bottom: 10px;
                 .canton-logo{
-                  max-height:25px;
+                  max-height:30px;
                   width: auto;
                   height: auto;
                   margin-top:0;
@@ -615,16 +625,9 @@
         }
       }
       .preview{
-        padding-left:0;
-        padding-right:0;
-        &.fullScreen{
-          .doc-info{
-            .doc-header{
-              #minimize-preview{
-                display:none;
-              }
-            }
-          }
+        .preview-content{
+          padding-left:0;
+          padding-right:0;
         }
       }
     }
@@ -691,8 +694,10 @@ export default class SearchResults extends Vue {
 
   handleScroll () {
     const searchResultsDiv = document.getElementById('results')!
-    if (searchResultsDiv.scrollTop + searchResultsDiv.clientHeight >= searchResultsDiv.scrollHeight) {
-      this.getMoreResults()
+    if (!SearchModule.allResultsLoaded) {
+      if (searchResultsDiv.scrollTop + searchResultsDiv.clientHeight >= searchResultsDiv.scrollHeight) {
+        this.getMoreResults()
+      }
     }
   }
 
