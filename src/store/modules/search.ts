@@ -15,6 +15,7 @@ export interface SearchResult {
 
 export interface SearchState {
   query: string;
+  searchTotal: number;
   searchResults: Array<SearchResult>;
   resultsPending: boolean;
   selectedResult: SearchResult | {};
@@ -24,6 +25,7 @@ export interface SearchState {
 export class Search extends VuexModule implements SearchState {
   private queryString = ''
   private resPending = false
+  private total = 0
   private results: Array<SearchResult> = []
   private selectedRes: SearchResult | {} = {}
 
@@ -46,13 +48,15 @@ export class Search extends VuexModule implements SearchState {
   }
 
   @Mutation
-  public SET_RESULTS (results: Array<SearchResult>) {
-    this.results = results
+  public SET_RESULTS (results: [Array<SearchResult>, number]) {
+    this.results = results[0]
+    this.total = results[1]
   }
 
   @Mutation
-  public SET_MORE_RESULTS (results: Array<SearchResult>) {
-    this.results = [...this.results, ...results]
+  public SET_MORE_RESULTS (results: [Array<SearchResult>, number]) {
+    this.results = [...this.results, ...results[0]]
+    this.total = results[1]
   }
 
   @Action({ commit: 'SET_RESULTS' })
@@ -74,6 +78,10 @@ export class Search extends VuexModule implements SearchState {
 
   public get searchResults (): Array<SearchResult> {
     return this.results
+  }
+
+  public get searchTotal (): number {
+    return this.total
   }
 
   @Mutation

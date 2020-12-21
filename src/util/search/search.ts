@@ -2,7 +2,7 @@ import { SearchResult } from '@/store/modules/search'
 import axios from 'axios'
 
 export class SearchUtil {
-  public static async search (query: string, searchAfter?: Array<any>): Promise<Array<SearchResult>> {
+  public static async search (query: string, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number]> {
     const search: any = {
       size: 20,
       query: {
@@ -36,10 +36,12 @@ export class SearchUtil {
       }).then(resp => SearchUtil.extractSearchResults(resp))
   }
 
-  private static extractSearchResults (resp: any): Array<SearchResult> {
+  private static extractSearchResults (resp: any): [Array<SearchResult>, number] {
     const results: Array<SearchResult> = []
+    let total = 0
     if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
       const hits: Array<any> = resp.data.hits.hits
+      total = resp.data.hits.total.value
       for (const hit of hits) {
         let text = ''
         if (hit.highlight !== undefined) {
@@ -64,7 +66,7 @@ export class SearchUtil {
         })
       }
     }
-    return results
+    return [results, total]
   }
 
   private static getExtract (highlight: Array<string>): string {
