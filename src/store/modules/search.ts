@@ -57,7 +57,7 @@ export class Search extends VuexModule implements SearchState {
 
   @Mutation
   public SET_MORE_RESULTS (results: [Array<SearchResult>, number]) {
-    if (results.length === 0) {
+    if (results[0].length === 0) {
       this.allResLoaded = true
     } else {
       this.allResLoaded = false

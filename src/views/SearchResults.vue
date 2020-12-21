@@ -139,9 +139,6 @@
         </div>
         <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
-            <div class="result-index">
-              <p>Treffer {{ index + 1}} von {{ result.totalHits }}</p>
-            </div>
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
               <h4 class="result-title">{{ result.title }} vom {{ result.date }}</h4>
@@ -149,6 +146,9 @@
             </div>
             <div class="text-preview">
               <p v-html="result.text"/>
+            </div>
+            <div class="result-index">
+              <p>Treffer {{ index + 1}} von {{ resultsTotal }}</p>
             </div>
           </div>
         </div>
@@ -333,7 +333,7 @@
         cursor: pointer;
 
         .result-body{
-          padding:20px;
+          padding:20px 20px 10px 20px;
 
           .result-header{
             width:100%;
@@ -384,9 +384,9 @@
           .result-index{
             font-size: 12px;
             p{
-              //text-align: right;
-              //margin-bottom:0;
-              color: #6f757c;
+              margin-bottom:0;
+              color: #6183ec;
+              text-align: right;
             }
           }
         }
@@ -402,7 +402,6 @@
       float: left;
       overflow: auto;
       box-sizing: border-box;
-      //padding:0.5em;
       overflow-x: hidden;
       overflow-y: hidden;
       flex-grow:0;
@@ -672,6 +671,10 @@ export default class SearchResults extends Vue {
 
   get resultsPending () {
     return SearchModule.resultsPending
+  }
+
+  get resultsTotal () {
+    return SearchModule.searchTotal
   }
 
   created () {
