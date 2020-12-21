@@ -11,6 +11,7 @@ export interface SearchResult {
   pdf: boolean;
   url: string;
   sort: Array<any>;
+  totalHits: string;
 }
 
 export interface SearchState {

@@ -137,8 +137,11 @@
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
-        <div v-for="result in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
+        <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
+            <div class="result-index">
+              <p>Treffer {{ index + 1}} von {{ result.totalHits }}</p>
+            </div>
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
               <h4 class="result-title">{{ result.title }} vom {{ result.date }}</h4>
@@ -373,6 +376,17 @@
             em{
               font-style: italic;
               background-color: #FFFF00;
+            }
+            p{
+              margin-bottom:0;
+            }
+          }
+          .result-index{
+            font-size: 12px;
+            p{
+              //text-align: right;
+              //margin-bottom:0;
+              color: #6f757c;
             }
           }
         }

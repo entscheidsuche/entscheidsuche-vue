@@ -40,6 +40,7 @@ export class SearchUtil {
     const results: Array<SearchResult> = []
     if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
       const hits: Array<any> = resp.data.hits.hits
+      const total: string = resp.data.hits.total.value
       for (const hit of hits) {
         let text = ''
         if (hit.highlight !== undefined) {
@@ -60,7 +61,8 @@ export class SearchUtil {
           canton: hit._source.kanton.toUpperCase(),
           pdf,
           url: hit._source.attachment.content_url,
-          sort: hit.sort
+          sort: hit.sort,
+          totalHits: total
         })
       }
     }
