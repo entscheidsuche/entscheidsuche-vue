@@ -13,15 +13,16 @@
             <HistogramSlider
               :width="this.sliderWidth"
               :bar-height="100"
-              :data="data"
+              :data="this.getDates()"
               :drag-interval="true"
               :force-edges="false"
               :colors="['#6183ec', '#c8d4f8']"
-              :min="1"
-              :max="100"
+              :min="new Date(1990, 11, 24).valueOf()"
+              :max="new Date(2017, 11, 24).valueOf()"
               :handleSize="16"
               :primaryColor="'#6183ec'"
               :labelColor="'#6183ec'"
+              :prettify="prettify"
             />
           </div>
         </div>
@@ -701,7 +702,11 @@ export default class SearchResults extends Vue {
 
   data () {
     return {
-      data: [1, 5, 10, 10, 70, 100, 100],
+      prettify: function (ts) {
+        return new Date(ts).toLocaleDateString('de', {
+          year: 'numeric'
+        })
+      },
       selected: [],
       options: [
         { text: 'DE', value: 'de' },
@@ -824,6 +829,20 @@ export default class SearchResults extends Vue {
     } else {
       this.sliderWidth = (this.windowWidth - 42)
     }
+  }
+
+  public getDates () {
+    const dict = {
+      2: new Date('2000-12-17'),
+      3: new Date('2010-12-17')
+    }
+    const datesArray: Date[] = []
+    for (const key in dict) {
+      for (let i = 0; i < Number(key); i++) {
+        datesArray.push(dict[key])
+      }
+    }
+    return datesArray
   }
 }
 </script>
