@@ -65,83 +65,8 @@
                 <b-form-checkbox>Entscheidungen des Militärkassationsgerichts</b-form-checkbox>
               </div>
             </b-collapse>
-            <div v-b-toggle="'collapse-2'" class="first">
-              <b-form-checkbox>ZH</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-3'" class="first">
-              <b-form-checkbox>BE</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-4'" class="first">
-              <b-form-checkbox>LU</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-5'" class="first">
-              <b-form-checkbox>UR</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-6'" class="first">
-              <b-form-checkbox>SZ</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-7'" class="first">
-              <b-form-checkbox>OW</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-8'" class="first">
-              <b-form-checkbox>NW</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-9'" class="first">
-              <b-form-checkbox>GL</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-10'" class="first">
-              <b-form-checkbox>ZG</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse11'" class="first">
-              <b-form-checkbox>FR</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-12'" class="first">
-              <b-form-checkbox>SO</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-13'" class="first">
-              <b-form-checkbox>BS</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-14'" class="first">
-              <b-form-checkbox>BL</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-15'" class="first">
-              <b-form-checkbox>SH</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-16'" class="first">
-              <b-form-checkbox>AR</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-17'" class="first">
-              <b-form-checkbox>AI</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-18'" class="first">
-              <b-form-checkbox>SG</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-19'" class="first">
-              <b-form-checkbox>GR</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-20'" class="first">
-              <b-form-checkbox>AG</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-21'" class="first">
-              <b-form-checkbox>TG</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-22'" class="first">
-              <b-form-checkbox>TI</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse23'" class="first">
-              <b-form-checkbox>VD</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-24'" class="first">
-              <b-form-checkbox>VS</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-25'" class="first">
-              <b-form-checkbox>NE</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-24'" class="first">
-              <b-form-checkbox>GE</b-form-checkbox>
-            </div>
-            <div v-b-toggle="'collapse-25'" class="first">
-              <b-form-checkbox>JU</b-form-checkbox>
+            <div v-for="canton in this.getUniqueCantons()" :key="canton">
+              <b-form-checkbox>{{ canton }}</b-form-checkbox>
             </div>
           </b-form-group>
         </div>
@@ -843,6 +768,16 @@ export default class SearchResults extends Vue {
       }
     }
     return datesArray
+  }
+
+  public getUniqueCantons () {
+    const cantons: string[] = []
+    this.results.forEach((result: SearchResult) => {
+      if (!(cantons.includes(result.canton))) {
+        cantons.push(result.canton)
+      }
+    })
+    return cantons
   }
 }
 </script>
