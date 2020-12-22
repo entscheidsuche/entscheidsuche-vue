@@ -8,11 +8,25 @@
           </div>
         </div>
         <div class="year-range">
-          <label class="title" for="range-1">Jahr</label>
-          <b-form-input id="range-1" type="range" min="0" max="5"></b-form-input>
+          <div id="slider-wrapper">
+            <p class="title">Jahr</p>
+            <HistogramSlider
+              :width="this.sliderWidth"
+              :bar-height="100"
+              :data="data"
+              :drag-interval="true"
+              :force-edges="false"
+              :colors="['#6183ec', '#c8d4f8']"
+              :min="1"
+              :max="100"
+              :handleSize="16"
+              :primaryColor="'#6183ec'"
+              :labelColor="'#6183ec'"
+            />
+          </div>
         </div>
         <div class="languages">
-          <b-form-group label="Sprachen" class="title">
+          <b-form-group label="Sprache" class="title">
             <b-form-checkbox
               v-for="option in options"
               v-model="selected"
@@ -258,6 +272,11 @@
         font-weight:normal;
         max-height:24px;
         overflow:hidden;
+      }
+      .year-range{
+        padding: 0 0 16px 0;
+        #slider-wrapper{
+        }
       }
       .authority{
         overflow: hidden;
@@ -664,6 +683,10 @@ import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
 import { SearchModule, SearchResult } from '@/store/modules/search'
+import HistogramSlider from 'vue-histogram-slider'
+import 'vue-histogram-slider/dist/histogram-slider.css'
+
+Vue.component(HistogramSlider.name, HistogramSlider)
 
 @Component({
   name: 'SearchResult'
@@ -674,9 +697,11 @@ export default class SearchResults extends Vue {
   private fullScreen = false;
   private windowWidth = 0;
   private previewVisible = false;
+  private sliderWidth = 1;
 
   data () {
     return {
+      data: [1, 5, 10, 10, 70, 100, 100],
       selected: [],
       options: [
         { text: 'DE', value: 'de' },
@@ -705,6 +730,7 @@ export default class SearchResults extends Vue {
   created () {
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
+    this.getFilterInnerWidth()
   }
 
   destroyed () {
@@ -712,6 +738,7 @@ export default class SearchResults extends Vue {
   }
 
   handleResize () {
+    this.getFilterInnerWidth()
     this.windowWidth = window.innerWidth
     if (this.windowWidth <= 1024) {
       this.filterVisible = false
@@ -787,6 +814,16 @@ export default class SearchResults extends Vue {
 
   public getMoreResults () {
     SearchModule.SetMoreResults()
+  }
+
+  public getFilterInnerWidth () {
+    if (this.windowWidth > 1024) {
+      this.sliderWidth = 258 - 16
+    } else if (this.windowWidth > 534) {
+      this.sliderWidth = 258
+    } else {
+      this.sliderWidth = (this.windowWidth - 42)
+    }
   }
 }
 </script>
