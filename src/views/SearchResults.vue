@@ -799,9 +799,9 @@ export default class SearchResults extends Vue {
   public prettifyDate (date: Date | number): string {
     // eslint-disable-next-line use-isnan
     if (date !== NaN && date instanceof Date) {
-      return date.getFullYear().toString()
+      return date.getFullYear().toString() + '/Q' + Math.ceil((date.getMonth() + 1) / 3).toString()
     } else if (typeof date === 'number' && !isNaN(date)) {
-      return new Date(date).getFullYear().toString()
+      return new Date(date).getFullYear().toString() + '/Q' + Math.ceil((new Date(date).getMonth() + 1) / 3).toString()
     }
     return '2020'
   }
