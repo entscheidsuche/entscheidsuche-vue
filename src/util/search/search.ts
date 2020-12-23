@@ -135,6 +135,47 @@ export class SearchUtil {
   }
 
   private static transformResultToFacets (resp: AxiosResponse<any>): Facets {
+    if (resp.data !== undefined) {
+      const facets: Facets = []
+      for (const key in resp.data) {
+        const facet = resp.data[key]
+        const firstLevelChildren: Facets = []
+        for (const secondKey in facet.gerichte) {
+          const secondFacet = facet.gerichte[secondKey]
+          const secondLevelChildren: Facets = []
+          for (const thirdKey in secondFacet.kammern) {
+            const thirdFacet = secondFacet.kammern[thirdKey]
+            secondLevelChildren.push({
+              id: thirdKey,
+              label: {
+                de: thirdFacet.de,
+                fr: thirdFacet.fr,
+                it: thirdFacet.it
+              }
+            })
+          }
+          firstLevelChildren.push({
+            id: secondKey,
+            label: {
+              de: secondFacet.de,
+              fr: secondFacet.fr,
+              it: secondFacet.it
+            },
+            children: secondLevelChildren
+          })
+        }
+        facets.push({
+          id: key,
+          label: {
+            de: facet.de,
+            fr: facet.fr,
+            it: facet.it
+          },
+          children: firstLevelChildren
+        })
+      }
+      return facets
+    }
     return []
   }
 }

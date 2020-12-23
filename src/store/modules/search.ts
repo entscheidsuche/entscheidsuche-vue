@@ -13,7 +13,7 @@ export interface Label {
 export type Facet = {
   id: string;
   label: Label;
-  children: Array<Facet> | undefined;
+  children?: Array<Facet>;
 }
 
 export interface SearchResult {
@@ -44,6 +44,7 @@ export interface SearchState {
   selectedResult: SearchResult | {};
   allResultsLoaded: boolean;
   aggregations: Aggregations;
+  facets: Facets;
 }
 
 @Module({ dynamic: true, store, name: 'search' })
@@ -55,7 +56,7 @@ export class Search extends VuexModule implements SearchState {
   private selectedRes: SearchResult | {} = {}
   private allResLoaded = false
   private aggs: Aggregations = {}
-  private facets: Facets = []
+  private fac: Facets = []
 
   @Mutation
   public SET_QUERY (query: string) {
@@ -65,7 +66,7 @@ export class Search extends VuexModule implements SearchState {
 
   @Action
   public SetQuery (query: string) {
-    if (this.facets.length === 0) {
+    if (this.fac.length === 0) {
       return this.context.dispatch('GetFacets').then((_) => {
         if (query !== this.queryString) {
           this.context.commit('SET_QUERY', query)
@@ -80,13 +81,22 @@ export class Search extends VuexModule implements SearchState {
     }
   }
 
+  public get query (): string {
+    return this.queryString
+  }
+
+  @Mutation
+  public SET_FACETS (facets: Facets) {
+    this.fac = facets
+  }
+
   @Action({ commit: 'SET_FACETS' })
   public async GetFacets () {
     return SearchUtil.facets()
   }
 
-  public get query (): string {
-    return this.queryString
+  public get facets (): Facets {
+    return this.fac
   }
 
   @Mutation
