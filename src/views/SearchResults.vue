@@ -24,6 +24,7 @@
                 :primaryColor="'#6183ec'"
                 :labelColor="'#6183ec'"
                 :prettify="this.prettifyDate"
+                :grid="false"
               />
             </template>
           </div>
@@ -42,31 +43,7 @@
         </div>
         <div class="authority">
           <b-form-group label="Verfasser" class="title">
-            <div v-b-toggle="'collapse-1'" class="first">
-              <b-form-checkbox>Bund</b-form-checkbox>
-            </div>
-            <b-collapse id="collapse-1">
-              <div v-b-toggle="'collapse-1-1'" class="second">
-                <b-form-checkbox>Bundesverwaltungsgericht</b-form-checkbox>
-              </div>
-              <b-collapse id="collapse-1-1" class="third">
-                <b-form-checkbox>Abteilung I</b-form-checkbox>
-                <b-form-checkbox>Abteilung II</b-form-checkbox>
-                <b-form-checkbox>Abteilung III</b-form-checkbox>
-              </b-collapse>
-              <div v-b-toggle="'collapse-1-2'" class="second">
-                <b-form-checkbox>Bundesgericht</b-form-checkbox>
-              </div>
-              <div v-b-toggle="'collapse-1-3'" class="second">
-                <b-form-checkbox>Bundesstrafgericht</b-form-checkbox>
-              </div>
-              <div v-b-toggle="'collapse-1-4'" class="second">
-                <b-form-checkbox>Bundespatentgericht</b-form-checkbox>
-              </div>
-              <div v-b-toggle="'collapse-1-5'" class="second">
-                <b-form-checkbox>Entscheidungen des Militärkassationsgerichts</b-form-checkbox>
-              </div>
-            </b-collapse>
+            <ejs-treeview id='treeview' :fields="fields" :showCheckBox='true'></ejs-treeview>
             <div v-for="canton in this.getUniqueCantons()" :key="canton">
               <b-form-checkbox>{{ canton }}</b-form-checkbox>
             </div>
@@ -134,6 +111,10 @@
 </template>
 
 <style lang="scss">
+@import "../../node_modules/@syncfusion/ej2-base/styles/material.css";
+@import "../../node_modules/@syncfusion/ej2-vue-navigations/styles/material.css";
+@import "../../node_modules/@syncfusion/ej2-buttons/styles/material.css";
+
 #searchResults {
   height: 100%;
   display:flex;
@@ -147,7 +128,7 @@
     width:100%;
 
     .filter{
-      width:300px;
+      width:340px;
       float: left;
       border-right:2px solid #e5e9f1;
       overflow: auto;
@@ -204,20 +185,61 @@
       .year-range{
         padding: 0 0 16px 0;
         #slider-wrapper{
+          margin-bottom:30px;
+          .vue-histogram-slider-wrapper{
+            margin-left:20px;
+            .irs-handle{
+              top: calc(50% - var(--handle-size)/2 + 13px);
+            }
+            .irs-from,.irs-to,.irs-single{
+              top:56px;
+            }
+            .irs-from::before,.irs-to::before,.irs-single::before{
+              transform: scaleY(-1);
+              bottom:19px;
+            }
+          }
         }
       }
       .authority{
-        overflow: hidden;
-        .first{
-          outline:none;
-        }
-        .second{
-          padding-left:20px;
-          outline:none;
-        }
-        .third{
-          padding-left:40px;
-          outline:none;
+        .bv-no-focus-ring{
+          #treeview{
+            //background-color:yellow;
+            .e-list-text{
+              padding:0;
+              padding-left:5px;
+            }
+            .e-icons{
+              color:#adb5bd;
+              &.e-check{
+                background-color: #6183ec;
+                border-color:#6183ec;
+                color:#fff;
+                background-image: url('../assets/check.svg');
+                background-repeat:no-repeat;
+                background-position: center;
+                font-size: 0;
+              }
+            }
+            .e-frame{
+              height:16px;
+              width:16px;
+              border-radius: 4px;
+              border: 1px solid #adb5bd;
+            }
+            .e-list-parent.e-ul{
+              padding-left: 10px;
+              .e-text-content.e-icon-wrapper{
+                padding-left: 6px;
+                .e-checkbox-wrapper{
+                  margin-left:0;
+                }
+              }
+            }
+            .e-text-content{
+              padding-left: 0;
+            }
+          }
         }
       }
     }
@@ -581,6 +603,13 @@
           border:0;
           width:0;
         }
+        .year-range{
+          #slider-wrapper{
+            .vue-histogram-slider-wrapper{
+              margin-left:24px;
+            }
+          }
+        }
       }
       .results{
         width:100vw;
@@ -613,8 +642,10 @@ import { AppModule, MessageState } from '@/store/modules/app'
 import { Aggregations, SearchModule, SearchResult } from '@/store/modules/search'
 import HistogramSlider from 'vue-histogram-slider'
 import 'vue-histogram-slider/dist/histogram-slider.css'
+import { TreeViewPlugin } from '@syncfusion/ej2-vue-navigations'
 
 Vue.component(HistogramSlider.name, HistogramSlider)
+Vue.use(TreeViewPlugin)
 
 @Component({
   name: 'SearchResult'
@@ -629,18 +660,30 @@ export default class SearchResults extends Vue {
   private showHistogram = true;
 
   data () {
+    const dataSource = [
+      { id: 1, name: 'Bund', hasChild: true, expanded: true },
+      { id: 2, pid: 1, name: 'Bundesverwaltungsgericht', hasChild: true, expanded: true },
+      { id: 4, pid: 2, name: 'Abteilung II' },
+      { id: 3, pid: 2, name: 'Abteilung I' },
+      { id: 5, pid: 2, name: 'Abteilung III' },
+      { id: 6, pid: 1, name: 'Bundesgericht' },
+      { id: 7, pid: 1, name: 'Bundesstrafgericht' },
+      { id: 8, pid: 2, name: 'Bundespatentgericht' },
+      { id: 9, pid: 2, name: 'Entscheidungen des Militärkassationsgerichts' }
+    ]
     return {
-      prettify: function (ts) {
-        return new Date(ts).toLocaleDateString('de', {
-          year: 'numeric'
-        })
-      },
+      fields: { dataSource: dataSource, id: 'id', parentID: 'pid', text: 'name', hasChildren: 'hasChild' },
       selected: [],
       options: [
         { text: 'DE', value: 'de' },
         { text: 'FR', value: 'fr' },
         { text: 'IT', value: 'it' }
-      ]
+      ],
+      prettify: function (ts) {
+        return new Date(ts).toLocaleDateString('de', {
+          year: 'numeric'
+        })
+      }
     }
   }
 
@@ -759,7 +802,7 @@ export default class SearchResults extends Vue {
     } else if (this.windowWidth > 534) {
       this.sliderWidth = 258
     } else {
-      this.sliderWidth = (this.windowWidth - 42)
+      this.sliderWidth = (this.windowWidth - 90)
     }
   }
 
