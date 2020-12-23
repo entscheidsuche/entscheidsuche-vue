@@ -43,10 +43,7 @@
         </div>
         <div class="authority">
           <b-form-group label="Verfasser" class="title">
-            <ejs-treeview id='treeview' :fields="fields" :showCheckBox='true'></ejs-treeview>
-            <div v-for="canton in this.getUniqueCantons()" :key="canton">
-              <b-form-checkbox>{{ canton }}</b-form-checkbox>
-            </div>
+            <ejs-treeview id='treeview' :fields="this.transformFacets()" :showCheckBox='true'></ejs-treeview>
           </b-form-group>
         </div>
       </div>
@@ -204,10 +201,23 @@
       .authority{
         .bv-no-focus-ring{
           #treeview{
-            //background-color:yellow;
+            background-color:#fff;
+            border:none;
             .e-list-text{
               padding:0;
               padding-left:5px;
+              color: #2b2b2b;
+              width: 235px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            .e-list-item{
+              padding:0;
+            }
+            .e-fullrow{
+              background-color: #fff;
+              border:none;
             }
             .e-icons{
               color:#adb5bd;
@@ -229,6 +239,8 @@
             }
             .e-list-parent.e-ul{
               padding-left: 10px;
+              overflow-y: hidden;
+              overflow-x: hidden;
               .e-text-content.e-icon-wrapper{
                 padding-left: 6px;
                 .e-checkbox-wrapper{
@@ -238,6 +250,7 @@
             }
             .e-text-content{
               padding-left: 0;
+              width: 250px;
             }
           }
         }
@@ -610,6 +623,15 @@
             }
           }
         }
+        .authority{
+          .bv-no-focus-ring{
+            #treeview{
+              .e-list-text{
+                width:calc(150%);
+              }
+            }
+          }
+        }
       }
       .results{
         width:100vw;
@@ -639,10 +661,11 @@
 import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
-import { Aggregations, SearchModule, SearchResult } from '@/store/modules/search'
+import { Aggregations, SearchModule, SearchResult, Facets, Facet } from '@/store/modules/search'
 import HistogramSlider from 'vue-histogram-slider'
 import 'vue-histogram-slider/dist/histogram-slider.css'
 import { TreeViewPlugin } from '@syncfusion/ej2-vue-navigations'
+import { TreeModel } from '@/util/treeModel'
 
 Vue.component(HistogramSlider.name, HistogramSlider)
 Vue.use(TreeViewPlugin)
@@ -660,19 +683,7 @@ export default class SearchResults extends Vue {
   private showHistogram = true;
 
   data () {
-    const dataSource = [
-      { id: 1, name: 'Bund', hasChild: true, expanded: true },
-      { id: 2, pid: 1, name: 'Bundesverwaltungsgericht', hasChild: true, expanded: true },
-      { id: 4, pid: 2, name: 'Abteilung II' },
-      { id: 3, pid: 2, name: 'Abteilung I' },
-      { id: 5, pid: 2, name: 'Abteilung III' },
-      { id: 6, pid: 1, name: 'Bundesgericht' },
-      { id: 7, pid: 1, name: 'Bundesstrafgericht' },
-      { id: 8, pid: 2, name: 'Bundespatentgericht' },
-      { id: 9, pid: 2, name: 'Entscheidungen des Militärkassationsgerichts' }
-    ]
     return {
-      fields: { dataSource: dataSource, id: 'id', parentID: 'pid', text: 'name', hasChildren: 'hasChild' },
       selected: [],
       options: [
         { text: 'DE', value: 'de' },
@@ -705,6 +716,14 @@ export default class SearchResults extends Vue {
 
   get aggregations () {
     return SearchModule.aggregations
+  }
+
+  get facets () {
+    return SearchModule.facets
+  }
+
+  get locale () {
+    return AppModule.locale
   }
 
   created () {
@@ -849,14 +868,41 @@ export default class SearchResults extends Vue {
     return '2020'
   }
 
-  public getUniqueCantons () {
-    const cantons: string[] = []
-    this.results.forEach((result: SearchResult) => {
-      if (!(cantons.includes(result.canton))) {
-        cantons.push(result.canton)
+  public transformFacets () {
+    const facetsTree: Array<TreeModel> = []
+    const locale = this.locale
+    const facets: Array<Facet> = this.facets
+    facets.forEach((facet: Facet) => {
+      if (facet.children !== undefined) {
+        if (facet.children.length > 0) {
+          facetsTree.push({ id: facet.id, name: facet.label[locale], hasChildren: true })
+          // push children
+          facet.children.forEach((child: Facet) => {
+            facetsTree.push(this.getChildEntry(child, locale, facet.id))
+            if (child.children !== undefined) {
+              if (child.children.length > 0) {
+                // push grandchildren
+                child.children.forEach((grandchild: Facet) => {
+                  facetsTree.push(this.getChildEntry(grandchild, locale, child.id))
+                })
+              }
+            }
+          })
+        }
+      } else {
+        facetsTree.push({ id: facet.id, name: facet.label[locale], hasChildren: false })
       }
     })
-    return cantons
+    return { dataSource: facetsTree, id: 'id', parentID: 'pid', text: 'name', hasChildren: 'hasChildren' }
+  }
+
+  public getChildEntry (facet: Facet, locale: string, parentID: string) {
+    if (facet.children !== undefined) {
+      if (facet.children.length > 0) {
+        return ({ id: facet.id, pid: parentID, name: facet.label[locale], hasChildren: true })
+      }
+    }
+    return ({ id: facet.id, pid: parentID, name: facet.label[locale], hasChildren: false })
   }
 }
 </script>
