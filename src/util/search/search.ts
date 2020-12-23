@@ -1,7 +1,12 @@
-import { Aggregation, Aggregations, SearchResult } from '@/store/modules/search'
-import axios from 'axios'
+import { Aggregation, Aggregations, Facets, SearchResult } from '@/store/modules/search'
+import axios, { AxiosResponse } from 'axios'
 
 export class SearchUtil {
+  public static async facets (): Promise<Facets> {
+    return axios.get('https://s3.eu-west-3.amazonaws.com/entscheidsuche.ch/scraper/Facetten.json')
+      .then(resp => SearchUtil.transformResultToFacets(resp))
+  }
+
   public static async search (query: string, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
     const search: any = {
       size: 20,
@@ -127,5 +132,9 @@ export class SearchUtil {
       }
     }
     return docType
+  }
+
+  private static transformResultToFacets (resp: AxiosResponse<any>): Facets {
+    return []
   }
 }

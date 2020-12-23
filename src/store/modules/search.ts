@@ -2,6 +2,20 @@ import { VuexModule, Module, Mutation, Action, getModule } from 'vuex-module-dec
 import { store } from '@/store'
 import { SearchUtil } from '@/util/search/search'
 
+export type Facets = Array<Facet>
+
+export interface Label {
+  de: string;
+  fr: string;
+  it: string;
+}
+
+export type Facet = {
+  id: string;
+  label: Label;
+  children: Array<Facet> | undefined;
+}
+
 export interface SearchResult {
   id: string;
   text: string;
@@ -41,6 +55,7 @@ export class Search extends VuexModule implements SearchState {
   private selectedRes: SearchResult | {} = {}
   private allResLoaded = false
   private aggs: Aggregations = {}
+  private facets: Facets = []
 
   @Mutation
   public SET_QUERY (query: string) {
@@ -50,10 +65,24 @@ export class Search extends VuexModule implements SearchState {
 
   @Action
   public SetQuery (query: string) {
-    if (query !== this.queryString) {
-      this.context.commit('SET_QUERY', query)
-      return this.context.dispatch('SetResults')
+    if (this.facets.length === 0) {
+      return this.context.dispatch('GetFacets').then((_) => {
+        if (query !== this.queryString) {
+          this.context.commit('SET_QUERY', query)
+          return this.context.dispatch('SetResults')
+        }
+      })
+    } else {
+      if (query !== this.queryString) {
+        this.context.commit('SET_QUERY', query)
+        return this.context.dispatch('SetResults')
+      }
     }
+  }
+
+  @Action({ commit: 'SET_FACETS' })
+  public async GetFacets () {
+    return SearchUtil.facets()
   }
 
   public get query (): string {
@@ -63,6 +92,9 @@ export class Search extends VuexModule implements SearchState {
   @Mutation
   public SET_RESULTS (results: [Array<SearchResult>, number, Aggregations]) {
     this.results = results[0]
+    if ('id' in this.selectedRes) {
+      const id = this.selectedRes.id
+    }
     this.total = results[1]
     this.aggs = results[2]
   }
