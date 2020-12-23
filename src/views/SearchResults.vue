@@ -10,20 +10,22 @@
         <div class="year-range">
           <div id="slider-wrapper">
             <p class="title">Jahr</p>
-            <HistogramSlider
-              :width="this.sliderWidth"
-              :bar-height="100"
-              :data="this.getDates()"
-              :drag-interval="true"
-              :force-edges="false"
-              :colors="['#6183ec', '#c8d4f8']"
-              :min="new Date(1990, 11, 24).valueOf()"
-              :max="new Date(2017, 11, 24).valueOf()"
-              :handleSize="16"
-              :primaryColor="'#6183ec'"
-              :labelColor="'#6183ec'"
-              :prettify="prettify"
-            />
+            <template v-if="this.showHistogram">
+              <HistogramSlider
+                :width="this.sliderWidth"
+                :bar-height="100"
+                :data="this.getDates()"
+                :drag-interval="true"
+                :force-edges="false"
+                :colors="['#c8d4f8', '#6183ec']"
+                :handleSize="16"
+                :min="this.getFromDate()"
+                :max="this.getToDate()"
+                :primaryColor="'#6183ec'"
+                :labelColor="'#6183ec'"
+                :prettify="this.prettifyDate"
+              />
+            </template>
           </div>
         </div>
         <div class="languages">
@@ -606,9 +608,9 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Component } from 'vue-property-decorator'
+import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
-import { SearchModule, SearchResult } from '@/store/modules/search'
+import { Aggregations, SearchModule, SearchResult } from '@/store/modules/search'
 import HistogramSlider from 'vue-histogram-slider'
 import 'vue-histogram-slider/dist/histogram-slider.css'
 
@@ -624,6 +626,7 @@ export default class SearchResults extends Vue {
   private windowWidth = 0;
   private previewVisible = false;
   private sliderWidth = 1;
+  private showHistogram = true;
 
   data () {
     return {
@@ -655,6 +658,10 @@ export default class SearchResults extends Vue {
 
   get resultsTotal () {
     return SearchModule.searchTotal
+  }
+
+  get aggregations () {
+    return SearchModule.aggregations
   }
 
   created () {
@@ -756,18 +763,47 @@ export default class SearchResults extends Vue {
     }
   }
 
+  @Watch('aggregations')
+  public onAggregationsChange (aggs: Aggregations) {
+    this.showHistogram = false
+    this.$nextTick(() => { this.showHistogram = true })
+  }
+
   public getDates () {
-    const dict = {
-      2: new Date('2000-12-17'),
-      3: new Date('2010-12-17')
-    }
+    const edatum = SearchModule.aggregations.edatum || []
     const datesArray: Date[] = []
-    for (const key in dict) {
-      for (let i = 0; i < Number(key); i++) {
-        datesArray.push(dict[key])
+    for (const agg of edatum) {
+      const date = new Date(agg.key)
+      for (let i = 0; i < agg.count; i++) {
+        datesArray.push(date)
       }
     }
+    console.log('calling getDates()')
     return datesArray
+  }
+
+  public getFromDate () {
+    const edatum = SearchModule.aggregations.edatum || []
+    if (edatum.length > 0) {
+      return edatum[0].key
+    }
+  }
+
+  public getToDate () {
+    const edatum = SearchModule.aggregations.edatum || []
+    if (edatum.length > 0) {
+      return (edatum[edatum.length - 1].key as number) + (1000 * 60 * 60 * 24 * 30 * 3)
+    }
+  }
+
+  public prettifyDate (date: Date | number): string {
+    // eslint-disable-next-line use-isnan
+    if (date !== NaN && date instanceof Date) {
+      return date.getFullYear().toString()
+    } else if (typeof date === 'number' && !isNaN(date)) {
+      return new Date(date).getFullYear().toString()
+    }
+    return '2020'
   }
 
   public getUniqueCantons () {

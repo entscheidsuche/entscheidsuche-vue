@@ -1,8 +1,8 @@
-import { SearchResult } from '@/store/modules/search'
+import { Aggregation, Aggregations, SearchResult } from '@/store/modules/search'
 import axios from 'axios'
 
 export class SearchUtil {
-  public static async search (query: string, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number]> {
+  public static async search (query: string, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
     const search: any = {
       size: 20,
       query: {
@@ -27,6 +27,23 @@ export class SearchUtil {
     if (searchAfter !== undefined) {
       // eslint-disable-next-line @typescript-eslint/camelcase
       search.search_after = searchAfter
+    } else {
+      search.aggs = {
+        hierarchie: {
+          terms: {
+            size: 1000,
+            field: 'hierarchie'
+          }
+        },
+        edatum: {
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          date_histogram: {
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            calendar_interval: 'quarter',
+            field: 'edatum'
+          }
+        }
+      }
     }
     return axios.post('https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search',
       search,
@@ -36,9 +53,10 @@ export class SearchUtil {
       }).then(resp => SearchUtil.extractSearchResults(resp))
   }
 
-  private static extractSearchResults (resp: any): [Array<SearchResult>, number] {
+  private static extractSearchResults (resp: any): [Array<SearchResult>, number, Aggregations | undefined] {
     const results: Array<SearchResult> = []
     let total = 0
+    let aggregations: Aggregations | undefined
     if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
       const hits: Array<any> = resp.data.hits.hits
       total = resp.data.hits.total.value
@@ -65,8 +83,24 @@ export class SearchUtil {
           sort: hit.sort
         })
       }
+      if (resp.data !== undefined && resp.data.aggregations !== undefined) {
+        aggregations = {}
+        for (const name in resp.data.aggregations) {
+          const buckets = resp.data.aggregations[name].buckets
+          if (buckets !== undefined) {
+            const aggs: Array<Aggregation> = []
+            for (const agg of buckets) {
+              aggs.push({
+                key: agg.key,
+                count: agg.doc_count
+              })
+            }
+            aggregations[name] = aggs
+          }
+        }
+      }
     }
-    return [results, total]
+    return [results, total, aggregations]
   }
 
   private static getExtract (highlight: Array<string>): string {

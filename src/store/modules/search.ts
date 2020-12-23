@@ -13,6 +13,15 @@ export interface SearchResult {
   sort: Array<any>;
 }
 
+export interface Aggregation {
+  key: string | number;
+  count: number;
+}
+
+export type Aggregations = {
+  [key in string]: Array<Aggregation>
+}
+
 export interface SearchState {
   query: string;
   searchTotal: number;
@@ -20,6 +29,7 @@ export interface SearchState {
   resultsPending: boolean;
   selectedResult: SearchResult | {};
   allResultsLoaded: boolean;
+  aggregations: Aggregations;
 }
 
 @Module({ dynamic: true, store, name: 'search' })
@@ -30,6 +40,7 @@ export class Search extends VuexModule implements SearchState {
   private results: Array<SearchResult> = []
   private selectedRes: SearchResult | {} = {}
   private allResLoaded = false
+  private aggs: Aggregations = {}
 
   @Mutation
   public SET_QUERY (query: string) {
@@ -50,9 +61,10 @@ export class Search extends VuexModule implements SearchState {
   }
 
   @Mutation
-  public SET_RESULTS (results: [Array<SearchResult>, number]) {
+  public SET_RESULTS (results: [Array<SearchResult>, number, Aggregations]) {
     this.results = results[0]
     this.total = results[1]
+    this.aggs = results[2]
   }
 
   @Mutation
@@ -116,6 +128,10 @@ export class Search extends VuexModule implements SearchState {
 
   public get allResultsLoaded (): boolean {
     return this.allResLoaded
+  }
+
+  public get aggregations (): Aggregations {
+    return this.aggs
   }
 }
 
