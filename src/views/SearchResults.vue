@@ -32,7 +32,7 @@
         <div class="languages">
           <b-form-group label="Sprache" class="title">
             <b-form-checkbox
-              v-for="option in options"
+              v-for="option in myOptions"
               v-model="selected"
               :key="option.value"
               :value="option.value"
@@ -43,7 +43,19 @@
         </div>
         <div class="authority">
           <b-form-group label="Verfasser" class="title">
-            <ejs-treeview id='treeview' :fields="this.transformFacets()" :showCheckBox='true'></ejs-treeview>
+            <treeselect v-model="value"  placeholder="Filtern" id="tree"
+              :multiple="true"
+              :options="this.transformFacets()"
+              :always-open="true"
+              :show-count="true"
+              :maxHeight="this.authorityHeight"
+              :clearable="false"
+              :openDirection="below">
+              <label slot="option-label" slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName }" :class="labelClassName">
+                {{ node.label }}
+                <span v-if="shouldShowCount" :class="countClassName">({{ node.raw.count }})</span>
+              </label>
+            </treeselect>
           </b-form-group>
         </div>
       </div>
@@ -108,9 +120,6 @@
 </template>
 
 <style lang="scss">
-@import "../../node_modules/@syncfusion/ej2-base/styles/material.css";
-@import "../../node_modules/@syncfusion/ej2-vue-navigations/styles/material.css";
-@import "../../node_modules/@syncfusion/ej2-buttons/styles/material.css";
 
 #searchResults {
   height: 100%;
@@ -161,7 +170,7 @@
           border-radius: 4px 0 0 4px;
           background-color: #6183ec;
           color:#fff;
-          z-index:100;
+          z-index:1000;
           justify-content: center;
           align-items: center;
           cursor:pointer;
@@ -199,59 +208,29 @@
         }
       }
       .authority{
-        .bv-no-focus-ring{
-          #treeview{
-            background-color:#fff;
-            border:none;
+        #tree{
+          font-size: 16px;
+          font-weight:normal;
+          .vue-treeselect__checkbox{
+            width:16px;
+            height:16px;
+            border-radius:4px;
+            border: 1px solid #adb5bd;
 
-            .e-list-text{
-              padding:0;
-              padding-left:5px;
-              color: #2b2b2b;
-              width: 235px;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
+            .vue-treeselect__check-mark{
+              position:relative;
+              top:3px;
+              left:3px;
             }
-            .e-list-item{
-              padding:0;
+            .vue-treeselect__minus-mark{
+              position:relative;
+              top:-5px;
+              left:3px;
             }
-            .e-fullrow{
-              background-color: #fff;
-              border:none;
-            }
-            .e-icons{
-              color:#adb5bd;
-              &.e-check{
-                background-color: #6183ec;
-                border-color:#6183ec;
-                color:#fff;
-                background-image: url('../assets/check.svg');
-                background-repeat:no-repeat;
-                background-position: center;
-                font-size: 0;
-              }
-            }
-            .e-frame{
-              height:16px;
-              width:16px;
-              border-radius: 4px;
-              border: 1px solid #adb5bd;
-            }
-            .e-list-parent.e-ul{
-              padding-left: 10px;
-              overflow-y: hidden;
-              overflow-x: hidden;
-              .e-text-content.e-icon-wrapper{
-                padding-left: 6px;
-                .e-checkbox-wrapper{
-                  margin-left:0;
-                }
-              }
-            }
-            .e-text-content{
-              padding-left: 0;
-              width: 250px;
+
+            &.vue-treeselect__checkbox--checked,&.vue-treeselect__checkbox--indeterminate{
+              background-color: #6183ec;
+              border-color: #6183ec;
             }
           }
         }
@@ -292,7 +271,7 @@
           border-radius: 0 4px 4px 0;
           background-color: #6183ec;
           color:#fff;
-          z-index:100;
+          z-index:1000;
           justify-content: center;
           align-items: center;
           cursor: pointer;
@@ -625,13 +604,14 @@
           }
         }
         .authority{
-          .bv-no-focus-ring{
-            #treeview{
-              .e-list-text{
-                width:calc(150%);
-              }
-            }
+          .vue-treeselect__control{
+            border-radius: 5px 5px 0 0;
           }
+          .vue-treeselect__menu{
+            top:35px;
+            border-radius: 0 0 5px 5px;
+          }
+
         }
       }
       .results{
@@ -665,11 +645,12 @@ import { AppModule, MessageState } from '@/store/modules/app'
 import { Aggregations, SearchModule, SearchResult, Facets, Facet } from '@/store/modules/search'
 import HistogramSlider from 'vue-histogram-slider'
 import 'vue-histogram-slider/dist/histogram-slider.css'
-import { TreeViewPlugin } from '@syncfusion/ej2-vue-navigations'
 import { TreeModel } from '@/util/treeModel'
+import Treeselect from '@riophae/vue-treeselect'
+import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 Vue.component(HistogramSlider.name, HistogramSlider)
-Vue.use(TreeViewPlugin)
+Vue.component('treeselect', Treeselect)
 
 @Component({
   name: 'SearchResult'
@@ -682,11 +663,13 @@ export default class SearchResults extends Vue {
   private previewVisible = false;
   private sliderWidth = 1;
   private showHistogram = true;
+  private authorityHeight = 300;
 
   data () {
     return {
+      value: null,
       selected: [],
-      options: [
+      myOptions: [
         { text: 'DE', value: 'de' },
         { text: 'FR', value: 'fr' },
         { text: 'IT', value: 'it' }
@@ -739,6 +722,7 @@ export default class SearchResults extends Vue {
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
     this.getFilterInnerWidth()
+    this.getAuthorityHeight()
   }
 
   destroyed () {
@@ -747,6 +731,7 @@ export default class SearchResults extends Vue {
 
   handleResize () {
     this.getFilterInnerWidth()
+    this.getAuthorityHeight()
     this.windowWidth = window.innerWidth
     if (this.windowWidth <= 1024) {
       this.filterVisible = false
@@ -834,6 +819,22 @@ export default class SearchResults extends Vue {
     }
   }
 
+  public getAuthorityHeight () {
+    if (this.windowWidth > 1024) {
+      if (this.showMessage) {
+        this.authorityHeight = window.innerHeight - 514
+      } else {
+        this.authorityHeight = window.innerHeight - 474
+      }
+    } else {
+      if (this.showMessage) {
+        this.authorityHeight = window.innerHeight - 564
+      } else {
+        this.authorityHeight = window.innerHeight - 524
+      }
+    }
+  }
+
   @Watch('aggregations')
   public onAggregationsChange (aggs: Aggregations) {
     this.showHistogram = false
@@ -878,42 +879,33 @@ export default class SearchResults extends Vue {
   }
 
   public transformFacets () {
-    window.console.log('transformFacets')
-    const facetsTree: Array<TreeModel> = []
+    const tree: Array<TreeModel> = []
     const locale = this.locale
     const facets: Array<Facet> = this.facets
     facets.forEach((facet: Facet) => {
-      if (facet.children !== undefined) {
+      if (facet.children !== null && facet.children !== undefined) {
         if (facet.children.length > 0) {
-          facetsTree.push({ id: facet.id, name: facet.label[locale], hasChildren: true })
-          // push children
+          const childrenArray: Array<TreeModel> = []
           facet.children.forEach((child: Facet) => {
-            facetsTree.push(this.getChildEntry(child, locale, facet.id))
-            if (child.children !== undefined) {
+            if (child.children !== null && child.children !== undefined) {
               if (child.children.length > 0) {
-                // push grandchildren
-                child.children.forEach((grandchild: Facet) => {
-                  facetsTree.push(this.getChildEntry(grandchild, locale, child.id))
+                const grandChildrenArray: Array<TreeModel> = []
+                child.children.forEach((grandChild: Facet) => {
+                  grandChildrenArray.push({ id: grandChild.id, label: grandChild.label[locale], count: 10 })
                 })
+                childrenArray.push({ id: child.id, label: child.label[locale], children: grandChildrenArray, count: 10 })
               }
+            } else {
+              childrenArray.push({ id: child.id, label: child.label[locale], count: 10 })
             }
           })
+          tree.push({ id: facet.id, label: facet.label[locale], children: childrenArray, count: 10 })
         }
       } else {
-        facetsTree.push({ id: facet.id, name: facet.label[locale], hasChildren: false })
+        tree.push({ id: facet.id, label: facet.label[locale], count: 10 })
       }
     })
-    window.console.log(facetsTree)
-    return { dataSource: facetsTree, id: 'id', parentID: 'pid', text: 'name', hasChildren: 'hasChildren' }
-  }
-
-  public getChildEntry (facet: Facet, locale: string, parentID: string) {
-    if (facet.children !== undefined) {
-      if (facet.children.length > 0) {
-        return ({ id: facet.id, pid: parentID, name: facet.label[locale], hasChildren: true })
-      }
-    }
-    return ({ id: facet.id, pid: parentID, name: facet.label[locale], hasChildren: false })
+    return tree
   }
 }
 </script>
