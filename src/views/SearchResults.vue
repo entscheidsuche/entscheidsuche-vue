@@ -43,10 +43,7 @@
         </div>
         <div class="authority">
           <b-form-group label="Verfasser" class="title">
-            <!--<ejs-treeview id='treeview' :fields="this.transformFacets()" :showCheckBox='true'></ejs-treeview>-->
-             <div class="control_wrapper">
-              <ejs-treeview id='treeview' :fields="fields" :nodeTemplate='Template'></ejs-treeview>
-            </div>
+            <ejs-treeview id='treeview' :fields="this.transformFacets()" :showCheckBox='true'></ejs-treeview>
           </b-form-group>
         </div>
       </div>
@@ -670,7 +667,6 @@ import HistogramSlider from 'vue-histogram-slider'
 import 'vue-histogram-slider/dist/histogram-slider.css'
 import { TreeViewPlugin } from '@syncfusion/ej2-vue-navigations'
 import { TreeModel } from '@/util/treeModel'
-import { mount } from '@vue/test-utils'
 
 Vue.component(HistogramSlider.name, HistogramSlider)
 Vue.use(TreeViewPlugin)
@@ -688,21 +684,7 @@ export default class SearchResults extends Vue {
   private showHistogram = true;
 
   data () {
-    const demoVue = Vue.component('demo', {
-      template: "<div><div class='ename'>{{ data.name }}</div><div class='ejob'>{{ data.job }}</div></div>"
-    })
-    const dataSource = [
-      { id: 1, name: 'Steven Buchanan', eimg: 'https://ej2.syncfusion.com/demos/src/treeview/images/employees/10.png', job: 'CEO', hasChild: true, expanded: true },
-      { id: 2, pid: 1, name: 'Laura Callahan', eimg: 'https://ej2.syncfusion.com/demos/src/treeview/images/employees/2.png', job: 'Product Manager', hasChild: false },
-      { id: 3, pid: 1, name: 'Andrew Fuller', eimg: 'https://ej2.syncfusion.com/demos/src/treeview/images/employees/7.png', job: 'Team Lead', hasChild: false }
-    ]
     return {
-      fields: { dataSource: dataSource, id: 'id', parentID: 'pid', text: 'name', hasChildren: 'hasChild' },
-      Template: function (e) {
-        return {
-          template: demoVue
-        }
-      },
       selected: [],
       options: [
         { text: 'DE', value: 'de' },
@@ -903,7 +885,7 @@ export default class SearchResults extends Vue {
     facets.forEach((facet: Facet) => {
       if (facet.children !== undefined) {
         if (facet.children.length > 0) {
-          facetsTree.push({ id: facet.id, name: facet.label[locale], hasChildren: true, count: 123 })
+          facetsTree.push({ id: facet.id, name: facet.label[locale], hasChildren: true })
           // push children
           facet.children.forEach((child: Facet) => {
             facetsTree.push(this.getChildEntry(child, locale, facet.id))
@@ -918,7 +900,7 @@ export default class SearchResults extends Vue {
           })
         }
       } else {
-        facetsTree.push({ id: facet.id, name: facet.label[locale], hasChildren: false, count: 123 })
+        facetsTree.push({ id: facet.id, name: facet.label[locale], hasChildren: false })
       }
     })
     window.console.log(facetsTree)
@@ -928,10 +910,10 @@ export default class SearchResults extends Vue {
   public getChildEntry (facet: Facet, locale: string, parentID: string) {
     if (facet.children !== undefined) {
       if (facet.children.length > 0) {
-        return ({ id: facet.id, pid: parentID, name: facet.label[locale], hasChildren: true, count: 123 })
+        return ({ id: facet.id, pid: parentID, name: facet.label[locale], hasChildren: true })
       }
     }
-    return ({ id: facet.id, pid: parentID, name: facet.label[locale], hasChildren: false, count: 123 })
+    return ({ id: facet.id, pid: parentID, name: facet.label[locale], hasChildren: false })
   }
 }
 </script>
