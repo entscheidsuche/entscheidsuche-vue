@@ -43,14 +43,13 @@
         </div>
         <div class="authority">
           <b-form-group label="Verfasser" class="title">
-            <treeselect v-model="value"  placeholder="Filtern" id="tree"
+            <treeselect v-model="value"  placeholder="Filtern" id="tree" openDirection="below"
               :multiple="true"
               :options="this.transformFacets()"
               :always-open="true"
               :show-count="true"
               :maxHeight="this.authorityHeight"
-              :clearable="false"
-              :openDirection="below">
+              :clearable="false">
               <label slot="option-label" slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName }" :class="labelClassName">
                 {{ node.label }}
                 <span v-if="shouldShowCount" :class="countClassName">({{ node.raw.count }})</span>
@@ -604,14 +603,6 @@
           }
         }
         .authority{
-          .vue-treeselect__control{
-            border-radius: 5px 5px 0 0;
-          }
-          .vue-treeselect__menu{
-            top:35px;
-            border-radius: 0 0 5px 5px;
-          }
-
         }
       }
       .results{
