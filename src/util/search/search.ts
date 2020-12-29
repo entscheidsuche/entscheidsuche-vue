@@ -1,4 +1,4 @@
-import { Aggregation, Aggregations, Facets, SearchResult } from '@/store/modules/search'
+import { Aggregation, Aggregations, Facets, Filter, SearchResult } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
 
 export class SearchUtil {
@@ -7,13 +7,17 @@ export class SearchUtil {
       .then(resp => SearchUtil.transformResultToFacets(resp))
   }
 
-  public static async search (query: string, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
+  public static async search (query: string, filters: Array<Filter>, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
     const search: any = {
       size: 20,
       query: {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        query_string: {
-          query: query
+        bool: {
+          must: {
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            query_string: {
+              query: query
+            }
+          }
         }
       },
       sort: [
@@ -28,6 +32,9 @@ export class SearchUtil {
           'attachment.content': {}
         }
       }
+    }
+    if (filters.length > 0) {
+      search.query.bool.filter = SearchUtil.buildFilters(filters)
     }
     if (searchAfter !== undefined) {
       // eslint-disable-next-line @typescript-eslint/camelcase
@@ -56,6 +63,57 @@ export class SearchUtil {
         maxContentLength: Infinity,
         maxBodyLength: Infinity
       }).then(resp => SearchUtil.extractSearchResults(resp))
+  }
+
+  private static buildFilters (filters: Array<Filter>): any {
+    if (filters.length === 1) {
+      return SearchUtil.buildFilter(filters[0])
+    }
+
+    const filterArray: Array<any> = []
+    for (const filter of filters) {
+      filterArray.push(SearchUtil.buildFilter(filter))
+    }
+
+    return filterArray
+  }
+
+  private static buildFilter (filter: Filter): any {
+    if (filter.type === 'edatum') {
+      if (filter.payload.from !== undefined && filter.payload.to !== undefined) {
+        return {
+          range: {
+            edatum: {
+              gte: filter.payload.from,
+              lte: filter.payload.to
+            }
+          }
+        }
+      } else if (filter.payload.from !== undefined) {
+        return {
+          range: {
+            edatum: {
+              gte: filter.payload.from
+            }
+          }
+        }
+      } else if (filter.payload.to !== undefined) {
+        return {
+          range: {
+            edatum: {
+              lte: filter.payload.to
+            }
+          }
+        }
+      }
+    }
+    if (filter.type === 'hierarchie') {
+      return {
+        terms: {
+          hierarchie: filter.payload
+        }
+      }
+    }
   }
 
   private static extractSearchResults (resp: any): [Array<SearchResult>, number, Aggregations | undefined] {

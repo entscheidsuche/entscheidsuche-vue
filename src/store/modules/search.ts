@@ -16,6 +16,11 @@ export type Facet = {
   children?: Array<Facet>;
 }
 
+export interface Filter {
+  type: string;
+  payload: any;
+}
+
 export interface SearchResult {
   id: string;
   text: string;
@@ -38,6 +43,7 @@ export type Aggregations = {
 
 export interface SearchState {
   query: string;
+  filters: Array<Filter>;
   searchTotal: number;
   searchResults: Array<SearchResult>;
   resultsPending: boolean;
@@ -57,11 +63,13 @@ export class Search extends VuexModule implements SearchState {
   private allResLoaded = false
   private aggs: Aggregations = {}
   private fac: Facets = []
+  private filt: Array<Filter> = []
 
   @Mutation
   public SET_QUERY (query: string) {
     this.queryString = query
     this.results = []
+    this.aggs = {}
   }
 
   @Action
@@ -83,6 +91,23 @@ export class Search extends VuexModule implements SearchState {
 
   public get query (): string {
     return this.queryString
+  }
+
+  @Mutation
+  public SET_FILTERS (filters: Array<Filter>) {
+    this.filt = filters
+    this.results = []
+    this.aggs = {}
+  }
+
+  @Action
+  public SetFilters (filters: Array<Filter>) {
+    this.context.commit('SET_FILTERS', filters)
+    return this.context.dispatch('SetResults')
+  }
+
+  public get filters (): Array<Filter> {
+    return this.filt
   }
 
   @Mutation
@@ -134,7 +159,7 @@ export class Search extends VuexModule implements SearchState {
   @Action({ commit: 'SET_RESULTS' })
   public async SetResults () {
     this.context.commit('RESULTS_PENDING', true)
-    return SearchUtil.search(this.queryString)
+    return SearchUtil.search(this.queryString, this.filt)
       .finally(() => this.context.commit('RESULTS_PENDING', false))
   }
 
@@ -143,7 +168,7 @@ export class Search extends VuexModule implements SearchState {
     if (this.results.length > 0) {
       const sort = this.results[this.results.length - 1].sort
       this.context.commit('RESULTS_PENDING', true)
-      return SearchUtil.search(this.queryString, sort)
+      return SearchUtil.search(this.queryString, this.filt, sort)
         .finally(() => this.context.commit('RESULTS_PENDING', false))
     }
   }

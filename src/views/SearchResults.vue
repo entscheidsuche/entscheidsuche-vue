@@ -25,6 +25,7 @@
                 :labelColor="'#6183ec'"
                 :prettify="this.prettifyDate"
                 :grid="false"
+                @finish="onHistogramChanged"
               />
             </template>
           </div>
@@ -849,11 +850,20 @@ export default class SearchResults extends Vue {
         datesArray.push(date)
       }
     }
-    console.log('calling getDates()')
     return datesArray
   }
 
+  public onHistogramChanged ($event) {
+    SearchModule.SetFilters([{ type: 'edatum', payload: { from: $event.from, to: $event.to } }])
+  }
+
   public getFromDate () {
+    const filters = SearchModule.filters || []
+    for (const filter of filters) {
+      if (filter.type === 'edatum') {
+        return filter.payload.from
+      }
+    }
     const edatum = SearchModule.aggregations.edatum || []
     if (edatum.length > 0) {
       return edatum[0].key
@@ -861,19 +871,33 @@ export default class SearchResults extends Vue {
   }
 
   public getToDate () {
+    const filters = SearchModule.filters || []
+    for (const filter of filters) {
+      if (filter.type === 'edatum') {
+        return filter.payload.to
+      }
+    }
     const edatum = SearchModule.aggregations.edatum || []
     if (edatum.length > 0) {
-      return (edatum[edatum.length - 1].key as number) + (1000 * 60 * 60 * 24 * 30 * 3)
+      return edatum[edatum.length - 1].key
     }
   }
 
   public prettifyDate (date: Date | number): string {
     // eslint-disable-next-line use-isnan
     if (date !== NaN && date instanceof Date) {
+      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`
+    } else if (typeof date === 'number' && !isNaN(date)) {
+      const d = new Date(date)
+      return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`
+    }
+    /*
+    if (date !== NaN && date instanceof Date) {
       return date.getFullYear().toString() + '/Q' + Math.ceil((date.getMonth() + 1) / 3).toString()
     } else if (typeof date === 'number' && !isNaN(date)) {
       return new Date(date).getFullYear().toString() + '/Q' + Math.ceil((new Date(date).getMonth() + 1) / 3).toString()
     }
+    */
     return '2020'
   }
 
@@ -903,7 +927,6 @@ export default class SearchResults extends Vue {
         facetsTree.push({ id: facet.id, name: facet.label[locale], hasChildren: false })
       }
     })
-    window.console.log(facetsTree)
     return { dataSource: facetsTree, id: 'id', parentID: 'pid', text: 'name', hasChildren: 'hasChildren' }
   }
 
