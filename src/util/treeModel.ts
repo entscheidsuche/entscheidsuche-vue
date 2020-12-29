@@ -5,4 +5,5 @@ export interface TreeModel {
   pid?: string;
   name: string;
   hasChildren: boolean;
+  count?: number;
 }
