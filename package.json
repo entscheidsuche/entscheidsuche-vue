@@ -10,6 +10,7 @@
     "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'"
   },
   "dependencies": {
+    "@syncfusion/ej2-vue-navigations": "^18.4.31",
     "axios": "^0.21.0",
     "bootstrap-vue": "^2.19.0",
     "core-js": "^3.6.5",

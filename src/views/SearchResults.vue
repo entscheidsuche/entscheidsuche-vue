@@ -745,6 +745,14 @@ export default class SearchResults extends Vue {
     return AppModule.locale
   }
 
+  @Watch('selectedResult')
+  public onSelectedResultChanged (selectedResult: SearchResult) {
+    if (!('id' in selectedResult)) {
+      this.previewVisible = false
+      this.fullScreen = false
+    }
+  }
+
   created () {
     window.addEventListener('resize', this.handleResize)
     this.handleResize()

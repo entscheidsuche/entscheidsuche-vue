@@ -104,6 +104,17 @@ export class Search extends VuexModule implements SearchState {
     this.results = results[0]
     if ('id' in this.selectedRes) {
       const id = this.selectedRes.id
+      let found = false
+      for (const result of results[0]) {
+        if (result.id === id) {
+          this.selectedRes = result
+          found = true
+          break
+        }
+      }
+      if (!found) {
+        this.selectedRes = {}
+      }
     }
     this.total = results[1]
     this.aggs = results[2]
