@@ -930,7 +930,8 @@ export default class SearchResults extends Vue {
       return 0
     }
     const isDisabled = function (id: string) {
-      return lookupCount(id) === 0
+      // return lookupCount(id) === 0
+      return false
     }
     facets.forEach((facet: Facet) => {
       if (facet.children !== null && facet.children !== undefined) {
