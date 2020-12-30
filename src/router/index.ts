@@ -21,6 +21,8 @@ const routes: Array<RouteConfig> = [
     beforeEnter: (to, from, next) => {
       if (to.query.filter !== undefined && typeof to.query.filter === 'string') {
         SearchModule.SetFilters([to.query.filter])
+      } else if (to.query.filter !== undefined && Array.isArray(to.query.filter)) {
+        SearchModule.SetFilters(to.query.filter as Array<string>)
       } else {
         SearchModule.SetFilters([])
       }

@@ -635,7 +635,7 @@
 import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
-import { Aggregations, SearchModule, SearchResult, Facets, Facet } from '@/store/modules/search'
+import { Aggregations, SearchModule, SearchResult, Facet } from '@/store/modules/search'
 import HistogramSlider from 'vue-histogram-slider'
 import 'vue-histogram-slider/dist/histogram-slider.css'
 import { TreeModel } from '@/util/treeModel'
@@ -713,8 +713,28 @@ export default class SearchResults extends Vue {
   }
 
   @Watch('hierarchieValues')
-  public onHierarchieValuesChanged (values: any) {
-    console.log(values)
+  public onHierarchieValuesChanged (values: Array<string>) {
+    const query = { ...router.currentRoute.query }
+    const existingFilters = Array.isArray(query.filter) ? query.filter : query.filter !== undefined ? [query.filter] : []
+    const newFilter: Array<string> = []
+    for (const filter of existingFilters) {
+      if (filter !== null && !filter.startsWith('hierarchie:')) {
+        newFilter.push(filter)
+      }
+    }
+    if (values.length > 0) {
+      SearchModule.AddFilter({ type: 'hierarchie', payload: values })
+      newFilter.push(`hierarchie:${values.join()}`)
+      query.filter = newFilter
+    } else {
+      SearchModule.RemoveFilter('hierarchie')
+      if (newFilter.length === 0) {
+        delete query.filter
+      } else {
+        query.filter = newFilter
+      }
+    }
+    router.push({ name: 'Search', query })
   }
 
   created () {
@@ -853,7 +873,7 @@ export default class SearchResults extends Vue {
   }
 
   public onHistogramChanged ($event) {
-    SearchModule.SetFilters([{ type: 'edatum', payload: { from: $event.from, to: $event.to } }])
+    SearchModule.AddFilter({ type: 'edatum', payload: { from: $event.from, to: $event.to } })
     const query = { ...router.currentRoute.query }
 
     if (Array.isArray(query.filter)) {
@@ -871,11 +891,9 @@ export default class SearchResults extends Vue {
   }
 
   public getFromDate () {
-    const filters = SearchModule.filters || []
-    for (const filter of filters) {
-      if (filter.type === 'edatum') {
-        return filter.payload.from
-      }
+    const filter = SearchModule.filters.edatum
+    if (filter !== undefined) {
+      return filter.payload.from
     }
     const edatum = SearchModule.aggregations.edatum || []
     if (edatum.length > 0) {
@@ -884,11 +902,9 @@ export default class SearchResults extends Vue {
   }
 
   public getToDate () {
-    const filters = SearchModule.filters || []
-    for (const filter of filters) {
-      if (filter.type === 'edatum') {
-        return filter.payload.to
-      }
+    const filter = SearchModule.filters.edatum
+    if (filter !== undefined) {
+      return filter.payload.to
     }
     const edatum = SearchModule.aggregations.edatum || []
     if (edatum.length > 0) {
@@ -957,11 +973,6 @@ export default class SearchResults extends Vue {
       }
     })
     return tree
-  }
-
-  public onHierarchieChanged ($event) {
-    console.log('hierarchie changed')
-    console.log($event)
   }
 }
 </script>

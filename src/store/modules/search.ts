@@ -21,6 +21,10 @@ export interface Filter {
   payload: any;
 }
 
+export type Filters = {
+  [key in string]: Filter
+}
+
 export interface SearchResult {
   id: string;
   text: string;
@@ -43,7 +47,7 @@ export type Aggregations = {
 
 export interface SearchState {
   query: string;
-  filters: Array<Filter>;
+  filters: Filters;
   searchTotal: number;
   searchResults: Array<SearchResult>;
   resultsPending: boolean;
@@ -63,7 +67,7 @@ export class Search extends VuexModule implements SearchState {
   private allResLoaded = false
   private aggs: Aggregations = {}
   private fac: Facets = []
-  private filt: Array<Filter> = []
+  private filt: Filters = {}
 
   @Mutation
   public SET_QUERY (query: string) {
@@ -95,18 +99,35 @@ export class Search extends VuexModule implements SearchState {
 
   @Mutation
   public SET_FILTERS (filters: Array<Filter | string>) {
-    const newFilters: Array<Filter> = []
+    const newFilters: Filters = {}
     for (const filter of filters) {
       if (typeof filter === 'string') {
         if (filter.startsWith('edatum:')) {
           const numbers = filter.substring(7).split(',')
-          newFilters.push({ type: 'edatum', payload: { from: parseInt(numbers[0]), to: parseInt(numbers[1]) } })
+          newFilters.edatum = { type: 'edatum', payload: { from: parseInt(numbers[0]), to: parseInt(numbers[1]) } }
+        } else if (filter.startsWith('hierarchie:')) {
+          const ids = filter.substring(11).split(',')
+          newFilters.hierarchie = { type: 'hierarchie', payload: ids }
         }
       } else {
-        newFilters.push(filter)
+        newFilters[filter.type] = filter
       }
     }
     this.filt = newFilters
+    this.results = []
+    this.aggs = {}
+  }
+
+  @Mutation
+  public ADD_FILTER (filter: Filter) {
+    this.filt[filter.type] = filter
+    this.results = []
+    this.aggs = {}
+  }
+
+  @Mutation
+  public REMOVE_FILTER (type: string) {
+    delete this.filt[type]
     this.results = []
     this.aggs = {}
   }
@@ -119,7 +140,23 @@ export class Search extends VuexModule implements SearchState {
     }
   }
 
-  public get filters (): Array<Filter> {
+  @Action
+  public AddFilter (filter: Filter) {
+    this.context.commit('ADD_FILTER', filter)
+    if (this.queryString !== '') {
+      return this.context.dispatch('SetResults')
+    }
+  }
+
+  @Action
+  public RemoveFilter (type: string) {
+    this.context.commit('REMOVE_FILTER', type)
+    if (this.queryString !== '') {
+      return this.context.dispatch('SetResults')
+    }
+  }
+
+  public get filters (): Filters {
     return this.filt
   }
 

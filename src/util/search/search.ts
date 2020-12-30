@@ -1,4 +1,4 @@
-import { Aggregation, Aggregations, Facets, Filter, SearchResult } from '@/store/modules/search'
+import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
 
 export class SearchUtil {
@@ -7,7 +7,7 @@ export class SearchUtil {
       .then(resp => SearchUtil.transformResultToFacets(resp))
   }
 
-  public static async search (query: string, filters: Array<Filter>, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
+  public static async search (query: string, filters: Filters, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
     const search: any = {
       size: 20,
       query: {
@@ -33,7 +33,7 @@ export class SearchUtil {
         }
       }
     }
-    if (filters.length > 0) {
+    if (Object.keys(filters).length > 0) {
       search.query.bool.filter = SearchUtil.buildFilters(filters)
     }
     if (searchAfter !== undefined) {
@@ -65,8 +65,9 @@ export class SearchUtil {
       }).then(resp => SearchUtil.extractSearchResults(resp))
   }
 
-  private static getCalendarInterval (filters: Array<Filter>): string {
-    for (const filter of filters) {
+  private static getCalendarInterval (filters: Filters): string {
+    const filter = filters.edatum
+    if (filter !== undefined) {
       if (filter.type === 'edatum') {
         const range = (filter.payload.to - filter.payload.from) / 1000 / 3600 / 24
         if (range < 40) {
@@ -81,17 +82,13 @@ export class SearchUtil {
     return 'quarter'
   }
 
-  private static buildFilters (filters: Array<Filter>): any {
-    if (filters.length === 1) {
-      return SearchUtil.buildFilter(filters[0])
-    }
-
+  private static buildFilters (filters: Filters): any {
     const filterArray: Array<any> = []
-    for (const filter of filters) {
-      filterArray.push(SearchUtil.buildFilter(filter))
+    for (const type in filters) {
+      filterArray.push(SearchUtil.buildFilter(filters[type]))
     }
 
-    return filterArray
+    return filterArray.length === 1 ? filterArray[0] : filterArray
   }
 
   private static buildFilter (filter: Filter): any {
