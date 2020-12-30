@@ -51,7 +51,7 @@ export class SearchUtil {
           // eslint-disable-next-line @typescript-eslint/camelcase
           date_histogram: {
             // eslint-disable-next-line @typescript-eslint/camelcase
-            calendar_interval: 'quarter',
+            calendar_interval: SearchUtil.getCalendarInterval(filters),
             field: 'edatum'
           }
         }
@@ -63,6 +63,22 @@ export class SearchUtil {
         maxContentLength: Infinity,
         maxBodyLength: Infinity
       }).then(resp => SearchUtil.extractSearchResults(resp))
+  }
+
+  private static getCalendarInterval (filters: Array<Filter>): string {
+    for (const filter of filters) {
+      if (filter.type === 'edatum') {
+        const range = (filter.payload.to - filter.payload.from) / 1000 / 3600 / 24
+        if (range < 40) {
+          return 'day'
+        } else if (range < 280) {
+          return 'week'
+        } else if (range < 1200) {
+          return 'month'
+        }
+      }
+    }
+    return 'quarter'
   }
 
   private static buildFilters (filters: Array<Filter>): any {

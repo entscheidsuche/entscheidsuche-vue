@@ -44,16 +44,17 @@
         </div>
         <div class="authority">
           <b-form-group label="Verfasser" class="title">
-            <treeselect v-model="value"  placeholder="Filtern" id="tree" openDirection="below"
+            <treeselect v-model="hierarchieValues"  placeholder="Filtern" id="tree" openDirection="below"
               :multiple="true"
               :options="this.transformFacets()"
               :always-open="true"
               :show-count="true"
               :maxHeight="this.authorityHeight"
               :clearable="false">
+              @input="onHierarchieChanged"
               <label slot="option-label" slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName }" :class="labelClassName">
                 {{ node.label }}
-                <span v-if="shouldShowCount" :class="countClassName">({{ node.raw.count }})</span>
+                <span :class="countClassName">({{ node.raw.count }})</span>
               </label>
             </treeselect>
           </b-form-group>
@@ -640,6 +641,7 @@ import 'vue-histogram-slider/dist/histogram-slider.css'
 import { TreeModel } from '@/util/treeModel'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import router from '@/router'
 
 Vue.component(HistogramSlider.name, HistogramSlider)
 Vue.component('treeselect', Treeselect)
@@ -659,7 +661,7 @@ export default class SearchResults extends Vue {
 
   data () {
     return {
-      value: null,
+      hierarchieValues: [],
       selected: [],
       myOptions: [
         { text: 'DE', value: 'de' },
@@ -708,6 +710,11 @@ export default class SearchResults extends Vue {
       this.previewVisible = false
       this.fullScreen = false
     }
+  }
+
+  @Watch('hierarchieValues')
+  public onHierarchieValuesChanged (values: any) {
+    console.log(values)
   }
 
   created () {
@@ -847,6 +854,20 @@ export default class SearchResults extends Vue {
 
   public onHistogramChanged ($event) {
     SearchModule.SetFilters([{ type: 'edatum', payload: { from: $event.from, to: $event.to } }])
+    const query = { ...router.currentRoute.query }
+
+    if (Array.isArray(query.filter)) {
+      const newFilter: Array<string> = []
+      for (const filter of query.filter) {
+        if (filter !== null && !filter.startsWith('edatum:')) {
+          newFilter.push(filter)
+        }
+      }
+      newFilter.push(`edatum:${$event.from},${$event.to}`)
+      router.push({ name: 'Search', query: { ...router.currentRoute.query, filter: newFilter } })
+    } else {
+      router.push({ name: 'Search', query: { ...router.currentRoute.query, filter: `edatum:${$event.from},${$event.to}` } })
+    }
   }
 
   public getFromDate () {
@@ -897,6 +918,20 @@ export default class SearchResults extends Vue {
     const tree: Array<TreeModel> = []
     const locale = this.locale
     const facets: Array<Facet> = this.facets
+    const hierarchie = SearchModule.aggregations.hierarchie || []
+    const hierarchieDict: { [key: string]: number } = {}
+    for (const aggregation of hierarchie) {
+      hierarchieDict[aggregation.key] = aggregation.count
+    }
+    const lookupCount = function (id: string) {
+      if (hierarchieDict[id] !== undefined) {
+        return hierarchieDict[id]
+      }
+      return 0
+    }
+    const isDisabled = function (id: string) {
+      return lookupCount(id) === 0
+    }
     facets.forEach((facet: Facet) => {
       if (facet.children !== null && facet.children !== undefined) {
         if (facet.children.length > 0) {
@@ -906,21 +941,26 @@ export default class SearchResults extends Vue {
               if (child.children.length > 0) {
                 const grandChildrenArray: Array<TreeModel> = []
                 child.children.forEach((grandChild: Facet) => {
-                  grandChildrenArray.push({ id: grandChild.id, label: grandChild.label[locale], count: 10 })
+                  grandChildrenArray.push({ id: grandChild.id, label: grandChild.label[locale], count: lookupCount(grandChild.id), isDisabled: isDisabled(grandChild.id) })
                 })
-                childrenArray.push({ id: child.id, label: child.label[locale], children: grandChildrenArray, count: 10 })
+                childrenArray.push({ id: child.id, label: child.label[locale], children: grandChildrenArray, count: lookupCount(child.id), isDisabled: isDisabled(child.id) })
               }
             } else {
-              childrenArray.push({ id: child.id, label: child.label[locale], count: 10 })
+              childrenArray.push({ id: child.id, label: child.label[locale], count: lookupCount(child.id), isDisabled: isDisabled(child.id) })
             }
           })
-          tree.push({ id: facet.id, label: facet.label[locale], children: childrenArray, count: 10 })
+          tree.push({ id: facet.id, label: facet.label[locale], children: childrenArray, count: lookupCount(facet.id), isDisabled: isDisabled(facet.id) })
         }
       } else {
-        tree.push({ id: facet.id, label: facet.label[locale], count: 10 })
+        tree.push({ id: facet.id, label: facet.label[locale], count: lookupCount(facet.id), isDisabled: isDisabled(facet.id) })
       }
     })
     return tree
+  }
+
+  public onHierarchieChanged ($event) {
+    console.log('hierarchie changed')
+    console.log($event)
   }
 }
 </script>

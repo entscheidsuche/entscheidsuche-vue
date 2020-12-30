@@ -94,16 +94,29 @@ export class Search extends VuexModule implements SearchState {
   }
 
   @Mutation
-  public SET_FILTERS (filters: Array<Filter>) {
-    this.filt = filters
+  public SET_FILTERS (filters: Array<Filter | string>) {
+    const newFilters: Array<Filter> = []
+    for (const filter of filters) {
+      if (typeof filter === 'string') {
+        if (filter.startsWith('edatum:')) {
+          const numbers = filter.substring(7).split(',')
+          newFilters.push({ type: 'edatum', payload: { from: parseInt(numbers[0]), to: parseInt(numbers[1]) } })
+        }
+      } else {
+        newFilters.push(filter)
+      }
+    }
+    this.filt = newFilters
     this.results = []
     this.aggs = {}
   }
 
   @Action
-  public SetFilters (filters: Array<Filter>) {
+  public SetFilters (filters: Array<Filter | string>) {
     this.context.commit('SET_FILTERS', filters)
-    return this.context.dispatch('SetResults')
+    if (this.queryString !== '') {
+      return this.context.dispatch('SetResults')
+    }
   }
 
   public get filters (): Array<Filter> {

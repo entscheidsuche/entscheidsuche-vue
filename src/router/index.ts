@@ -19,6 +19,11 @@ const routes: Array<RouteConfig> = [
     name: 'Search',
     component: SearchResults,
     beforeEnter: (to, from, next) => {
+      if (to.query.filter !== undefined && typeof to.query.filter === 'string') {
+        SearchModule.SetFilters([to.query.filter])
+      } else {
+        SearchModule.SetFilters([])
+      }
       if (to.query.query !== undefined && typeof to.query.query === 'string') {
         SearchModule.SetQuery(to.query.query)
       }
