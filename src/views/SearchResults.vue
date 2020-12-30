@@ -12,6 +12,7 @@
             <p class="title">Jahr</p>
             <template v-if="this.showHistogram">
               <HistogramSlider
+                ref="histogram"
                 :width="this.sliderWidth"
                 :bar-height="100"
                 :data="this.getDates()"
@@ -635,7 +636,7 @@
 import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
-import { Aggregations, SearchModule, SearchResult, Facet } from '@/store/modules/search'
+import { Aggregations, SearchModule, SearchResult, Facet, Aggregation } from '@/store/modules/search'
 import HistogramSlider from 'vue-histogram-slider'
 import 'vue-histogram-slider/dist/histogram-slider.css'
 import { TreeModel } from '@/util/treeModel'
@@ -854,10 +855,21 @@ export default class SearchResults extends Vue {
     }
   }
 
-  @Watch('aggregations')
-  public onAggregationsChange (aggs: Aggregations) {
+  @Watch('aggregations.edatum')
+  public onAggregationsChange (aggs: Array<Aggregation>, oldAggs: Array<Aggregation>) {
+    if (aggs === oldAggs) {
+      return
+    }
     this.showHistogram = false
-    this.$nextTick(() => { this.showHistogram = true })
+    this.$nextTick(() => {
+      this.showHistogram = true
+      setTimeout(() => {
+        const filter = SearchModule.filters.edatum
+        if (filter !== undefined) {
+          (this.$refs.histogram as any).update({ from: filter.payload.from, to: filter.payload.to })
+        }
+      }, 100)
+    })
   }
 
   public getDates () {
@@ -873,6 +885,7 @@ export default class SearchResults extends Vue {
   }
 
   public onHistogramChanged ($event) {
+    console.log('histogram changed')
     SearchModule.AddFilter({ type: 'edatum', payload: { from: $event.from, to: $event.to } })
     const query = { ...router.currentRoute.query }
 
@@ -892,10 +905,13 @@ export default class SearchResults extends Vue {
 
   public getFromDate () {
     const filter = SearchModule.filters.edatum
+    const edatum = SearchModule.aggregations.edatum || []
+    if (filter !== undefined && edatum.length > 0) {
+      return Math.min(filter.payload.from, edatum[0].key as number)
+    }
     if (filter !== undefined) {
       return filter.payload.from
     }
-    const edatum = SearchModule.aggregations.edatum || []
     if (edatum.length > 0) {
       return edatum[0].key
     }
@@ -903,10 +919,13 @@ export default class SearchResults extends Vue {
 
   public getToDate () {
     const filter = SearchModule.filters.edatum
+    const edatum = SearchModule.aggregations.edatum || []
+    if (filter !== undefined && edatum.length > 0) {
+      return Math.max(filter.payload.to, edatum[edatum.length - 1].key as number)
+    }
     if (filter !== undefined) {
       return filter.payload.to
     }
-    const edatum = SearchModule.aggregations.edatum || []
     if (edatum.length > 0) {
       return edatum[edatum.length - 1].key
     }

@@ -7,7 +7,7 @@ export class SearchUtil {
       .then(resp => SearchUtil.transformResultToFacets(resp))
   }
 
-  public static async search (query: string, filters: Filters, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
+  private static buildPrimarySearch (query: string, filters: Filters, searchAfter?: Array<any>): any {
     const search: any = {
       size: 20,
       query: {
@@ -40,14 +40,22 @@ export class SearchUtil {
       // eslint-disable-next-line @typescript-eslint/camelcase
       search.search_after = searchAfter
     } else {
-      search.aggs = {
-        hierarchie: {
+      if (filters.hierarchie === undefined) {
+        if (search.aggs === undefined) {
+          search.aggs = {}
+        }
+        search.aggs.hierarchie = {
           terms: {
             size: 1000,
             field: 'hierarchie'
           }
-        },
-        edatum: {
+        }
+      }
+      if (filters.edatum === undefined) {
+        if (search.aggs === undefined) {
+          search.aggs = {}
+        }
+        search.aggs.edatum = {
           // eslint-disable-next-line @typescript-eslint/camelcase
           date_histogram: {
             // eslint-disable-next-line @typescript-eslint/camelcase
@@ -57,12 +65,90 @@ export class SearchUtil {
         }
       }
     }
+    return search
+  }
+
+  private static buildAggregationSearch (query: string, filter: Filter, filters: Filters): any {
+    const search: any = {
+      size: 0,
+      query: {
+        bool: {
+          must: {
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            query_string: {
+              query: query
+            }
+          }
+        }
+      }
+    }
+    if (Object.keys(filters).length > 0) {
+      search.query.bool.filter = SearchUtil.buildFilters(filters)
+    }
+    search.aggs = {}
+    if (filter.type === 'hierarchie') {
+      search.aggs.hierarchie = {
+        terms: {
+          size: 1000,
+          field: 'hierarchie'
+        }
+      }
+    } else if (filter.type === 'edatum') {
+      search.aggs.edatum = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        date_histogram: {
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          calendar_interval: SearchUtil.getCalendarInterval(filters),
+          field: 'edatum'
+        }
+      }
+    }
+    return search
+  }
+
+  public static async search (query: string, filters: Filters, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
+    const primarySearch = this.buildPrimarySearch(query, filters, searchAfter)
+    const searches: Array<any> = []
+    if (searchAfter === undefined && Object.keys(filters).length > 0) {
+      for (const type in filters) {
+        const filter = filters[type]
+        const remainingFilters = { ...filters }
+        delete remainingFilters[type]
+        searches.push(this.buildAggregationSearch(query, filter, remainingFilters))
+      }
+    }
+    return axios.post('https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search',
+      primarySearch,
+      {
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
+      }).then(resp => {
+      const [searchResults, total, aggregations] = SearchUtil.extractSearchResults(resp)
+      if (searches.length === 0) {
+        return [searchResults, total, aggregations]
+      } else {
+        return SearchUtil.searchAggs(searches, searchResults, total, aggregations)
+      }
+    })
+  }
+
+  private static searchAggs (searches: Array<any>, searchResults: Array<SearchResult>, total: number, aggregations: Aggregations | undefined): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
+    const search = searches.pop()
     return axios.post('https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search',
       search,
       {
         maxContentLength: Infinity,
         maxBodyLength: Infinity
-      }).then(resp => SearchUtil.extractSearchResults(resp))
+      }).then(resp => {
+      const [key, aggregation] = SearchUtil.extractAggregation(resp)
+      const newAggregations = (aggregations !== undefined) ? aggregations : {}
+      newAggregations[key] = aggregation
+      if (searches.length === 0) {
+        return [searchResults, total, newAggregations]
+      } else {
+        return SearchUtil.searchAggs(searches, searchResults, total, newAggregations)
+      }
+    })
   }
 
   private static getCalendarInterval (filters: Filters): string {
@@ -177,6 +263,25 @@ export class SearchUtil {
       }
     }
     return [results, total, aggregations]
+  }
+
+  private static extractAggregation (resp: AxiosResponse<any>): [string, Array<Aggregation>] {
+    if (resp.data !== undefined && resp.data.aggregations !== undefined) {
+      for (const name in resp.data.aggregations) {
+        const buckets = resp.data.aggregations[name].buckets
+        if (buckets !== undefined) {
+          const aggs: Array<Aggregation> = []
+          for (const agg of buckets) {
+            aggs.push({
+              key: agg.key,
+              count: agg.doc_count
+            })
+          }
+          return [name, aggs]
+        }
+      }
+    }
+    return ['unknown', []]
   }
 
   private static getExtract (highlight: Array<string>): string {

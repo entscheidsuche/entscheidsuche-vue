@@ -1,6 +1,7 @@
 import { VuexModule, Module, Mutation, Action, getModule } from 'vuex-module-decorators'
 import { store } from '@/store'
 import { SearchUtil } from '@/util/search/search'
+import _ from 'lodash'
 
 export type Facets = Array<Facet>
 
@@ -72,8 +73,6 @@ export class Search extends VuexModule implements SearchState {
   @Mutation
   public SET_QUERY (query: string) {
     this.queryString = query
-    this.results = []
-    this.aggs = {}
   }
 
   @Action
@@ -114,22 +113,16 @@ export class Search extends VuexModule implements SearchState {
       }
     }
     this.filt = newFilters
-    this.results = []
-    this.aggs = {}
   }
 
   @Mutation
   public ADD_FILTER (filter: Filter) {
     this.filt[filter.type] = filter
-    this.results = []
-    this.aggs = {}
   }
 
   @Mutation
   public REMOVE_FILTER (type: string) {
     delete this.filt[type]
-    this.results = []
-    this.aggs = {}
   }
 
   @Action
@@ -192,7 +185,17 @@ export class Search extends VuexModule implements SearchState {
       }
     }
     this.total = results[1]
-    this.aggs = results[2]
+    const newAggregations = {}
+    for (const key in results[2]) {
+      const oldAggs = this.aggs[key]
+      const newAggs = results[2][key]
+      if (oldAggs !== undefined && _.isEqual(oldAggs, newAggs)) {
+        newAggregations[key] = oldAggs
+      } else {
+        newAggregations[key] = newAggs
+      }
+    }
+    this.aggs = newAggregations
   }
 
   @Mutation
