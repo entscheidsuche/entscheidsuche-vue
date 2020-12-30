@@ -117,7 +117,9 @@ export class Search extends VuexModule implements SearchState {
 
   @Mutation
   public ADD_FILTER (filter: Filter) {
-    this.filt[filter.type] = filter
+    this.filt = { ...this.filt, [filter.type]: filter }
+    this.results = []
+    this.aggs = {}
   }
 
   @Mutation
