@@ -7,9 +7,31 @@
             <b-icon icon="caret-left-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
+        <div class="total-hits">
+          <div class="title-wrapper">
+            <p class="title">Trefferanzahl: {{ resultsTotal }}</p>
+          </div>
+          <b-button v-on:click="undoFilter()" v-bind:class="['undoFilter', this.allowUndoFilter ? '' : 'disabled']" block variant="outline-primary" size="sm">
+            Alle Filter zurücksetzen
+          </b-button>
+        </div>
+        <div class="sort">
+          <div class="title-wrapper">
+            <p class="title">Sortieren nach:</p>
+          </div>
+          <b-form-group v-slot="{ ariaDescribedby }">
+            <b-form-radio-group v-model="selectedRadio" stacked>
+            <b-form-radio :aria-describedby="ariaDescribedby" value="relevance">Relevanz</b-form-radio>
+            <b-form-radio :aria-describedby="ariaDescribedby" value="date">Datum</b-form-radio>
+            </b-form-radio-group>
+          </b-form-group>
+        </div>
         <div class="year-range">
           <div id="slider-wrapper">
-            <p class="title">Jahr</p>
+            <div v-bind:class="['title-wrapper', this.dateFilterEmpty() ? '' : 'active']" v-on:click="undoDateFilter()">
+              <p class="title">Jahr</p>
+              <b-icon class="undo-filter" icon="x"></b-icon>
+            </div>
             <template v-if="this.showHistogram">
               <HistogramSlider
                 ref="histogram"
@@ -32,7 +54,10 @@
           </div>
         </div>
         <div class="languages">
-          <b-form-group label="Sprache" class="title">
+          <div class="title-wrapper">
+            <p class="title">Sprache</p>
+          </div>
+          <b-form-group>
             <b-form-checkbox
               v-for="option in myOptions"
               v-model="selected"
@@ -44,7 +69,11 @@
           </b-form-group>
         </div>
         <div class="authority">
-          <b-form-group label="Verfasser" class="title">
+          <div v-bind:class="['title-wrapper', this.hierarchieFilterEmpty() ? '' : 'active']" v-on:click="undoHierarchieFilter()">
+            <p class="title">Verfasser</p>
+            <b-icon class="undo-filter" icon="x"></b-icon>
+          </div>
+          <b-form-group>
             <treeselect v-model="hierarchieValues"  placeholder="Filtern" id="tree" openDirection="below"
               :multiple="true"
               :options="this.transformFacets()"
@@ -149,6 +178,38 @@
       transition: all 0.2s linear;
       position: relative;
 
+      .title-wrapper{
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 7px;
+        .title{
+          color:#212529;
+          display: inline;
+          padding-left:4px;
+          padding-right:4px;
+        }
+        .undo-filter{
+          display:none;
+        }
+        &.active{
+          background-color: #6183ec;
+          .title{
+            color:#fff;
+          }
+          .undo-filter{
+            display:inline;
+            border-left:1px solid #fff;
+            color:#fff;
+            font-size:20px;
+            position: relative;
+            top:2px;
+          }
+        }
+        &.active:hover{
+          background-color: #3f68e8;
+        }
+      }
+
       &.hidden{
         width:0;
         padding: 8px 0 8px 0;
@@ -179,6 +240,18 @@
 
           svg{
             font-size:20px;
+          }
+        }
+      }
+      .total-hits{
+        margin-bottom:16px;
+        .title{
+          margin-bottom:7px;
+        }
+        .undoFilter{
+          &.disabled{
+            cursor:default;
+            pointer-events:none;
           }
         }
       }
@@ -273,7 +346,7 @@
           border-radius: 0 4px 4px 0;
           background-color: #6183ec;
           color:#fff;
-          z-index:1000;
+          z-index:999;
           justify-content: center;
           align-items: center;
           cursor: pointer;
@@ -636,7 +709,7 @@
 import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
-import { Aggregations, SearchModule, SearchResult, Facet, Aggregation } from '@/store/modules/search'
+import { Aggregations, SearchModule, SearchResult, Facet, Aggregation, Filters, Filter } from '@/store/modules/search'
 import HistogramSlider from 'vue-histogram-slider'
 import 'vue-histogram-slider/dist/histogram-slider.css'
 import { TreeModel } from '@/util/treeModel'
@@ -659,11 +732,13 @@ export default class SearchResults extends Vue {
   private sliderWidth = 1;
   private showHistogram = true;
   private authorityHeight = 300;
+  private allowUndoFilter = false
 
   data () {
     return {
       hierarchieValues: [],
       selected: [],
+      selectedRadio: 'relevance',
       myOptions: [
         { text: 'DE', value: 'de' },
         { text: 'FR', value: 'fr' },
@@ -705,6 +780,10 @@ export default class SearchResults extends Vue {
     return AppModule.locale
   }
 
+  get filter () {
+    return SearchModule.filters
+  }
+
   @Watch('selectedResult')
   public onSelectedResultChanged (selectedResult: SearchResult) {
     if (!('id' in selectedResult)) {
@@ -719,6 +798,15 @@ export default class SearchResults extends Vue {
       SearchModule.AddFilter({ type: 'hierarchie', payload: values })
     } else {
       SearchModule.RemoveFilter('hierarchie')
+    }
+  }
+
+  @Watch('filter')
+  public onFilterChanged (filters: Filters) {
+    if (Object.keys(filters).length > 0) {
+      this.allowUndoFilter = true
+    } else {
+      this.allowUndoFilter = false
     }
   }
 
@@ -961,6 +1049,26 @@ export default class SearchResults extends Vue {
       }
     })
     return tree
+  }
+
+  public undoFilter () {
+    SearchModule.SetFilters([])
+  }
+
+  public undoDateFilter () {
+    // TODO
+  }
+
+  public undoHierarchieFilter () {
+    // TODO
+  }
+
+  public dateFilterEmpty () {
+    return !(Object.keys(this.filter).includes('edatum'))
+  }
+
+  public hierarchieFilterEmpty () {
+    return !(Object.keys(this.filter).includes('hierarchie'))
   }
 }
 </script>
