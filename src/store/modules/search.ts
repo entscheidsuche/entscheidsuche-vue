@@ -2,8 +2,42 @@ import { VuexModule, Module, Mutation, Action, getModule } from 'vuex-module-dec
 import { store } from '@/store'
 import { SearchUtil } from '@/util/search/search'
 import _ from 'lodash'
+import router from '@/router'
+import { Dictionary } from 'vue-router/types/router'
 
 export type Facets = Array<Facet>
+
+function updateRoute (queryString: string, filters: Filters): void {
+  const name = router.currentRoute.name
+  const query = { ...router.currentRoute.query }
+  const existingQueryString = query.query
+  const existingFilters = query.filter !== undefined ? Array.isArray(query.filter) ? query.filter : [query.filter] : undefined
+  const newFilters: Array<string> | undefined = Object.keys(filters).length > 0 ? [] : undefined
+  const newQueryString = queryString !== '' ? queryString : undefined
+
+  if (newFilters !== undefined) {
+    for (const filterKey in filters) {
+      const filter = filters[filterKey]
+      if (filter.type === 'hierarchie') {
+        newFilters.push(`hierarchie:${filter.payload.join()}`)
+      } else if (filter.type === 'edatum') {
+        newFilters.push(`edatum:${filter.payload.from},${filter.payload.to}`)
+      }
+    }
+  }
+  if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters)) {
+    const newQuery: Dictionary<string | string[]> = {}
+    if (newQueryString !== undefined) {
+      newQuery.query = newQueryString
+    }
+    if (newFilters !== undefined) {
+      newQuery.filter = newFilters
+    }
+    if (name !== undefined && name !== null && newQueryString !== undefined) {
+      router.push({ name: name, query: newQuery })
+    }
+  }
+}
 
 export interface Label {
   de: string;
@@ -73,6 +107,10 @@ export class Search extends VuexModule implements SearchState {
   @Mutation
   public SET_QUERY (query: string) {
     this.queryString = query
+    if (query === '') {
+      this.filt = {}
+    }
+    updateRoute(query, this.filt)
   }
 
   @Action
@@ -113,16 +151,21 @@ export class Search extends VuexModule implements SearchState {
       }
     }
     this.filt = newFilters
+    updateRoute(this.queryString, newFilters)
   }
 
   @Mutation
   public ADD_FILTER (filter: Filter) {
-    this.filt[filter.type] = filter
+    this.filt = { ...this.filt, [filter.type]: filter }
+    updateRoute(this.queryString, this.filt)
   }
 
   @Mutation
   public REMOVE_FILTER (type: string) {
-    delete this.filt[type]
+    const newFilters = { ...this.filt }
+    delete newFilters[type]
+    this.filt = newFilters
+    updateRoute(this.queryString, newFilters)
   }
 
   @Action

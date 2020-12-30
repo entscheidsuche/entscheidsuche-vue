@@ -715,27 +715,11 @@ export default class SearchResults extends Vue {
 
   @Watch('hierarchieValues')
   public onHierarchieValuesChanged (values: Array<string>) {
-    const query = { ...router.currentRoute.query }
-    const existingFilters = Array.isArray(query.filter) ? query.filter : query.filter !== undefined ? [query.filter] : []
-    const newFilter: Array<string> = []
-    for (const filter of existingFilters) {
-      if (filter !== null && !filter.startsWith('hierarchie:')) {
-        newFilter.push(filter)
-      }
-    }
     if (values.length > 0) {
       SearchModule.AddFilter({ type: 'hierarchie', payload: values })
-      newFilter.push(`hierarchie:${values.join()}`)
-      query.filter = newFilter
     } else {
       SearchModule.RemoveFilter('hierarchie')
-      if (newFilter.length === 0) {
-        delete query.filter
-      } else {
-        query.filter = newFilter
-      }
     }
-    router.push({ name: 'Search', query })
   }
 
   created () {
@@ -885,22 +869,7 @@ export default class SearchResults extends Vue {
   }
 
   public onHistogramChanged ($event) {
-    console.log('histogram changed')
     SearchModule.AddFilter({ type: 'edatum', payload: { from: $event.from, to: $event.to } })
-    const query = { ...router.currentRoute.query }
-
-    if (Array.isArray(query.filter)) {
-      const newFilter: Array<string> = []
-      for (const filter of query.filter) {
-        if (filter !== null && !filter.startsWith('edatum:')) {
-          newFilter.push(filter)
-        }
-      }
-      newFilter.push(`edatum:${$event.from},${$event.to}`)
-      router.push({ name: 'Search', query: { ...router.currentRoute.query, filter: newFilter } })
-    } else {
-      router.push({ name: 'Search', query: { ...router.currentRoute.query, filter: `edatum:${$event.from},${$event.to}` } })
-    }
   }
 
   public getFromDate () {
