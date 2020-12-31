@@ -50,14 +50,17 @@
               :key="option.value"
               :value="option.value"
               name="flavour-3a">
-              {{ option.text }}
+              <span>{{ option.text }}</span>
+              <span class="language-count">(1)</span>
             </b-form-checkbox>
           </b-form-group>
         </div>
         <div class="authority">
           <div v-bind:class="['title-wrapper', this.hierarchieFilterEmpty() ? '' : 'active']" v-on:click="undoHierarchieFilter()">
-            <p class="title">Verfasser</p>
-            <b-icon class="undo-filter" icon="x"></b-icon>
+            <div class="row-wrapper">
+              <p class="title">Verfasser</p>
+              <b-icon class="undo-filter" icon="x"></b-icon>
+            </div>
           </div>
           <b-form-group>
             <treeselect v-model="hierarchieValues"  placeholder="Filtern" id="tree" openDirection="below"
@@ -68,8 +71,10 @@
               :maxHeight="this.authorityHeight"
               :clearable="false">
               @input="onHierarchieChanged"
-              <label slot="option-label" slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName }" :class="labelClassName">
-                {{ node.label }}
+              <label slot="option-label" slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName}" v-bind:class="[labelClassName, node.raw.count === 0 ? 'empty' : '']">
+                <div class="text-wrapper">
+                  <span>{{ node.label }}</span>
+                </div>
                 <span :class="countClassName">({{ node.raw.count }})</span>
               </label>
             </treeselect>
@@ -268,10 +273,39 @@
           }
         }
       }
+      .languages{
+        .custom-control-label{
+          display:flex;
+          justify-content:space-between;
+          .language-count{
+            opacity: 0.6;
+          }
+        }
+      }
       .authority{
         #tree{
           font-size: 16px;
           font-weight:normal;
+
+          .vue-treeselect__multi-value-item{
+            color:#fff;
+            background-color: #6183ec;
+            border-radius: 4px;
+            .vue-treeselect__multi-value-label{
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              max-width: 110px;
+              padding-right:0;
+            }
+            .vue-treeselect__icon{
+              color:#fff;
+              border-left-color:#fff;
+            }
+          }
+          .vue-treeselect__multi-value-item:hover{
+            background-color:#3f68e8;
+          }
           .vue-treeselect__checkbox{
             width:16px;
             height:16px;
@@ -288,11 +322,27 @@
               top:-5px;
               left:3px;
             }
-
             &.vue-treeselect__checkbox--checked,&.vue-treeselect__checkbox--indeterminate{
               background-color: #6183ec;
               border-color: #6183ec;
             }
+          }
+          .vue-treeselect__label{
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0;
+            &.empty{
+              color:#bdbdbd
+            }
+            .text-wrapper{
+              flex-shrink: 1;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              overflow: hidden;
+            }
+              .vue-treeselect__count{
+                flex-shrink: 0;
+              }
           }
         }
       }
