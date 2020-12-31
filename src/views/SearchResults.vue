@@ -32,11 +32,7 @@
               <p class="title">Jahr</p>
               <b-icon class="undo-filter" icon="x"></b-icon>
             </div>
-            <template v-if="this.showHistogram">
-              <DateFilter
-                :sliderWidth="sliderWidth"
-                @value-changed="onDateRangeChanged"/>
-            </template>
+            <DateFilter :sliderWidth="sliderWidth"/>
           </div>
         </div>
         <div class="languages">
@@ -769,10 +765,8 @@ export default class SearchResults extends Vue {
   private windowWidth = 0
   private previewVisible = false
   private sliderWidth = 1
-  private showHistogram = true
   private authorityHeight = 300
   private allowUndoFilter = false
-  private dateRange: { from: number; to: number } | undefined
 
   data () {
     return {
@@ -843,10 +837,6 @@ export default class SearchResults extends Vue {
 
   @Watch('filter')
   public onFilterChanged (filters: Filters) {
-    if (!Object.prototype.hasOwnProperty.call(filters, 'edatum') && this.dateRange !== undefined) {
-      this.showHistogram = false
-      this.$nextTick(() => { this.showHistogram = true })
-    }
     if (Object.keys(filters).length > 0) {
       this.allowUndoFilter = true
     } else {
@@ -977,19 +967,6 @@ export default class SearchResults extends Vue {
         this.authorityHeight = window.innerHeight - 524
       }
     }
-  }
-
-  @Watch('aggregations.edatum')
-  public onAggregationsChange (aggs: Array<Aggregation>, oldAggs: Array<Aggregation>) {
-    if (aggs === oldAggs) {
-      return
-    }
-    this.showHistogram = false
-    this.$nextTick(() => { this.showHistogram = true })
-  }
-
-  public onDateRangeChanged (value: { from: number; to: number }) {
-    this.dateRange = value
   }
 
   public transformFacets () {
