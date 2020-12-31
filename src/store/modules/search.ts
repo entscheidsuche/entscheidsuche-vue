@@ -17,11 +17,13 @@ function updateRoute (queryString: string, filters: Filters): void {
 
   if (newFilters !== undefined) {
     for (const filterKey in filters) {
-      const filter = filters[filterKey]
-      if (filter.type === 'hierarchie') {
-        newFilters.push(`hierarchie:${filter.payload.join()}`)
-      } else if (filter.type === 'edatum') {
-        newFilters.push(`edatum:${filter.payload.from},${filter.payload.to}`)
+      if (Object.prototype.hasOwnProperty.call(filters, filterKey)) {
+        const filter = filters[filterKey]
+        if (filter.type === 'hierarchie') {
+          newFilters.push(`hierarchie:${filter.payload.join()}`)
+        } else if (filter.type === 'edatum') {
+          newFilters.push(`edatum:${filter.payload.from},${filter.payload.to}`)
+        }
       }
     }
   }
@@ -116,7 +118,7 @@ export class Search extends VuexModule implements SearchState {
   @Action
   public SetQuery (query: string) {
     if (this.fac.length === 0) {
-      return this.context.dispatch('GetFacets').then((_) => {
+      return this.context.dispatch('GetFacets').then(() => {
         if (query !== this.queryString) {
           this.context.commit('SET_QUERY', query)
           return this.context.dispatch('SetResults')
@@ -230,12 +232,14 @@ export class Search extends VuexModule implements SearchState {
     this.total = results[1]
     const newAggregations = {}
     for (const key in results[2]) {
-      const oldAggs = this.aggs[key]
-      const newAggs = results[2][key]
-      if (oldAggs !== undefined && _.isEqual(oldAggs, newAggs)) {
-        newAggregations[key] = oldAggs
-      } else {
-        newAggregations[key] = newAggs
+      if (Object.prototype.hasOwnProperty.call(results[2], key)) {
+        const oldAggs = this.aggs[key]
+        const newAggs = results[2][key]
+        if (oldAggs !== undefined && _.isEqual(oldAggs, newAggs)) {
+          newAggregations[key] = oldAggs
+        } else {
+          newAggregations[key] = newAggs
+        }
       }
     }
     this.aggs = newAggregations
@@ -243,11 +247,7 @@ export class Search extends VuexModule implements SearchState {
 
   @Mutation
   public SET_MORE_RESULTS (results: [Array<SearchResult>, number]) {
-    if (results[0].length === 0) {
-      this.allResLoaded = true
-    } else {
-      this.allResLoaded = false
-    }
+    this.allResLoaded = results[0].length === 0
     this.results = [...this.results, ...results[0]]
     this.total = results[1]
   }

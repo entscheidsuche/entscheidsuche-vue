@@ -33,23 +33,9 @@
               <b-icon class="undo-filter" icon="x"></b-icon>
             </div>
             <template v-if="this.showHistogram">
-              <HistogramSlider
-                ref="histogram"
-                :width="this.sliderWidth"
-                :bar-height="100"
-                :data="this.getDates()"
-                :drag-interval="true"
-                :force-edges="false"
-                :colors="['#c8d4f8', '#6183ec']"
-                :handleSize="16"
-                :min="this.getFromDate()"
-                :max="this.getToDate()"
-                :primaryColor="'#6183ec'"
-                :labelColor="'#6183ec'"
-                :prettify="this.prettifyDate"
-                :grid="false"
-                @finish="onHistogramChanged"
-              />
+              <DateFilter
+                :sliderWidth="sliderWidth"
+                @value-changed="onDateRangeChanged"/>
             </template>
           </div>
         </div>
@@ -715,24 +701,28 @@ import 'vue-histogram-slider/dist/histogram-slider.css'
 import { TreeModel } from '@/util/treeModel'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import router from '@/router'
+import DateFilter from '@/components/DateFilter.vue'
 
 Vue.component(HistogramSlider.name, HistogramSlider)
 Vue.component('treeselect', Treeselect)
 
 @Component({
-  name: 'SearchResult'
+  name: 'SearchResult',
+  components: {
+    DateFilter
+  }
 })
 
 export default class SearchResults extends Vue {
-  private filterVisible = true;
-  private fullScreen = false;
-  private windowWidth = 0;
-  private previewVisible = false;
-  private sliderWidth = 1;
-  private showHistogram = true;
-  private authorityHeight = 300;
+  private filterVisible = true
+  private fullScreen = false
+  private windowWidth = 0
+  private previewVisible = false
+  private sliderWidth = 1
+  private showHistogram = true
+  private authorityHeight = 300
   private allowUndoFilter = false
+  private dateRange: { from: number; to: number } | undefined
 
   data () {
     return {
@@ -803,6 +793,10 @@ export default class SearchResults extends Vue {
 
   @Watch('filter')
   public onFilterChanged (filters: Filters) {
+    if (!Object.prototype.hasOwnProperty.call(filters, 'edatum') && this.dateRange !== undefined) {
+      this.showHistogram = false
+      this.$nextTick(() => { this.showHistogram = true })
+    }
     if (Object.keys(filters).length > 0) {
       this.allowUndoFilter = true
     } else {
@@ -815,6 +809,14 @@ export default class SearchResults extends Vue {
     this.handleResize()
     this.getFilterInnerWidth()
     this.getAuthorityHeight()
+  }
+
+  mounted () {
+    if (Object.keys(this.filter).length > 0) {
+      this.allowUndoFilter = true
+    } else {
+      this.allowUndoFilter = false
+    }
   }
 
   destroyed () {
@@ -933,77 +935,11 @@ export default class SearchResults extends Vue {
       return
     }
     this.showHistogram = false
-    this.$nextTick(() => {
-      this.showHistogram = true
-      setTimeout(() => {
-        const filter = SearchModule.filters.edatum
-        if (filter !== undefined) {
-          (this.$refs.histogram as any).update({ from: filter.payload.from, to: filter.payload.to })
-        }
-      }, 100)
-    })
+    this.$nextTick(() => { this.showHistogram = true })
   }
 
-  public getDates () {
-    const edatum = SearchModule.aggregations.edatum || []
-    const datesArray: Date[] = []
-    for (const agg of edatum) {
-      const date = new Date(agg.key)
-      for (let i = 0; i < agg.count; i++) {
-        datesArray.push(date)
-      }
-    }
-    return datesArray
-  }
-
-  public onHistogramChanged ($event) {
-    SearchModule.AddFilter({ type: 'edatum', payload: { from: $event.from, to: $event.to } })
-  }
-
-  public getFromDate () {
-    const filter = SearchModule.filters.edatum
-    const edatum = SearchModule.aggregations.edatum || []
-    if (filter !== undefined && edatum.length > 0) {
-      return Math.min(filter.payload.from, edatum[0].key as number)
-    }
-    if (filter !== undefined) {
-      return filter.payload.from
-    }
-    if (edatum.length > 0) {
-      return edatum[0].key
-    }
-  }
-
-  public getToDate () {
-    const filter = SearchModule.filters.edatum
-    const edatum = SearchModule.aggregations.edatum || []
-    if (filter !== undefined && edatum.length > 0) {
-      return Math.max(filter.payload.to, edatum[edatum.length - 1].key as number)
-    }
-    if (filter !== undefined) {
-      return filter.payload.to
-    }
-    if (edatum.length > 0) {
-      return edatum[edatum.length - 1].key
-    }
-  }
-
-  public prettifyDate (date: Date | number): string {
-    // eslint-disable-next-line use-isnan
-    if (date !== NaN && date instanceof Date) {
-      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`
-    } else if (typeof date === 'number' && !isNaN(date)) {
-      const d = new Date(date)
-      return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`
-    }
-    /*
-    if (date !== NaN && date instanceof Date) {
-      return date.getFullYear().toString() + '/Q' + Math.ceil((date.getMonth() + 1) / 3).toString()
-    } else if (typeof date === 'number' && !isNaN(date)) {
-      return new Date(date).getFullYear().toString() + '/Q' + Math.ceil((new Date(date).getMonth() + 1) / 3).toString()
-    }
-    */
-    return '2020'
+  public onDateRangeChanged (value: { from: number; to: number }) {
+    this.dateRange = value
   }
 
   public transformFacets () {
