@@ -98,6 +98,7 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 export default class HierarchieFilter extends Vue {
   private authorityHeight = 300
+  private hierarchieValues = []
 
   get locale () {
     return AppModule.locale
@@ -118,6 +119,15 @@ export default class HierarchieFilter extends Vue {
 
   handleResize () {
     this.getAuthorityHeight()
+  }
+
+  @Watch('hierarchieValues')
+  public onHierarchieValuesChanged (values: Array<string>) {
+    if (values.length > 0) {
+      SearchModule.AddFilter({ type: 'hierarchie', payload: values })
+    } else {
+      SearchModule.RemoveFilter('hierarchie')
+    }
   }
 
   public getAuthorityHeight () {

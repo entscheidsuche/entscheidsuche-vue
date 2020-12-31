@@ -689,7 +689,6 @@ export default class SearchResults extends Vue {
 
   data () {
     return {
-      hierarchieValues: [],
       selected: [],
       selectedRadio: 'relevance',
       myOptions: [
@@ -742,15 +741,6 @@ export default class SearchResults extends Vue {
     if (!('id' in selectedResult)) {
       this.previewVisible = false
       this.fullScreen = false
-    }
-  }
-
-  @Watch('hierarchieValues')
-  public onHierarchieValuesChanged (values: Array<string>) {
-    if (values.length > 0) {
-      SearchModule.AddFilter({ type: 'hierarchie', payload: values })
-    } else {
-      SearchModule.RemoveFilter('hierarchie')
     }
   }
 
