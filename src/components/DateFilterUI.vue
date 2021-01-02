@@ -3,13 +3,14 @@
     ref="histogram"
     :width="sliderWidth"
     :bar-height="100"
-    :data="getDates()"
+    :transitionDuration="10"
+    :data="dates"
     :drag-interval="true"
     :force-edges="false"
     :colors="['#c8d4f8', '#6183ec']"
     :handleSize="16"
-    :min="getFromDate()"
-    :max="getToDate()"
+    :min="interval.min"
+    :max="interval.max"
     :primaryColor="'#6183ec'"
     :labelColor="'#6183ec'"
     :prettify="prettifyDate"
@@ -22,8 +23,7 @@
 </style>
 
 <script lang="ts">
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
-import { SearchModule } from '@/store/modules/search'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import HistogramSlider from 'vue-histogram-slider'
 
 @Component({
@@ -33,58 +33,28 @@ import HistogramSlider from 'vue-histogram-slider'
 })
 export default class DateFilterUI extends Vue {
   @Prop() sliderWidth
+  @Prop() dates
+  @Prop() interval: { min: number; max: number } | undefined
+  @Prop() range: { from: number | undefined; to: number | undefined } | undefined
 
   public mounted () {
-    const filter = SearchModule.filters.edatum
-    if (filter !== undefined) {
-      (this.$refs.histogram as any).update({ from: filter.payload.from, to: filter.payload.to })
-      this.$emit('value-changed', { from: filter.payload.from, to: filter.payload.to })
+    if (this.range !== undefined && (this.range.from !== undefined || this.range.to !== undefined)) {
+      setTimeout(() => {
+        if (this.range !== undefined && this.interval !== undefined) {
+          if (this.range.from !== undefined || this.range.to !== undefined) {
+            (this.$refs.histogram as any).update(
+              {
+                from: this.range.from !== undefined ? this.range.from : this.interval.min,
+                to: this.range.to !== undefined ? this.range.to : this.interval.max
+              })
+          }
+        }
+      }, 20)
     }
   }
 
-  @Emit('value-changed')
   public onValueChanged (value) {
-    SearchModule.AddFilter({ type: 'edatum', payload: { from: value.from, to: value.to } })
-  }
-
-  public getDates () {
-    const edatum = SearchModule.aggregations.edatum || []
-    const datesArray: Date[] = []
-    for (const agg of edatum) {
-      const date = new Date(agg.key)
-      for (let i = 0; i < agg.count; i++) {
-        datesArray.push(date)
-      }
-    }
-    return datesArray
-  }
-
-  public getFromDate () {
-    const filter = SearchModule.filters.edatum
-    const edatum = SearchModule.aggregations.edatum || []
-    if (filter !== undefined && edatum.length > 0) {
-      return Math.min(filter.payload.from, edatum[0].key as number)
-    }
-    if (filter !== undefined) {
-      return filter.payload.from
-    }
-    if (edatum.length > 0) {
-      return edatum[0].key
-    }
-  }
-
-  public getToDate () {
-    const filter = SearchModule.filters.edatum
-    const edatum = SearchModule.aggregations.edatum || []
-    if (filter !== undefined && edatum.length > 0) {
-      return Math.max(filter.payload.to, edatum[edatum.length - 1].key as number)
-    }
-    if (filter !== undefined) {
-      return filter.payload.to
-    }
-    if (edatum.length > 0) {
-      return edatum[edatum.length - 1].key
-    }
+    this.$emit('value-changed', value)
   }
 
   public prettifyDate (date: Date | number): string {

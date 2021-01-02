@@ -865,11 +865,11 @@ export default class SearchResults extends Vue {
   }
 
   public undoDateFilter () {
-    // TODO
+    SearchModule.RemoveFilter('edatum')
   }
 
   public undoHierarchieFilter () {
-    // TODO
+    SearchModule.RemoveFilter('hierarchie')
   }
 
   public dateFilterEmpty () {

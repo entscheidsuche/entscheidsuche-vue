@@ -22,7 +22,7 @@ function updateRoute (queryString: string, filters: Filters): void {
         if (filter.type === 'hierarchie') {
           newFilters.push(`hierarchie:${filter.payload.join()}`)
         } else if (filter.type === 'edatum') {
-          newFilters.push(`edatum:${filter.payload.from},${filter.payload.to}`)
+          newFilters.push(`edatum:${filter.payload.from ? filter.payload.from : ''},${filter.payload.to !== undefined ? filter.payload.to : ''}`)
         }
       }
     }
@@ -143,7 +143,15 @@ export class Search extends VuexModule implements SearchState {
       if (typeof filter === 'string') {
         if (filter.startsWith('edatum:')) {
           const numbers = filter.substring(7).split(',')
-          newFilters.edatum = { type: 'edatum', payload: { from: parseInt(numbers[0]), to: parseInt(numbers[1]) } }
+          newFilters.edatum =
+          {
+            type: 'edatum',
+            payload:
+            {
+              from: numbers[0].length > 0 ? parseInt(numbers[0]) : undefined,
+              to: numbers[1].length > 0 ? parseInt(numbers[1]) : undefined
+            }
+          }
         } else if (filter.startsWith('hierarchie:')) {
           const ids = filter.substring(11).split(',')
           newFilters.hierarchie = { type: 'hierarchie', payload: ids }
