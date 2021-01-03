@@ -83,9 +83,9 @@
 </style>
 
 <script lang="ts">
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
-import { SearchModule, Facet, Filters, Filter } from '@/store/modules/search'
+import { SearchModule, Facet, Filters } from '@/store/modules/search'
 import { TreeModel } from '@/util/treeModel'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -98,7 +98,7 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 export default class HierarchieFilter extends Vue {
   private authorityHeight = 300
-  private hierarchieValues = []
+  private hierarchieValues: Array<string> = []
 
   get locale () {
     return AppModule.locale
@@ -108,13 +108,23 @@ export default class HierarchieFilter extends Vue {
     return SearchModule.facets
   }
 
-  public get showMessage () {
+  get filters () {
+    return SearchModule.filters
+  }
+
+  get showMessage () {
     return AppModule.showMessage === MessageState.VISIBLE
   }
 
   created () {
     window.addEventListener('resize', this.handleResize)
     this.getAuthorityHeight()
+  }
+
+  mounted () {
+    if (Object.prototype.hasOwnProperty.call(this.filters, 'hierarchie')) {
+      this.hierarchieValues = this.filters.hierarchie.payload
+    }
   }
 
   handleResize () {
@@ -127,6 +137,15 @@ export default class HierarchieFilter extends Vue {
       SearchModule.AddFilter({ type: 'hierarchie', payload: values })
     } else {
       SearchModule.RemoveFilter('hierarchie')
+    }
+  }
+
+  @Watch('filters')
+  public onFilterChanged (filters: Filters) {
+    if (!Object.prototype.hasOwnProperty.call(filters, 'hierarchie')) {
+      if (this.hierarchieValues.length > 0) {
+        this.hierarchieValues = []
+      }
     }
   }
 
@@ -161,10 +180,6 @@ export default class HierarchieFilter extends Vue {
       }
       return 0
     }
-    const isDisabled = function (id: string) {
-      // return lookupCount(id) === 0
-      return false
-    }
     facets.forEach((facet: Facet) => {
       if (facet.children !== null && facet.children !== undefined) {
         if (facet.children.length > 0) {
@@ -174,18 +189,18 @@ export default class HierarchieFilter extends Vue {
               if (child.children.length > 0) {
                 const grandChildrenArray: Array<TreeModel> = []
                 child.children.forEach((grandChild: Facet) => {
-                  grandChildrenArray.push({ id: grandChild.id, label: grandChild.label[locale], count: lookupCount(grandChild.id), isDisabled: isDisabled(grandChild.id) })
+                  grandChildrenArray.push({ id: grandChild.id, label: grandChild.label[locale], count: lookupCount(grandChild.id), isDisabled: false })
                 })
-                childrenArray.push({ id: child.id, label: child.label[locale], children: grandChildrenArray, count: lookupCount(child.id), isDisabled: isDisabled(child.id) })
+                childrenArray.push({ id: child.id, label: child.label[locale], children: grandChildrenArray, count: lookupCount(child.id), isDisabled: false })
               }
             } else {
-              childrenArray.push({ id: child.id, label: child.label[locale], count: lookupCount(child.id), isDisabled: isDisabled(child.id) })
+              childrenArray.push({ id: child.id, label: child.label[locale], count: lookupCount(child.id), isDisabled: false })
             }
           })
-          tree.push({ id: facet.id, label: facet.label[locale], children: childrenArray, count: lookupCount(facet.id), isDisabled: isDisabled(facet.id) })
+          tree.push({ id: facet.id, label: facet.label[locale], children: childrenArray, count: lookupCount(facet.id), isDisabled: false })
         }
       } else {
-        tree.push({ id: facet.id, label: facet.label[locale], count: lookupCount(facet.id), isDisabled: isDisabled(facet.id) })
+        tree.push({ id: facet.id, label: facet.label[locale], count: lookupCount(facet.id), isDisabled: false })
       }
     })
     return tree
