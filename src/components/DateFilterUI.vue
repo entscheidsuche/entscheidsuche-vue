@@ -42,7 +42,7 @@ export default class DateFilterUI extends Vue {
       setTimeout(() => {
         if (this.range !== undefined && this.interval !== undefined) {
           if (this.range.from !== undefined || this.range.to !== undefined) {
-            (this.$refs.histogram as any).update(
+            (this.$refs.histogram as HistogramSlider).update(
               {
                 from: this.range.from !== undefined ? this.range.from : this.interval.min,
                 to: this.range.to !== undefined ? this.range.to : this.interval.max
@@ -58,8 +58,7 @@ export default class DateFilterUI extends Vue {
   }
 
   public prettifyDate (date: Date | number): string {
-    // eslint-disable-next-line use-isnan
-    if (date !== NaN && date instanceof Date) {
+    if (date instanceof Date) {
       return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`
     } else if (!isNaN(date)) {
       const d = new Date(date)
