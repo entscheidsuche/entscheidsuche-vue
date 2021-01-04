@@ -5,7 +5,7 @@
       :options="this.transformFacets()"
       :always-open="true"
       :show-count="true"
-      :maxHeight="this.authorityHeight"
+      :maxHeight="2000"
       :clearable="false">
       @input="onHierarchieChanged"
       <label slot="option-label" slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName}" v-bind:class="[labelClassName, node.raw.count === 0 ? 'empty' : '']">
@@ -84,7 +84,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import { AppModule, MessageState } from '@/store/modules/app'
+import { AppModule } from '@/store/modules/app'
 import { SearchModule, Facet, Filters, FilterType } from '@/store/modules/search'
 import { TreeModel } from '@/util/treeModel'
 import Treeselect from '@riophae/vue-treeselect'
@@ -97,7 +97,6 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 })
 
 export default class HierarchieFilter extends Vue {
-  private authorityHeight = 300
   private hierarchieValues: Array<string> = []
 
   get locale () {
@@ -112,23 +111,10 @@ export default class HierarchieFilter extends Vue {
     return SearchModule.filters
   }
 
-  get showMessage () {
-    return AppModule.showMessage === MessageState.VISIBLE
-  }
-
-  created () {
-    window.addEventListener('resize', this.handleResize)
-    this.getAuthorityHeight()
-  }
-
   mounted () {
     if (Object.prototype.hasOwnProperty.call(this.filters, 'hierarchie')) {
       this.hierarchieValues = this.filters.hierarchie.payload
     }
-  }
-
-  handleResize () {
-    this.getAuthorityHeight()
   }
 
   @Watch('hierarchieValues')
@@ -145,22 +131,6 @@ export default class HierarchieFilter extends Vue {
     if (!Object.prototype.hasOwnProperty.call(filters, 'hierarchie')) {
       if (this.hierarchieValues.length > 0) {
         this.hierarchieValues = []
-      }
-    }
-  }
-
-  public getAuthorityHeight () {
-    if (window.innerWidth > 1024) {
-      if (this.showMessage) {
-        this.authorityHeight = window.innerHeight - 690
-      } else {
-        this.authorityHeight = window.innerHeight - 650
-      }
-    } else {
-      if (this.showMessage) {
-        this.authorityHeight = window.innerHeight - 564
-      } else {
-        this.authorityHeight = window.innerHeight - 524
       }
     }
   }

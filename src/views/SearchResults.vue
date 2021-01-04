@@ -11,16 +11,19 @@
           <div class="title-wrapper">
             <p class="title">Trefferanzahl: {{ resultsTotal }}</p>
           </div>
-          <b-button v-on:click="undoFilter()" v-bind:class="['undoFilter', this.allowUndoFilter ? '' : 'disabled']" block variant="outline-primary" size="sm">
-            Alle Filter zurücksetzen
-          </b-button>
+          <div class="undo-all" v-if="this.allowUndoFilter" v-on:click="undoFilter()">
+            <div v-bind:class="['title-wrapper', this.allowUndoFilter ? 'active' : '']" v-on:click="undoFilter()">
+              <p class="title">Alle Filter</p>
+              <b-icon class="undo-filter" icon="x"></b-icon>
+            </div>
+          </div>
         </div>
         <div class="sort">
           <div class="title-wrapper">
             <p class="title">Sortieren nach:</p>
           </div>
           <b-form-group v-slot="{ ariaDescribedby }">
-            <b-form-radio-group v-model="selectedRadio" stacked>
+            <b-form-radio-group v-model="selectedRadio">
             <b-form-radio :aria-describedby="ariaDescribedby" value="relevance">Relevanz</b-form-radio>
             <b-form-radio :aria-describedby="ariaDescribedby" value="date">Datum</b-form-radio>
             </b-form-radio-group>
@@ -154,6 +157,7 @@
           display:none;
         }
         &.active{
+          cursor:pointer;
           background-color: #6183ec;
           .title{
             color:#fff;
@@ -206,15 +210,13 @@
         }
       }
       .total-hits{
-        margin-bottom:16px;
+        margin-bottom:2px;
         .title{
           margin-bottom:7px;
         }
-        .undoFilter{
-          &.disabled{
-            cursor:default;
-            pointer-events:none;
-          }
+        .undo-all{
+          display:inline;
+          float:right;
         }
       }
       .title{
@@ -246,10 +248,16 @@
       }
       .languages{
         .custom-control-label{
-          display:flex;
-          justify-content:space-between;
-          .language-count{
-            opacity: 0.6;
+          width: 100%;
+          .option-wrapper{
+            display:flex;
+            justify-content:space-between;
+            .language-count{
+              opacity: 0.6;
+            }
+            &.empty{
+              color:#bdbdbd
+            }
           }
         }
       }

@@ -6,8 +6,10 @@
       :key="option.value"
       :value="option.value"
       name="flavour-3a">
-      <span>{{ option.text }}</span>
-      <span class="language-count">({{ option.count }})</span>
+      <div v-bind:class="['option-wrapper', option.count === 0 ? 'empty' : '']">
+        <span>{{ option.text }}</span>
+        <span class="language-count">({{ option.count }})</span>
+      </div>
     </b-form-checkbox>
   </b-form-group>
 </template>
