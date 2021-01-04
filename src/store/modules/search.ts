@@ -5,7 +5,13 @@ import _ from 'lodash'
 import router from '@/router'
 import { Dictionary } from 'vue-router/types/router'
 
+const FILTER_DELIMITER = '@'
+
 export type Facets = Array<Facet>
+
+export enum FilterType {
+  HIERARCHIE = 'hierarchie', EDATUM = 'edatum'
+}
 
 function updateRoute (queryString: string, filters: Filters): void {
   const name = router.currentRoute.name
@@ -19,10 +25,10 @@ function updateRoute (queryString: string, filters: Filters): void {
     for (const filterKey in filters) {
       if (Object.prototype.hasOwnProperty.call(filters, filterKey)) {
         const filter = filters[filterKey]
-        if (filter.type === 'hierarchie') {
-          newFilters.push(`hierarchie:${filter.payload.join()}`)
-        } else if (filter.type === 'edatum') {
-          newFilters.push(`edatum:${filter.payload.from ? filter.payload.from : ''},${filter.payload.to !== undefined ? filter.payload.to : ''}`)
+        if (filter.type === FilterType.HIERARCHIE) {
+          newFilters.push(`h${FILTER_DELIMITER}${filter.payload.join()}`)
+        } else if (filter.type === FilterType.EDATUM) {
+          newFilters.push(`e${FILTER_DELIMITER}${filter.payload.from ? filter.payload.from : ''},${filter.payload.to !== undefined ? filter.payload.to : ''}`)
         }
       }
     }
@@ -54,7 +60,8 @@ export type Facet = {
 }
 
 export interface Filter {
-  type: string;
+  type: FilterType;
+  // eslint-disable-next-line
   payload: any;
 }
 
@@ -70,7 +77,7 @@ export interface SearchResult {
   canton: string;
   pdf: boolean;
   url: string;
-  sort: Array<any>;
+  sort: Array<string | number>;
 }
 
 export interface Aggregation {
@@ -141,20 +148,20 @@ export class Search extends VuexModule implements SearchState {
     const newFilters: Filters = {}
     for (const filter of filters) {
       if (typeof filter === 'string') {
-        if (filter.startsWith('edatum:')) {
-          const numbers = filter.substring(7).split(',')
+        if (filter.startsWith('e' + FILTER_DELIMITER)) {
+          const numbers = filter.substring(1 + FILTER_DELIMITER.length).split(',')
           newFilters.edatum =
           {
-            type: 'edatum',
+            type: FilterType.EDATUM,
             payload:
             {
               from: numbers[0].length > 0 ? parseInt(numbers[0]) : undefined,
               to: numbers[1].length > 0 ? parseInt(numbers[1]) : undefined
             }
           }
-        } else if (filter.startsWith('hierarchie:')) {
-          const ids = filter.substring(11).split(',')
-          newFilters.hierarchie = { type: 'hierarchie', payload: ids }
+        } else if (filter.startsWith('h' + FILTER_DELIMITER)) {
+          const ids = filter.substring(1 + FILTER_DELIMITER.length).split(',')
+          newFilters.hierarchie = { type: FilterType.HIERARCHIE, payload: ids }
         }
       } else {
         newFilters[filter.type] = filter

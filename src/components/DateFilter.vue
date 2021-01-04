@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Aggregations, Filters, SearchModule } from '@/store/modules/search'
+import { Aggregations, Filters, FilterType, SearchModule } from '@/store/modules/search'
 import DateFilterUI from '@/components/DateFilterUI.vue'
 
 @Component({
@@ -60,7 +60,7 @@ export default class DateFilter extends Vue {
         to: value.to < this.dateInterval.max ? value.to : undefined
       }
       if (this.dateRange.from !== undefined || this.dateRange.to !== undefined) {
-        SearchModule.AddFilter({ type: 'edatum', payload: this.dateRange })
+        SearchModule.AddFilter({ type: FilterType.EDATUM, payload: this.dateRange })
       } else {
         SearchModule.RemoveFilter('edatum')
       }
