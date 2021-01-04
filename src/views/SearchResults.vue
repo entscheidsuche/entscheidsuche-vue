@@ -36,20 +36,11 @@
           </div>
         </div>
         <div class="languages">
-          <div class="title-wrapper">
+          <div v-bind:class="['title-wrapper', this.languageFilterEmpty() ? '' : 'active']" v-on:click="undoLanguageFilter()">
             <p class="title">Sprache</p>
+            <b-icon class="undo-filter" icon="x"></b-icon>
           </div>
-          <b-form-group>
-            <b-form-checkbox
-              v-for="option in myOptions"
-              v-model="selected"
-              :key="option.value"
-              :value="option.value"
-              name="flavour-3a">
-              <span>{{ option.text }}</span>
-              <span class="language-count">(1)</span>
-            </b-form-checkbox>
-          </b-form-group>
+          <LanguageFilter/>
         </div>
         <div class="authority">
           <div v-bind:class="['title-wrapper', this.hierarchieFilterEmpty() ? '' : 'active']" v-on:click="undoHierarchieFilter()">
@@ -667,6 +658,7 @@ import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import DateFilter from '@/components/DateFilter.vue'
 import HierarchieFilter from '@/components/HierarchieFilter.vue'
+import LanguageFilter from '@/components/LanguageFilter.vue'
 
 Vue.component(HistogramSlider.name, HistogramSlider)
 Vue.component('treeselect', Treeselect)
@@ -675,6 +667,7 @@ Vue.component('treeselect', Treeselect)
   name: 'SearchResult',
   components: {
     DateFilter,
+    LanguageFilter,
     HierarchieFilter
   }
 })
@@ -691,11 +684,6 @@ export default class SearchResults extends Vue {
     return {
       selected: [],
       selectedRadio: 'relevance',
-      myOptions: [
-        { text: 'DE', value: 'de' },
-        { text: 'FR', value: 'fr' },
-        { text: 'IT', value: 'it' }
-      ],
       prettify: function (ts) {
         return new Date(ts).toLocaleDateString('de', {
           year: 'numeric'
@@ -868,12 +856,20 @@ export default class SearchResults extends Vue {
     SearchModule.RemoveFilter('edatum')
   }
 
+  public undoLanguageFilter () {
+    SearchModule.RemoveFilter('language')
+  }
+
   public undoHierarchieFilter () {
     SearchModule.RemoveFilter('hierarchie')
   }
 
   public dateFilterEmpty () {
     return !(Object.keys(this.filter).includes('edatum'))
+  }
+
+  public languageFilterEmpty () {
+    return !(Object.keys(this.filter).includes('language'))
   }
 
   public hierarchieFilterEmpty () {

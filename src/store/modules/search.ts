@@ -10,7 +10,7 @@ const FILTER_DELIMITER = '@'
 export type Facets = Array<Facet>
 
 export enum FilterType {
-  HIERARCHIE = 'hierarchie', EDATUM = 'edatum'
+  HIERARCHIE = 'hierarchie', EDATUM = 'edatum', LANGUAGE = 'language'
 }
 
 function updateRoute (queryString: string, filters: Filters): void {
@@ -29,6 +29,8 @@ function updateRoute (queryString: string, filters: Filters): void {
           newFilters.push(`h${FILTER_DELIMITER}${filter.payload.join()}`)
         } else if (filter.type === FilterType.EDATUM) {
           newFilters.push(`e${FILTER_DELIMITER}${filter.payload.from ? filter.payload.from : ''},${filter.payload.to !== undefined ? filter.payload.to : ''}`)
+        } else if (filter.type === FilterType.LANGUAGE) {
+          newFilters.push(`l${FILTER_DELIMITER}${filter.payload.join()}`)
         }
       }
     }
@@ -162,6 +164,9 @@ export class Search extends VuexModule implements SearchState {
         } else if (filter.startsWith('h' + FILTER_DELIMITER)) {
           const ids = filter.substring(1 + FILTER_DELIMITER.length).split(',')
           newFilters.hierarchie = { type: FilterType.HIERARCHIE, payload: ids }
+        } else if (filter.startsWith('l' + FILTER_DELIMITER)) {
+          const ids = filter.substring(1 + FILTER_DELIMITER.length).split(',')
+          newFilters.language = { type: FilterType.LANGUAGE, payload: ids }
         }
       } else {
         newFilters[filter.type] = filter

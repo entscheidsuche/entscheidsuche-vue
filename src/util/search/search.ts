@@ -51,6 +51,17 @@ export class SearchUtil {
           }
         }
       }
+      if (filters.language === undefined) {
+        if (search.aggs === undefined) {
+          search.aggs = {}
+        }
+        search.aggs.language = {
+          terms: {
+            size: 3,
+            field: 'attachment.language'
+          }
+        }
+      }
       if (filters.edatum === undefined) {
         if (search.aggs === undefined) {
           search.aggs = {}
@@ -91,6 +102,13 @@ export class SearchUtil {
         terms: {
           size: 1000,
           field: 'hierarchie'
+        }
+      }
+    } else if (filter.type === 'language') {
+      search.aggs.language = {
+        terms: {
+          size: 3,
+          field: 'attachment.language'
         }
       }
     } else if (filter.type === 'edatum') {
@@ -210,6 +228,13 @@ export class SearchUtil {
       return {
         terms: {
           hierarchie: filter.payload
+        }
+      }
+    }
+    if (filter.type === 'language') {
+      return {
+        terms: {
+          'attachment.language': filter.payload
         }
       }
     }
