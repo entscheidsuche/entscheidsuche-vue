@@ -650,18 +650,12 @@
 import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
-import { Aggregations, SearchModule, SearchResult, Facet, Aggregation, Filters, Filter } from '@/store/modules/search'
-import HistogramSlider from 'vue-histogram-slider'
+import { SearchModule, SearchResult, Filters } from '@/store/modules/search'
 import 'vue-histogram-slider/dist/histogram-slider.css'
-import { TreeModel } from '@/util/treeModel'
-import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import DateFilter from '@/components/DateFilter.vue'
 import HierarchieFilter from '@/components/HierarchieFilter.vue'
 import LanguageFilter from '@/components/LanguageFilter.vue'
-
-Vue.component(HistogramSlider.name, HistogramSlider)
-Vue.component('treeselect', Treeselect)
 
 @Component({
   name: 'SearchResult',
@@ -712,10 +706,6 @@ export default class SearchResults extends Vue {
     return SearchModule.aggregations
   }
 
-  get facets () {
-    return SearchModule.facets
-  }
-
   get locale () {
     return AppModule.locale
   }
@@ -734,11 +724,7 @@ export default class SearchResults extends Vue {
 
   @Watch('filter')
   public onFilterChanged (filters: Filters) {
-    if (Object.keys(filters).length > 0) {
-      this.allowUndoFilter = true
-    } else {
-      this.allowUndoFilter = false
-    }
+    this.allowUndoFilter = Object.keys(filters).length > 0
   }
 
   created () {
@@ -748,11 +734,7 @@ export default class SearchResults extends Vue {
   }
 
   mounted () {
-    if (Object.keys(this.filter).length > 0) {
-      this.allowUndoFilter = true
-    } else {
-      this.allowUndoFilter = false
-    }
+    this.allowUndoFilter = Object.keys(this.filter).length > 0
   }
 
   destroyed () {
@@ -762,16 +744,12 @@ export default class SearchResults extends Vue {
   handleResize () {
     this.getFilterInnerWidth()
     this.windowWidth = window.innerWidth
-    if (this.windowWidth <= 1024) {
-      this.filterVisible = false
-    } else {
-      this.filterVisible = true
-    }
+    this.filterVisible = this.windowWidth > 1024
   }
 
   handleScroll () {
-    const searchResultsDiv = document.getElementById('results')!
-    if (!SearchModule.allResultsLoaded) {
+    const searchResultsDiv = document.getElementById('results')
+    if (!SearchModule.allResultsLoaded && searchResultsDiv !== null) {
       if (searchResultsDiv.scrollTop + searchResultsDiv.clientHeight >= searchResultsDiv.scrollHeight) {
         this.getMoreResults()
       }
@@ -779,17 +757,13 @@ export default class SearchResults extends Vue {
   }
 
   public onToggleFilter (): void {
-    if (this.filterVisible === true) {
-      this.filterVisible = false
-    } else {
-      this.filterVisible = true
-    }
+    this.filterVisible = !this.filterVisible
   }
 
   public onFullScreen (): void{
-    if (this.fullScreen === false) {
+    if (!this.fullScreen) {
       this.fullScreen = true
-    } else if (this.fullScreen === true && this.windowWidth <= 534) {
+    } else if (this.fullScreen && this.windowWidth <= 534) {
       this.previewVisible = false
       this.fullScreen = false
     } else {
@@ -810,7 +784,7 @@ export default class SearchResults extends Vue {
 
   public onClosePreview (): void{
     this.previewVisible = false
-    if (this.fullScreen === true) {
+    if (this.fullScreen) {
       this.fullScreen = false
       if (this.windowWidth > 534) {
         this.previewVisible = true
