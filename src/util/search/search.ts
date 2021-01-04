@@ -1,4 +1,4 @@
-import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult } from '@/store/modules/search'
+import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult, SortOrder } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
 
 export class SearchUtil {
@@ -7,7 +7,7 @@ export class SearchUtil {
       .then(resp => SearchUtil.transformResultToFacets(resp))
   }
 
-  private static buildPrimarySearch (query: string, filters: Filters, searchAfter?: Array<any>): any {
+  private static buildPrimarySearch (query: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): any {
     const search: any = {
       size: 20,
       query: {
@@ -21,7 +21,7 @@ export class SearchUtil {
         }
       },
       sort: [
-        { _score: 'desc' },
+        { [sortOrder === SortOrder.RELEVANCE ? '_score' : 'edatum']: 'desc' },
         { id: 'desc' }
       ],
       highlight: {
@@ -124,8 +124,8 @@ export class SearchUtil {
     return search
   }
 
-  public static async search (query: string, filters: Filters, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
-    const primarySearch = this.buildPrimarySearch(query, filters, searchAfter)
+  public static async search (query: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
+    const primarySearch = this.buildPrimarySearch(query, filters, sortOrder, searchAfter)
     const searches: Array<any> = []
     if (searchAfter === undefined && Object.keys(filters).length > 0) {
       for (const type in filters) {

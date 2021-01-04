@@ -85,7 +85,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { AppModule } from '@/store/modules/app'
-import { SearchModule, Facet, Filters, FilterType } from '@/store/modules/search'
+import { Facet, Filters, FilterType, SearchModule } from '@/store/modules/search'
 import { TreeModel } from '@/util/treeModel'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -122,7 +122,7 @@ export default class HierarchieFilter extends Vue {
     if (values.length > 0) {
       SearchModule.AddFilter({ type: FilterType.HIERARCHIE, payload: values })
     } else {
-      SearchModule.RemoveFilter('hierarchie')
+      SearchModule.RemoveFilter(FilterType.HIERARCHIE)
     }
   }
 

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '@/views/Home.vue'
 import SearchResults from '@/views/SearchResults.vue'
-import { SearchModule } from '@/store/modules/search'
+import { SearchModule, SortOrder } from '@/store/modules/search'
 import { sync } from 'vuex-router-sync'
 import { store } from '@/store'
 
@@ -25,6 +25,11 @@ const routes: Array<RouteConfig> = [
         SearchModule.SetFilters(to.query.filter as Array<string>)
       } else {
         SearchModule.SetFilters([])
+      }
+      if (to.query.sort !== undefined && typeof to.query.sort === 'string') {
+        SearchModule.SetSortOrder(to.query.sort === SortOrder.DATE ? SortOrder.DATE : SortOrder.RELEVANCE)
+      } else {
+        SearchModule.SetSortOrder(SortOrder.RELEVANCE)
       }
       if (to.query.query !== undefined && typeof to.query.query === 'string') {
         SearchModule.SetQuery(to.query.query)

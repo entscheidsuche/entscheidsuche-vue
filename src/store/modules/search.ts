@@ -13,13 +13,19 @@ export enum FilterType {
   HIERARCHIE = 'hierarchie', EDATUM = 'edatum', LANGUAGE = 'language'
 }
 
-function updateRoute (queryString: string, filters: Filters): void {
+export enum SortOrder {
+  RELEVANCE = 'relevance', DATE = 'date'
+}
+
+function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrder): void {
   const name = router.currentRoute.name
   const query = { ...router.currentRoute.query }
   const existingQueryString = query.query
   const existingFilters = query.filter !== undefined ? Array.isArray(query.filter) ? query.filter : [query.filter] : undefined
   const newFilters: Array<string> | undefined = Object.keys(filters).length > 0 ? [] : undefined
   const newQueryString = queryString !== '' ? queryString : undefined
+  const existingSort = query.sort !== undefined && query.sort === SortOrder.DATE ? SortOrder.DATE : undefined
+  const newSort = sortOrder === SortOrder.DATE ? SortOrder.DATE : undefined
 
   if (newFilters !== undefined) {
     for (const filterKey in filters) {
@@ -35,13 +41,18 @@ function updateRoute (queryString: string, filters: Filters): void {
       }
     }
   }
-  if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters)) {
+  if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters) || existingSort !== newSort) {
     const newQuery: Dictionary<string | string[]> = {}
     if (newQueryString !== undefined) {
       newQuery.query = newQueryString
     }
     if (newFilters !== undefined) {
       newQuery.filter = newFilters
+    }
+    if (newSort !== undefined) {
+      newQuery.sort = newSort
+    } else {
+      delete newQuery.sort
     }
     if (name !== undefined && name !== null && newQueryString !== undefined) {
       router.push({ name: name, query: newQuery })
@@ -94,6 +105,7 @@ export type Aggregations = {
 export interface SearchState {
   query: string;
   filters: Filters;
+  sortOrder: SortOrder;
   searchTotal: number;
   searchResults: Array<SearchResult>;
   resultsPending: boolean;
@@ -114,6 +126,7 @@ export class Search extends VuexModule implements SearchState {
   private aggs: Aggregations = {}
   private fac: Facets = []
   private filt: Filters = {}
+  private sort = SortOrder.RELEVANCE
 
   @Mutation
   public SET_QUERY (query: string) {
@@ -121,7 +134,7 @@ export class Search extends VuexModule implements SearchState {
     if (query === '') {
       this.filt = {}
     }
-    updateRoute(query, this.filt)
+    updateRoute(query, this.filt, this.sort)
   }
 
   @Action
@@ -138,6 +151,24 @@ export class Search extends VuexModule implements SearchState {
         this.context.commit('SET_QUERY', query)
         return this.context.dispatch('SetResults')
       }
+    }
+  }
+
+  public get sortOrder (): SortOrder {
+    return this.sort
+  }
+
+  @Mutation
+  public SET_SORT_ORDER (sortOrder: SortOrder) {
+    this.sort = sortOrder
+    updateRoute(this.queryString, this.filt, sortOrder)
+  }
+
+  @Action
+  public SetSortOrder (sortOrder: SortOrder) {
+    this.context.commit('SET_SORT_ORDER', sortOrder)
+    if (this.queryString !== '') {
+      return this.context.dispatch('SetResults')
     }
   }
 
@@ -173,21 +204,21 @@ export class Search extends VuexModule implements SearchState {
       }
     }
     this.filt = newFilters
-    updateRoute(this.queryString, newFilters)
+    updateRoute(this.queryString, newFilters, this.sort)
   }
 
   @Mutation
   public ADD_FILTER (filter: Filter) {
     this.filt = { ...this.filt, [filter.type]: filter }
-    updateRoute(this.queryString, this.filt)
+    updateRoute(this.queryString, this.filt, this.sort)
   }
 
   @Mutation
-  public REMOVE_FILTER (type: string) {
+  public REMOVE_FILTER (type: FilterType) {
     const newFilters = { ...this.filt }
     delete newFilters[type]
     this.filt = newFilters
-    updateRoute(this.queryString, newFilters)
+    updateRoute(this.queryString, newFilters, this.sort)
   }
 
   @Action
@@ -207,7 +238,7 @@ export class Search extends VuexModule implements SearchState {
   }
 
   @Action
-  public RemoveFilter (type: string) {
+  public RemoveFilter (type: FilterType) {
     this.context.commit('REMOVE_FILTER', type)
     if (this.queryString !== '') {
       return this.context.dispatch('SetResults')
@@ -275,16 +306,16 @@ export class Search extends VuexModule implements SearchState {
   @Action({ commit: 'SET_RESULTS' })
   public async SetResults () {
     this.context.commit('RESULTS_PENDING', true)
-    return SearchUtil.search(this.queryString, this.filt)
+    return SearchUtil.search(this.queryString, this.filt, this.sort)
       .finally(() => this.context.commit('RESULTS_PENDING', false))
   }
 
   @Action({ commit: 'SET_MORE_RESULTS' })
   public async SetMoreResults () {
     if (this.results.length > 0) {
-      const sort = this.results[this.results.length - 1].sort
+      const sortAfter = this.results[this.results.length - 1].sort
       this.context.commit('RESULTS_PENDING', true)
-      return SearchUtil.search(this.queryString, this.filt, sort)
+      return SearchUtil.search(this.queryString, this.filt, this.sort, sortAfter)
         .finally(() => this.context.commit('RESULTS_PENDING', false))
     }
   }

@@ -75,7 +75,7 @@ export default class LanguageFilter extends Vue {
       SearchModule.AddFilter({ type: FilterType.LANGUAGE, payload: selected })
     } else {
       if (Object.prototype.hasOwnProperty.call(this.filters, 'language')) {
-        SearchModule.RemoveFilter('language')
+        SearchModule.RemoveFilter(FilterType.LANGUAGE)
       }
     }
   }

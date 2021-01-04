@@ -22,12 +22,7 @@
           <div class="title-wrapper">
             <p class="title">Sortieren nach:</p>
           </div>
-          <b-form-group v-slot="{ ariaDescribedby }">
-            <b-form-radio-group v-model="selectedRadio">
-            <b-form-radio :aria-describedby="ariaDescribedby" value="relevance">Relevanz</b-form-radio>
-            <b-form-radio :aria-describedby="ariaDescribedby" value="date">Datum</b-form-radio>
-            </b-form-radio-group>
-          </b-form-group>
+          <SortOrderSelector/>
         </div>
         <div class="year-range">
           <div id="slider-wrapper">
@@ -658,16 +653,18 @@
 import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
-import { SearchModule, SearchResult, Filters } from '@/store/modules/search'
+import { Filters, FilterType, SearchModule, SearchResult } from '@/store/modules/search'
 import 'vue-histogram-slider/dist/histogram-slider.css'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import DateFilter from '@/components/DateFilter.vue'
 import HierarchieFilter from '@/components/HierarchieFilter.vue'
 import LanguageFilter from '@/components/LanguageFilter.vue'
+import SortOrderSelector from '@/components/SortOrderSelector.vue'
 
 @Component({
   name: 'SearchResult',
   components: {
+    SortOrderSelector,
     DateFilter,
     LanguageFilter,
     HierarchieFilter
@@ -685,7 +682,6 @@ export default class SearchResults extends Vue {
   data () {
     return {
       selected: [],
-      selectedRadio: 'relevance',
       prettify: function (ts) {
         return new Date(ts).toLocaleDateString('de', {
           year: 'numeric'
@@ -757,7 +753,7 @@ export default class SearchResults extends Vue {
 
   handleScroll () {
     const searchResultsDiv = document.getElementById('results')
-    if (!SearchModule.allResultsLoaded && searchResultsDiv !== null) {
+    if (!SearchModule.allResultsLoaded && !SearchModule.resultsPending && searchResultsDiv !== null) {
       if (searchResultsDiv.scrollTop + searchResultsDiv.clientHeight >= searchResultsDiv.scrollHeight) {
         this.getMoreResults()
       }
@@ -835,15 +831,15 @@ export default class SearchResults extends Vue {
   }
 
   public undoDateFilter () {
-    SearchModule.RemoveFilter('edatum')
+    SearchModule.RemoveFilter(FilterType.EDATUM)
   }
 
   public undoLanguageFilter () {
-    SearchModule.RemoveFilter('language')
+    SearchModule.RemoveFilter(FilterType.LANGUAGE)
   }
 
   public undoHierarchieFilter () {
-    SearchModule.RemoveFilter('hierarchie')
+    SearchModule.RemoveFilter(FilterType.HIERARCHIE)
   }
 
   public dateFilterEmpty () {
