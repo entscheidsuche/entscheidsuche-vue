@@ -56,6 +56,9 @@
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
+        <div v-if="results.length === 0" class="no-results">
+          <h3 class="hint">Ihre Suche nach "{{ query }}" ergab leider keine Treffer</h3>
+        </div>
         <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
             <div class="result-header">
@@ -304,6 +307,17 @@
         }
         .show-filter:hover{
           background-color: #3f68e8;
+        }
+      }
+      .no-results{
+        //height:auto;
+        //margin-top:50px;
+        display:flex;
+        justify-content:center;
+        align-items: center;
+
+        .hint{
+          height:auto;
         }
       }
       .result-item:hover{
@@ -765,12 +779,12 @@ export default class SearchResults extends Vue {
     return SearchModule.aggregations
   }
 
-  get locale () {
-    return AppModule.locale
-  }
-
   get filter () {
     return SearchModule.filters
+  }
+
+  get query () {
+    return SearchModule.query
   }
 
   @Watch('selectedResult')
