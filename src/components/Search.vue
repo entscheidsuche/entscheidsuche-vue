@@ -7,23 +7,6 @@
   </b-input-group>
 </template>
 
-<i18n>
-{
-  "de": {
-    "search": "Suchen",
-    "searchterm": "Suchbegriff"
-  },
-  "fr": {
-    "search": "Suchen",
-    "searchterm": "Suchbegriff"
-  },
-  "it": {
-    "search": "Suchen",
-    "searchterm": "Suchbegriff"
-  }
-}
-</i18n>
-
 <style lang="scss">
 #header{
   .header-main{

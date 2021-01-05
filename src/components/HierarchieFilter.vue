@@ -1,6 +1,6 @@
 <template>
   <b-form-group>
-    <treeselect v-model="hierarchieValues"  placeholder="Filtern" id="tree" openDirection="below"
+    <treeselect v-model="hierarchieValues"  placeholder="" id="tree" openDirection="below"
       :multiple="true"
       :options="this.transformFacets()"
       :always-open="true"
@@ -90,6 +90,7 @@ import { Facet, Filters, FilterType, SearchModule } from '@/store/modules/search
 import { TreeModel } from '@/util/treeModel'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import i18n from '@/i18n'
 
 @Component({
   components: {

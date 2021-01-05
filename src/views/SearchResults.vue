@@ -9,25 +9,25 @@
         </div>
         <div class="total-hits">
           <div class="title-wrapper">
-            <p class="title">Trefferanzahl: {{ resultsTotal }}</p>
+            <p class="title">{{ $t('allHits') }}: {{ resultsTotal }}</p>
           </div>
           <div class="undo-all" v-if="this.allowUndoFilter" v-on:click="undoFilter()">
             <div v-bind:class="['title-wrapper', this.allowUndoFilter ? 'active' : '']" v-on:click="undoFilter()">
-              <p class="title">Alle Filter</p>
+              <p class="title">{{ $t('allFilter') }}</p>
               <b-icon class="undo-filter" icon="x"></b-icon>
             </div>
           </div>
         </div>
         <div class="sort">
           <div class="title-wrapper">
-            <p class="title">Sortieren nach:</p>
+            <p class="title">{{ $t('sort') }}:</p>
           </div>
           <SortOrderSelector/>
         </div>
         <div class="year-range">
           <div id="slider-wrapper">
             <div v-bind:class="['title-wrapper', this.dateFilterEmpty() ? '' : 'active']" v-on:click="undoDateFilter()">
-              <p class="title">Jahr</p>
+              <p class="title">{{ $t('year') }}</p>
               <b-icon class="undo-filter" icon="x"></b-icon>
             </div>
             <DateFilter :sliderWidth="sliderWidth"/>
@@ -35,7 +35,7 @@
         </div>
         <div class="languages">
           <div v-bind:class="['title-wrapper', this.languageFilterEmpty() ? '' : 'active']" v-on:click="undoLanguageFilter()">
-            <p class="title">Sprache</p>
+            <p class="title">{{ $t('language') }}</p>
             <b-icon class="undo-filter" icon="x"></b-icon>
           </div>
           <LanguageFilter/>
@@ -43,7 +43,7 @@
         <div class="authority">
           <div v-bind:class="['title-wrapper', this.hierarchieFilterEmpty() ? '' : 'active']" v-on:click="undoHierarchieFilter()">
             <div class="row-wrapper">
-              <p class="title">Verfasser</p>
+              <p class="title">{{ $t('authority') }}</p>
               <b-icon class="undo-filter" icon="x"></b-icon>
             </div>
           </div>
@@ -66,7 +66,7 @@
             <div class="abstract">
               <div class="first-row">
                 <b-button v-on:click.stop="onToggleAbstract(result.id)" v-bind:class="['show-more']" v-bind:id="('button-' + result.id)" style="border:none;outline:none;box-shadow:none;">
-                  <b-icon icon="caret-up-fill" aria-hidden="true"></b-icon>
+                  <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
                 </b-button>
                 <p class="card-text" v-html="result.text" v-bind:id="result.id"/>
               </div>
@@ -75,7 +75,7 @@
               <p v-html="result.text"/>
             </div>
             <div class="result-index">
-              <p>Treffer {{ index + 1}} von {{ resultsTotal }}</p>
+              <p>{{ $t('hit') }} {{ index + 1}} {{ $t('of') }} {{ resultsTotal }}</p>
             </div>
           </div>
         </div>
@@ -109,7 +109,7 @@
           <div class="abstract">
             <div class="first-row">
               <b-button v-on:click.stop="onToggleAbstract((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
-                <b-icon icon="caret-up-fill" aria-hidden="true"></b-icon>
+                <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
               </b-button>
               <p class="card-text" v-html="selectedResult.text" v-bind:id="(selectedResult.id + '-preview')"/>
             </div>

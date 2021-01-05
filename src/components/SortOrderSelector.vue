@@ -1,8 +1,8 @@
 <template>
   <b-form-group v-slot="{ ariaDescribedby }">
     <b-form-radio-group v-model="sortOrder">
-      <b-form-radio :aria-describedby="ariaDescribedby" value="relevance">Relevanz</b-form-radio>
-      <b-form-radio :aria-describedby="ariaDescribedby" value="date">Datum</b-form-radio>
+      <b-form-radio :aria-describedby="ariaDescribedby" value="relevance">{{ $t('relevance') }}</b-form-radio>
+      <b-form-radio :aria-describedby="ariaDescribedby" value="date">{{ $t('date') }}</b-form-radio>
     </b-form-radio-group>
   </b-form-group>
 </template>

@@ -1,3 +1,21 @@
 {
-  "message": "FR Aktuelles bei Bedarf!"
+  "message": "FR Aktuelles bei Bedarf!",
+  "allHits": "FR Trefferanzahl",
+  "allFilter": "FR Alle Filter",
+  "sort": "FR Sortieren nach",
+  "relevance": "FR Relevanz",
+  "date": "FR Datum",
+  "year": "FR Jahr",
+  "language": "FR Sprache",
+  "authority": "FR Verfasser",
+  "filterPlaceholder": "FR Filtern",
+  "hit": "FR Treffer",
+  "of": "FR von",
+  "about": "FR Über uns",
+  "organization": "FR Verein entscheidsuche.ch",
+  "upload": "FR Upload von Urteilen / Entscheiden",
+  "dataUsage": "FR Wer unsere Daten weiterverwendet",
+  "status": "FR Hinweis / Status",
+  "search": "FR Suchen",
+  "searchterm": "FR Suchbegriff"
 }
