@@ -9,12 +9,35 @@
 </template>
 
 <style lang="scss">
+.vue-histogram-slider-wrapper{
+  .vue-histogram-view{
+    width:calc(100% - 10px);
+    padding-left:2.5px;
+  }
+  margin-left:20px;
+  .irs-handle{
+    top: calc(50% - var(--handle-size)/2 + 13px);
+  }
+  .irs-from,.irs-to,.irs-single{
+    top:56px;
+  }
+  .irs-from::before,.irs-to::before,.irs-single::before{
+    transform: scaleY(-1);
+    bottom:19px;
+  }
+}
+@media (max-width: 534px){
+  .vue-histogram-slider-wrapper{
+    margin-left:24px;
+  }
+}
 </style>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Aggregations, Filters, FilterType, SearchModule } from '@/store/modules/search'
 import DateFilterUI from '@/components/DateFilterUI.vue'
+import 'vue-histogram-slider/dist/histogram-slider.css'
 
 @Component({
   components: {

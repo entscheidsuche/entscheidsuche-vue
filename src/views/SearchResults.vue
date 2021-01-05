@@ -219,6 +219,9 @@
             font-size:20px;
           }
         }
+        .hide-filter:hover{
+          background-color: #3f68e8;
+        }
       }
       .total-hits{
         margin-bottom:2px;
@@ -242,34 +245,6 @@
         padding: 0 0 16px 0;
         #slider-wrapper{
           margin-bottom:30px;
-          .vue-histogram-slider-wrapper{
-            margin-left:20px;
-            .irs-handle{
-              top: calc(50% - var(--handle-size)/2 + 13px);
-            }
-            .irs-from,.irs-to,.irs-single{
-              top:56px;
-            }
-            .irs-from::before,.irs-to::before,.irs-single::before{
-              transform: scaleY(-1);
-              bottom:19px;
-            }
-          }
-        }
-      }
-      .languages{
-        .custom-control-label{
-          width: 100%;
-          .option-wrapper{
-            display:flex;
-            justify-content:space-between;
-            .language-count{
-              opacity: 0.6;
-            }
-            &.empty{
-              color:#bdbdbd
-            }
-          }
         }
       }
     }
@@ -326,6 +301,9 @@
             flex-shrink: 0;
             font-size:20px;
           }
+        }
+        .show-filter:hover{
+          background-color: #3f68e8;
         }
       }
       .result-item:hover{
@@ -703,13 +681,6 @@
           border:0;
           width:0;
         }
-        .year-range{
-          #slider-wrapper{
-            .vue-histogram-slider-wrapper{
-              margin-left:24px;
-            }
-          }
-        }
       }
       .results{
         width:100vw;
@@ -740,8 +711,6 @@ import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
 import { Filters, FilterType, SearchModule, SearchResult } from '@/store/modules/search'
-import 'vue-histogram-slider/dist/histogram-slider.css'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import DateFilter from '@/components/DateFilter.vue'
 import HierarchieFilter from '@/components/HierarchieFilter.vue'
 import LanguageFilter from '@/components/LanguageFilter.vue'

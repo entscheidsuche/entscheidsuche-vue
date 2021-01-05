@@ -159,18 +159,18 @@ export default class HierarchieFilter extends Vue {
               if (child.children.length > 0) {
                 const grandChildrenArray: Array<TreeModel> = []
                 child.children.forEach((grandChild: Facet) => {
-                  grandChildrenArray.push({ id: grandChild.id, label: grandChild.label[locale], count: lookupCount(grandChild.id), isDisabled: false })
+                  grandChildrenArray.push({ id: grandChild.id, label: grandChild.label[locale], count: lookupCount(grandChild.id) })
                 })
-                childrenArray.push({ id: child.id, label: child.label[locale], children: grandChildrenArray, count: lookupCount(child.id), isDisabled: false })
+                childrenArray.push({ id: child.id, label: child.label[locale], children: grandChildrenArray, count: lookupCount(child.id) })
               }
             } else {
-              childrenArray.push({ id: child.id, label: child.label[locale], count: lookupCount(child.id), isDisabled: false })
+              childrenArray.push({ id: child.id, label: child.label[locale], count: lookupCount(child.id) })
             }
           })
-          tree.push({ id: facet.id, label: facet.label[locale], children: childrenArray, count: lookupCount(facet.id), isDisabled: false })
+          tree.push({ id: facet.id, label: facet.label[locale], children: childrenArray, count: lookupCount(facet.id) })
         }
       } else {
-        tree.push({ id: facet.id, label: facet.label[locale], count: lookupCount(facet.id), isDisabled: false })
+        tree.push({ id: facet.id, label: facet.label[locale], count: lookupCount(facet.id) })
       }
     })
     return tree
