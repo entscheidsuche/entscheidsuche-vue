@@ -63,6 +63,14 @@
               <h4 class="result-title">{{ result.title }} vom {{ result.date }}</h4>
               <img v-bind:class="['link-logo', result.pdf ? 'pdf' : 'html']">
             </div>
+            <div class="abstract">
+              <div class="first-row">
+                <b-button v-on:click.stop="onToggleAbstract(result.id)" v-bind:class="['show-more']" v-bind:id="('button-' + result.id)" style="border:none;outline:none;box-shadow:none;">
+                  <b-icon icon="caret-up-fill" aria-hidden="true"></b-icon>
+                </b-button>
+                <p class="card-text" v-html="result.text" v-bind:id="result.id"/>
+              </div>
+            </div>
             <div class="text-preview">
               <p v-html="result.text"/>
             </div>
@@ -97,6 +105,14 @@
               </div>
             </div>
             <h4 v-if="this.windowWidth <= 1024" class="result-title-mobile">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
+          </div>
+          <div class="abstract">
+            <div class="first-row">
+              <b-button v-on:click.stop="onToggleAbstract((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
+                <b-icon icon="caret-up-fill" aria-hidden="true"></b-icon>
+              </b-button>
+              <p class="card-text" v-html="selectedResult.text" v-bind:id="(selectedResult.id + '-preview')"/>
+            </div>
           </div>
         </div>
         <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
@@ -360,6 +376,40 @@
               word-break: break-all;
             }
           }
+          .abstract{
+            font-size:14px;
+            font-weight: bold;
+            .first-row{
+              display:flex;
+
+              .card-text{
+                flex-shrink: 1;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+              }
+              .show-more{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-shrink: 0;
+                height:21px;
+                width:28px;
+                margin-right: 10px;
+                background-color: transparent;
+
+                svg{
+                  font-size:16px;
+                }
+
+                &.hidden {
+                  svg{
+                    display:none;
+                  }
+                }
+              }
+            }
+          }
           .text-preview{
             font-size: 14px;
             em{
@@ -419,6 +469,7 @@
               display: flex;
               justify-content: space-between;
               flex-direction: row;
+              margin-bottom:10px;
 
               .canton-logo{
                 max-height:36px;
@@ -491,6 +542,40 @@
               margin-bottom: 0;
               word-break: break-all;
               display:none;
+            }
+          }
+          .abstract{
+            font-size:14px;
+            font-weight: bold;
+            .first-row{
+              display:flex;
+
+              .card-text{
+                flex-shrink: 1;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+              }
+              .show-more{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-shrink: 0;
+                height:21px;
+                width:28px;
+                margin-right: 10px;
+                background-color: transparent;
+
+                svg{
+                  font-size:16px;
+                }
+
+                &.hidden {
+                  svg{
+                    display:none;
+                  }
+                }
+              }
             }
           }
         }
@@ -595,6 +680,7 @@
               .result-title-mobile{
                 font-size: 16px;
                 display:block;
+                margin-bottom: 10px;
               }
             }
           }
@@ -852,6 +938,23 @@ export default class SearchResults extends Vue {
 
   public hierarchieFilterEmpty () {
     return !(Object.keys(this.filter).includes('hierarchie'))
+  }
+
+  public onToggleAbstract (id: string) {
+    const textDiv = document.getElementById(id)
+    const button = document.getElementById(('button-' + id))
+    if (textDiv !== null && button !== null) {
+      if (textDiv.style.whiteSpace !== 'normal') {
+        textDiv.style.whiteSpace = 'normal'
+      } else {
+        textDiv.style.whiteSpace = 'nowrap'
+      }
+      if (button.style.transform !== 'rotate(90deg)') {
+        button.style.transform = 'rotate(90deg)'
+      } else {
+        button.style.transform = 'rotate(0deg)'
+      }
+    }
   }
 }
 </script>
