@@ -210,7 +210,7 @@
           border-radius: 4px 0 0 4px;
           background-color: #6183ec;
           color:#fff;
-          z-index:1000;
+          z-index:999;
           justify-content: center;
           align-items: center;
           cursor:pointer;
@@ -283,7 +283,7 @@
           border-radius: 0 4px 4px 0;
           background-color: #6183ec;
           color:#fff;
-          z-index:999;
+          z-index:998;
           justify-content: center;
           align-items: center;
           cursor: pointer;

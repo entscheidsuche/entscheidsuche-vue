@@ -6,7 +6,8 @@
       :always-open="true"
       :show-count="true"
       :maxHeight="2000"
-      :clearable="false">
+      :clearable="false"
+      :z-index="997">
       @input="onHierarchieChanged"
       <label slot="option-label" slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName}" v-bind:class="[labelClassName, node.raw.count === 0 ? 'empty' : '']">
         <div class="text-wrapper">
