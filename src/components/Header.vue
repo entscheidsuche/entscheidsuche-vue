@@ -18,11 +18,11 @@
         </b-button>
         <nav>
           <ul class="menu-desktop">
-            <li><router-link :to="{ name: 'About' }" class="desktop-menu-item">Über uns</router-link></li>
-            <li><router-link :to="{ name: 'Organization' }" class="desktop-menu-item">Verein entscheidsuche.ch</router-link></li>
-            <li><router-link :to="{ name: 'Upload' }" class="desktop-menu-item">Upload von Urteilen / Entscheiden</router-link></li>
-            <li><router-link :to="{ name: 'DataUsage' }" class="desktop-menu-item">Wer unsere Daten weiterverwendet</router-link></li>
-            <li><router-link :to="{ name: 'Status' }" class="desktop-menu-item">Hinweis / Status</router-link></li>
+            <li><router-link :to="{ name: 'About' }" class="desktop-menu-item">{{ $t('about') }}</router-link></li>
+            <li><router-link :to="{ name: 'Organization' }" class="desktop-menu-item">{{ $t('organization') }}</router-link></li>
+            <li><router-link :to="{ name: 'Upload' }" class="desktop-menu-item">{{ $t('upload') }}</router-link></li>
+            <li><router-link :to="{ name: 'DataUsage' }" class="desktop-menu-item">{{ $t('dataUsage') }}</router-link></li>
+            <li><router-link :to="{ name: 'Status' }" class="desktop-menu-item">{{ $t('status') }}</router-link></li>
           </ul>
         </nav>
       </div>

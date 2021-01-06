@@ -1,3 +1,21 @@
 {
-  "message": "IT Aktuelles bei Bedarf!"
+  "message": "IT Aktuelles bei Bedarf!",
+  "allHits": "IT Trefferanzahl",
+  "allFilter": "IT Alle Filter",
+  "sort": "IT Sortieren nach",
+  "relevance": "IT Relevanz",
+  "date": "IT Datum",
+  "year": "IT Jahr",
+  "language": "IT Sprache",
+  "authority": "IT Verfasser",
+  "filterPlaceholder": "IT Filtern",
+  "hit": "IT Treffer",
+  "of": "IT von",
+  "about": "IT Über uns",
+  "organization": "IT Verein entscheidsuche.ch",
+  "upload": "IT Upload von Urteilen / Entscheiden",
+  "dataUsage": "IT Wer unsere Daten weiterverwendet",
+  "status": "IT Hinweis / Status",
+  "search": "IT Suchen",
+  "searchterm": "IT Suchbegriff"
 }

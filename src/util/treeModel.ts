@@ -5,5 +5,4 @@ export interface TreeModel {
   label: string;
   children?: TreeModel[];
   count: number;
-  isDisabled: boolean;
 }

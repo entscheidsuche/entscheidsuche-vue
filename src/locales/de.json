@@ -1,3 +1,21 @@
 {
-  "message": "DE Aktuelles bei Bedarf!"
+  "message": "DE Aktuelles bei Bedarf!",
+  "allHits": "Trefferanzahl",
+  "allFilter": "Alle Filter",
+  "sort": "Sortieren nach",
+  "relevance": "Relevanz",
+  "date": "Datum",
+  "year": "Jahr",
+  "language": "Sprache",
+  "authority": "Verfasser",
+  "filterPlaceholder": "Filtern",
+  "hit": "Treffer",
+  "of": "von",
+  "about": "Über uns",
+  "organization": "Verein entscheidsuche.ch",
+  "upload": "Upload von Urteilen / Entscheiden",
+  "dataUsage": "Wer unsere Daten weiterverwendet",
+  "status": "Hinweis / Status",
+  "search": "Suchen",
+  "searchterm": "Suchbegriff"
 }

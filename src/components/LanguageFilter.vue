@@ -15,6 +15,19 @@
 </template>
 
 <style lang="scss">
+.custom-control-label{
+  width: 100%;
+  .option-wrapper{
+    display:flex;
+    justify-content:space-between;
+    .language-count{
+      opacity: 0.6;
+    }
+    &.empty{
+      color:#bdbdbd
+    }
+  }
+}
 </style>
 
 <script lang="ts">

@@ -9,25 +9,25 @@
         </div>
         <div class="total-hits">
           <div class="title-wrapper">
-            <p class="title">Trefferanzahl: {{ resultsTotal }}</p>
+            <p class="title">{{ $t('allHits') }}: {{ resultsTotal }}</p>
           </div>
           <div class="undo-all" v-if="this.allowUndoFilter" v-on:click="undoFilter()">
             <div v-bind:class="['title-wrapper', this.allowUndoFilter ? 'active' : '']" v-on:click="undoFilter()">
-              <p class="title">Alle Filter</p>
+              <p class="title">{{ $t('allFilter') }}</p>
               <b-icon class="undo-filter" icon="x"></b-icon>
             </div>
           </div>
         </div>
         <div class="sort">
           <div class="title-wrapper">
-            <p class="title">Sortieren nach:</p>
+            <p class="title">{{ $t('sort') }}:</p>
           </div>
           <SortOrderSelector/>
         </div>
         <div class="year-range">
           <div id="slider-wrapper">
             <div v-bind:class="['title-wrapper', this.dateFilterEmpty() ? '' : 'active']" v-on:click="undoDateFilter()">
-              <p class="title">Jahr</p>
+              <p class="title">{{ $t('year') }}</p>
               <b-icon class="undo-filter" icon="x"></b-icon>
             </div>
             <DateFilter :sliderWidth="sliderWidth"/>
@@ -35,7 +35,7 @@
         </div>
         <div class="languages">
           <div v-bind:class="['title-wrapper', this.languageFilterEmpty() ? '' : 'active']" v-on:click="undoLanguageFilter()">
-            <p class="title">Sprache</p>
+            <p class="title">{{ $t('language') }}</p>
             <b-icon class="undo-filter" icon="x"></b-icon>
           </div>
           <LanguageFilter/>
@@ -43,7 +43,7 @@
         <div class="authority">
           <div v-bind:class="['title-wrapper', this.hierarchieFilterEmpty() ? '' : 'active']" v-on:click="undoHierarchieFilter()">
             <div class="row-wrapper">
-              <p class="title">Verfasser</p>
+              <p class="title">{{ $t('authority') }}</p>
               <b-icon class="undo-filter" icon="x"></b-icon>
             </div>
           </div>
@@ -56,6 +56,9 @@
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
+        <div v-if="results.length === 0" class="no-results">
+          <h3 class="hint">Ihre Suche nach "{{ query }}" ergab leider keine Treffer</h3>
+        </div>
         <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
             <div class="result-header">
@@ -63,11 +66,19 @@
               <h4 class="result-title" v-html="result.title"/>
               <img v-bind:class="['link-logo', result.pdf ? 'pdf' : 'html']">
             </div>
+            <div class="abstract">
+              <div class="first-row">
+                <b-button v-on:click.stop="onToggleAbstract(result.id)" v-bind:class="['show-more']" v-bind:id="('button-' + result.id)" style="border:none;outline:none;box-shadow:none;">
+                  <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
+                </b-button>
+                <p class="card-text" v-html="result.text" v-bind:id="result.id"/>
+              </div>
+            </div>
             <div class="text-preview">
               <p v-html="result.text"/>
             </div>
             <div class="result-index">
-              <p>Treffer {{ index + 1}} von {{ resultsTotal }}</p>
+              <p>{{ $t('hit') }} {{ index + 1}} {{ $t('of') }} {{ resultsTotal }}</p>
             </div>
           </div>
         </div>
@@ -97,6 +108,14 @@
               </div>
             </div>
             <h4 v-if="this.windowWidth <= 1024" class="result-title-mobile">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
+          </div>
+          <div class="abstract">
+            <div class="first-row">
+              <b-button v-on:click.stop="onToggleAbstract((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
+                <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
+              </b-button>
+              <p class="card-text" v-html="selectedResult.text" v-bind:id="(selectedResult.id + '-preview')"/>
+            </div>
           </div>
         </div>
         <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
@@ -194,7 +213,7 @@
           border-radius: 4px 0 0 4px;
           background-color: #6183ec;
           color:#fff;
-          z-index:1000;
+          z-index:999;
           justify-content: center;
           align-items: center;
           cursor:pointer;
@@ -202,6 +221,9 @@
           svg{
             font-size:20px;
           }
+        }
+        .hide-filter:hover{
+          background-color: #3f68e8;
         }
       }
       .total-hits{
@@ -226,34 +248,6 @@
         padding: 0 0 16px 0;
         #slider-wrapper{
           margin-bottom:30px;
-          .vue-histogram-slider-wrapper{
-            margin-left:20px;
-            .irs-handle{
-              top: calc(50% - var(--handle-size)/2 + 13px);
-            }
-            .irs-from,.irs-to,.irs-single{
-              top:56px;
-            }
-            .irs-from::before,.irs-to::before,.irs-single::before{
-              transform: scaleY(-1);
-              bottom:19px;
-            }
-          }
-        }
-      }
-      .languages{
-        .custom-control-label{
-          width: 100%;
-          .option-wrapper{
-            display:flex;
-            justify-content:space-between;
-            .language-count{
-              opacity: 0.6;
-            }
-            &.empty{
-              color:#bdbdbd
-            }
-          }
         }
       }
     }
@@ -292,7 +286,7 @@
           border-radius: 0 4px 4px 0;
           background-color: #6183ec;
           color:#fff;
-          z-index:999;
+          z-index:998;
           justify-content: center;
           align-items: center;
           cursor: pointer;
@@ -310,6 +304,20 @@
             flex-shrink: 0;
             font-size:20px;
           }
+        }
+        .show-filter:hover{
+          background-color: #3f68e8;
+        }
+      }
+      .no-results{
+        //height:auto;
+        //margin-top:50px;
+        display:flex;
+        justify-content:center;
+        align-items: center;
+
+        .hint{
+          height:auto;
         }
       }
       .result-item:hover{
@@ -361,6 +369,40 @@
               em{
                 font-style: italic;
                 background-color: #FFFF00;
+              }
+            }
+          }
+          .abstract{
+            font-size:14px;
+            font-weight: bold;
+            .first-row{
+              display:flex;
+
+              .card-text{
+                flex-shrink: 1;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+              }
+              .show-more{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-shrink: 0;
+                height:21px;
+                width:28px;
+                margin-right: 10px;
+                background-color: transparent;
+
+                svg{
+                  font-size:16px;
+                }
+
+                &.hidden {
+                  svg{
+                    display:none;
+                  }
+                }
               }
             }
           }
@@ -423,6 +465,7 @@
               display: flex;
               justify-content: space-between;
               flex-direction: row;
+              margin-bottom:10px;
 
               .canton-logo{
                 max-height:36px;
@@ -495,6 +538,40 @@
               margin-bottom: 0;
               word-break: break-all;
               display:none;
+            }
+          }
+          .abstract{
+            font-size:14px;
+            font-weight: bold;
+            .first-row{
+              display:flex;
+
+              .card-text{
+                flex-shrink: 1;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+              }
+              .show-more{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-shrink: 0;
+                height:21px;
+                width:28px;
+                margin-right: 10px;
+                background-color: transparent;
+
+                svg{
+                  font-size:16px;
+                }
+
+                &.hidden {
+                  svg{
+                    display:none;
+                  }
+                }
+              }
             }
           }
         }
@@ -599,6 +676,7 @@
               .result-title-mobile{
                 font-size: 16px;
                 display:block;
+                margin-bottom: 10px;
               }
             }
           }
@@ -620,13 +698,6 @@
           padding:8px 0 8px 0;
           border:0;
           width:0;
-        }
-        .year-range{
-          #slider-wrapper{
-            .vue-histogram-slider-wrapper{
-              margin-left:24px;
-            }
-          }
         }
       }
       .results{
@@ -658,8 +729,6 @@ import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState } from '@/store/modules/app'
 import { Filters, FilterType, SearchModule, SearchResult } from '@/store/modules/search'
-import 'vue-histogram-slider/dist/histogram-slider.css'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import DateFilter from '@/components/DateFilter.vue'
 import HierarchieFilter from '@/components/HierarchieFilter.vue'
 import LanguageFilter from '@/components/LanguageFilter.vue'
@@ -714,12 +783,12 @@ export default class SearchResults extends Vue {
     return SearchModule.aggregations
   }
 
-  get locale () {
-    return AppModule.locale
-  }
-
   get filter () {
     return SearchModule.filters
+  }
+
+  get query () {
+    return SearchModule.query
   }
 
   @Watch('selectedResult')
@@ -856,6 +925,23 @@ export default class SearchResults extends Vue {
 
   public hierarchieFilterEmpty () {
     return !(Object.keys(this.filter).includes('hierarchie'))
+  }
+
+  public onToggleAbstract (id: string) {
+    const textDiv = document.getElementById(id)
+    const button = document.getElementById(('button-' + id))
+    if (textDiv !== null && button !== null) {
+      if (textDiv.style.whiteSpace !== 'normal') {
+        textDiv.style.whiteSpace = 'normal'
+      } else {
+        textDiv.style.whiteSpace = 'nowrap'
+      }
+      if (button.style.transform !== 'rotate(90deg)') {
+        button.style.transform = 'rotate(90deg)'
+      } else {
+        button.style.transform = 'rotate(0deg)'
+      }
+    }
   }
 }
 </script>
