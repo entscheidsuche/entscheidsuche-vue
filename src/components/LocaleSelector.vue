@@ -11,10 +11,12 @@
             <b-form-radio v-model="localeChangeSelected" name="some-radios" value="it">{{ $t('italian') }}</b-form-radio>
           </b-form-group>
         </div>
+        <!--
         <div class="language-buttons">
           <b-button variant="secondary" id="left" v-on:click="onCancelLocaleChange()">{{ $t('cancel') }}</b-button>
           <b-button variant="outline-primary" v-on:click="onSaveLocaleChange()">{{ $t('save') }}</b-button>
         </div>
+        -->
       </div>
     </div>
   </div>
@@ -64,7 +66,7 @@
 
   .language-wrapper{
     width:400px;
-    height:300px;
+    height:250px;
     background-color: #fff;
     position: fixed;
     top: 50%;
@@ -182,9 +184,9 @@ import { AppModule } from '@/store/modules/app'
 
 @Component
 export default class LocaleSelector extends Vue {
-  private localeChangeSelected!: string;
+  private localeChangeSelected = 'de'
 
-  public mounted () {
+  public created () {
     this.localeChangeSelected = this.locale
   }
 
@@ -196,10 +198,18 @@ export default class LocaleSelector extends Vue {
     return AppModule.showLocaleSelector
   }
 
-  @Watch('showLocaleSelector')
-  public onShowLocaleSelectorChange (show: boolean) {
-    if (show) {
-      this.localeChangeSelected = this.locale
+  @Watch('locale')
+  public onLocaleChange (locale: string) {
+    if (this.localeChangeSelected !== locale) {
+      this.localeChangeSelected = locale
+    }
+  }
+
+  @Watch('localeChangeSelected')
+  public onShowLocaleSelectorChange (selectedLoale: string) {
+    if (this.locale !== selectedLoale) {
+      AppModule.SetLocale(selectedLoale)
+      AppModule.SetShowLocaleSelector(false)
     }
   }
 

@@ -56,7 +56,7 @@
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
-        <div v-if="results.length === 0" class="no-results">
+        <div v-if="!pristine && results.length === 0" class="no-results">
           <h3 class="hint">Ihre Suche nach "{{ query }}" ergab leider keine Treffer</h3>
         </div>
         <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
@@ -66,12 +66,12 @@
               <h4 class="result-title" v-html="result.title"/>
               <img v-bind:class="['link-logo', result.pdf ? 'pdf' : 'html']">
             </div>
-            <div class="abstract">
+            <div class="abstract" v-if="result.abstract.length > 0">
               <div class="first-row">
                 <b-button v-on:click.stop="onToggleAbstract(result.id)" v-bind:class="['show-more']" v-bind:id="('button-' + result.id)" style="border:none;outline:none;box-shadow:none;">
                   <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
                 </b-button>
-                <p class="card-text" v-html="result.text" v-bind:id="result.id"/>
+                <p class="card-text" v-html="result.abstract" v-bind:id="result.id"/>
               </div>
             </div>
             <div class="text-preview">
@@ -91,10 +91,10 @@
         <div class="doc-info">
           <div class="doc-header">
             <div class="flex-row">
-              <div v-if="selectedResult.canton != undefined">
+              <div v-if="selectedResult.canton !== undefined">
                 <img :src="getImgUrl(selectedResult.canton)" class="canton-logo">
               </div>
-              <h4 v-if="this.windowWidth > 1024" class="result-title">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
+              <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
               <div class="controls-wrapper">
                 <b-button variant="primary"  v-on:click="onFullScreen()" id="maximize-preview-btn">
                   <b-icon id="maximize-preview" icon="arrows-fullscreen"></b-icon>
@@ -107,14 +107,14 @@
                 </b-button>
               </div>
             </div>
-            <h4 v-if="this.windowWidth <= 1024" class="result-title-mobile">{{ selectedResult.title }} vom {{ selectedResult.date }}</h4>
+            <h4 v-if="this.windowWidth <= 1024" class="result-title-mobile" v-html="selectedResult.title"/>
           </div>
-          <div class="abstract">
+          <div class="abstract" v-if="selectedResult.abstract !== undefined && selectedResult.abstract.length > 0">
             <div class="first-row">
               <b-button v-on:click.stop="onToggleAbstract((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
                 <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
               </b-button>
-              <p class="card-text" v-html="selectedResult.text" v-bind:id="(selectedResult.id + '-preview')"/>
+              <p class="card-text" v-html="selectedResult.abstract" v-bind:id="(selectedResult.id + '-preview')"/>
             </div>
           </div>
         </div>
@@ -375,6 +375,10 @@
           .abstract{
             font-size:14px;
             font-weight: bold;
+            em{
+              font-style: italic;
+              background-color: #FFFF00;
+            }
             .first-row{
               display:flex;
 
@@ -767,6 +771,10 @@ export default class SearchResults extends Vue {
     return SearchModule.searchResults
   }
 
+  get pristine () {
+    return SearchModule.pristine
+  }
+
   get selectedResult () {
     return SearchModule.selectedResult
   }
@@ -789,6 +797,15 @@ export default class SearchResults extends Vue {
 
   get query () {
     return SearchModule.query
+  }
+
+  get locale () {
+    return AppModule.locale
+  }
+
+  @Watch('locale')
+  public onLocaleChanged () {
+    SearchModule.SetResults()
   }
 
   @Watch('selectedResult')

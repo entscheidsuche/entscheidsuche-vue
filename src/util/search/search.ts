@@ -15,7 +15,16 @@ export class SearchUtil {
           must: {
             // eslint-disable-next-line @typescript-eslint/camelcase
             query_string: {
-              query: query
+              query: query,
+              // eslint-disable-next-line @typescript-eslint/camelcase
+              default_operator: 'AND',
+              type: 'cross_fields',
+              fields: [
+                'title.*',
+                'abstract.*',
+                'attachment.content',
+                'reference'
+              ]
             }
           }
         }
@@ -26,8 +35,14 @@ export class SearchUtil {
       ],
       highlight: {
         fields: {
-          [`title.${lang}`]: {},
-          [`abstract.${lang}`]: {},
+          [`title.${lang}`]: {
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            number_of_fragments: 0
+          },
+          [`abstract.${lang}`]: {
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            number_of_fragments: 0
+          },
           'attachment.content': {}
         }
       }

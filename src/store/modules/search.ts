@@ -4,6 +4,7 @@ import { SearchUtil } from '@/util/search/search'
 import _ from 'lodash'
 import router from '@/router'
 import { Dictionary } from 'vue-router/types/router'
+import { AppModule } from '@/store/modules/app'
 
 const FILTER_DELIMITER = '@'
 
@@ -104,6 +105,7 @@ export type Aggregations = {
 }
 
 export interface SearchState {
+  pristine: boolean;
   query: string;
   filters: Filters;
   sortOrder: SortOrder;
@@ -118,6 +120,7 @@ export interface SearchState {
 
 @Module({ dynamic: true, store, name: 'search' })
 export class Search extends VuexModule implements SearchState {
+  private prist = true
   private queryString = ''
   private resPending = false
   private total = 0
@@ -128,6 +131,10 @@ export class Search extends VuexModule implements SearchState {
   private fac: Facets = []
   private filt: Filters = {}
   private sort = SortOrder.RELEVANCE
+
+  public get pristine () {
+    return this.prist
+  }
 
   @Mutation
   public SET_QUERY (query: string) {
@@ -266,6 +273,9 @@ export class Search extends VuexModule implements SearchState {
 
   @Mutation
   public SET_RESULTS (results: [Array<SearchResult>, number, Aggregations]) {
+    if (this.prist) {
+      this.prist = false
+    }
     this.results = results[0]
     if ('id' in this.selectedRes) {
       const id = this.selectedRes.id
@@ -308,7 +318,7 @@ export class Search extends VuexModule implements SearchState {
   @Action({ commit: 'SET_RESULTS' })
   public async SetResults () {
     this.context.commit('RESULTS_PENDING', true)
-    return SearchUtil.search(this.queryString, 'de', this.filt, this.sort)
+    return SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort)
       .finally(() => this.context.commit('RESULTS_PENDING', false))
   }
 
@@ -317,7 +327,7 @@ export class Search extends VuexModule implements SearchState {
     if (this.results.length > 0) {
       const sortAfter = this.results[this.results.length - 1].sort
       this.context.commit('RESULTS_PENDING', true)
-      return SearchUtil.search(this.queryString, 'de', this.filt, this.sort, sortAfter)
+      return SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort, sortAfter)
         .finally(() => this.context.commit('RESULTS_PENDING', false))
     }
   }
