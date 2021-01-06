@@ -120,9 +120,9 @@ export default class HierarchieFilter extends Vue {
   @Watch('hierarchieValues')
   public onHierarchieValuesChanged (values: Array<string>) {
     if (values.length > 0) {
-      SearchModule.AddFilter({ type: FilterType.HIERARCHIE, payload: values })
+      SearchModule.AddFilter({ type: FilterType.HIERARCHY, payload: values })
     } else {
-      SearchModule.RemoveFilter(FilterType.HIERARCHIE)
+      SearchModule.RemoveFilter(FilterType.HIERARCHY)
     }
   }
 

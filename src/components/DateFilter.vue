@@ -60,9 +60,9 @@ export default class DateFilter extends Vue {
         to: value.to < this.dateInterval.max ? value.to : undefined
       }
       if (this.dateRange.from !== undefined || this.dateRange.to !== undefined) {
-        SearchModule.AddFilter({ type: FilterType.EDATUM, payload: this.dateRange })
+        SearchModule.AddFilter({ type: FilterType.DATE, payload: this.dateRange })
       } else {
-        SearchModule.RemoveFilter(FilterType.EDATUM)
+        SearchModule.RemoveFilter(FilterType.DATE)
       }
     }
   }

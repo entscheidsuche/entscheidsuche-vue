@@ -10,7 +10,7 @@ const FILTER_DELIMITER = '@'
 export type Facets = Array<Facet>
 
 export enum FilterType {
-  HIERARCHIE = 'hierarchie', EDATUM = 'edatum', LANGUAGE = 'language'
+  HIERARCHY = 'hierarchie', DATE = 'edatum', LANGUAGE = 'language'
 }
 
 export enum SortOrder {
@@ -31,9 +31,9 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
     for (const filterKey in filters) {
       if (Object.prototype.hasOwnProperty.call(filters, filterKey)) {
         const filter = filters[filterKey]
-        if (filter.type === FilterType.HIERARCHIE) {
+        if (filter.type === FilterType.HIERARCHY) {
           newFilters.push(`h${FILTER_DELIMITER}${filter.payload.join()}`)
-        } else if (filter.type === FilterType.EDATUM) {
+        } else if (filter.type === FilterType.DATE) {
           newFilters.push(`e${FILTER_DELIMITER}${filter.payload.from ? filter.payload.from : ''},${filter.payload.to !== undefined ? filter.payload.to : ''}`)
         } else if (filter.type === FilterType.LANGUAGE) {
           newFilters.push(`l${FILTER_DELIMITER}${filter.payload.join()}`)
@@ -84,8 +84,9 @@ export type Filters = {
 
 export interface SearchResult {
   id: string;
-  text: string;
   title: string;
+  abstract: string;
+  text: string;
   date: string;
   canton: string;
   pdf: boolean;
@@ -185,7 +186,7 @@ export class Search extends VuexModule implements SearchState {
           const numbers = filter.substring(1 + FILTER_DELIMITER.length).split(',')
           newFilters.edatum =
           {
-            type: FilterType.EDATUM,
+            type: FilterType.DATE,
             payload:
             {
               from: numbers[0].length > 0 ? parseInt(numbers[0]) : undefined,
@@ -194,7 +195,7 @@ export class Search extends VuexModule implements SearchState {
           }
         } else if (filter.startsWith('h' + FILTER_DELIMITER)) {
           const ids = filter.substring(1 + FILTER_DELIMITER.length).split(',')
-          newFilters.hierarchie = { type: FilterType.HIERARCHIE, payload: ids }
+          newFilters.hierarchie = { type: FilterType.HIERARCHY, payload: ids }
         } else if (filter.startsWith('l' + FILTER_DELIMITER)) {
           const ids = filter.substring(1 + FILTER_DELIMITER.length).split(',')
           newFilters.language = { type: FilterType.LANGUAGE, payload: ids }
@@ -297,16 +298,17 @@ export class Search extends VuexModule implements SearchState {
   }
 
   @Mutation
-  public SET_MORE_RESULTS (results: [Array<SearchResult>, number]) {
-    this.allResLoaded = results[0].length === 0
-    this.results = [...this.results, ...results[0]]
-    this.total = results[1]
+  public SET_MORE_RESULTS (results: [Array<SearchResult>, number] | undefined) {
+    if (results !== undefined) {
+      this.allResLoaded = results[0].length === 0
+      this.results = [...this.results, ...results[0]]
+    }
   }
 
   @Action({ commit: 'SET_RESULTS' })
   public async SetResults () {
     this.context.commit('RESULTS_PENDING', true)
-    return SearchUtil.search(this.queryString, this.filt, this.sort)
+    return SearchUtil.search(this.queryString, 'de', this.filt, this.sort)
       .finally(() => this.context.commit('RESULTS_PENDING', false))
   }
 
@@ -315,7 +317,7 @@ export class Search extends VuexModule implements SearchState {
     if (this.results.length > 0) {
       const sortAfter = this.results[this.results.length - 1].sort
       this.context.commit('RESULTS_PENDING', true)
-      return SearchUtil.search(this.queryString, this.filt, this.sort, sortAfter)
+      return SearchUtil.search(this.queryString, 'de', this.filt, this.sort, sortAfter)
         .finally(() => this.context.commit('RESULTS_PENDING', false))
     }
   }

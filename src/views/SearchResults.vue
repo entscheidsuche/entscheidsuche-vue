@@ -60,7 +60,7 @@
           <div class="result-body">
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
-              <h4 class="result-title">{{ result.title }} vom {{ result.date }}</h4>
+              <h4 class="result-title" v-html="result.title"/>
               <img v-bind:class="['link-logo', result.pdf ? 'pdf' : 'html']">
             </div>
             <div class="text-preview">
@@ -358,6 +358,10 @@
               width:100%;
               margin-bottom: 0;
               word-break: break-all;
+              em{
+                font-style: italic;
+                background-color: #FFFF00;
+              }
             }
           }
           .text-preview{
@@ -831,7 +835,7 @@ export default class SearchResults extends Vue {
   }
 
   public undoDateFilter () {
-    SearchModule.RemoveFilter(FilterType.EDATUM)
+    SearchModule.RemoveFilter(FilterType.DATE)
   }
 
   public undoLanguageFilter () {
@@ -839,7 +843,7 @@ export default class SearchResults extends Vue {
   }
 
   public undoHierarchieFilter () {
-    SearchModule.RemoveFilter(FilterType.HIERARCHIE)
+    SearchModule.RemoveFilter(FilterType.HIERARCHY)
   }
 
   public dateFilterEmpty () {

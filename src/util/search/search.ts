@@ -7,7 +7,7 @@ export class SearchUtil {
       .then(resp => SearchUtil.transformResultToFacets(resp))
   }
 
-  private static buildPrimarySearch (query: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): any {
+  private static buildPrimarySearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): any {
     const search: any = {
       size: 20,
       query: {
@@ -21,14 +21,13 @@ export class SearchUtil {
         }
       },
       sort: [
-        { [sortOrder === SortOrder.RELEVANCE ? '_score' : 'edatum']: 'desc' },
+        { [sortOrder === SortOrder.RELEVANCE ? '_score' : 'date']: 'desc' },
         { id: 'desc' }
       ],
       highlight: {
         fields: {
-          titel: {},
-          leitsatz: {},
-          'attachment.author': {},
+          [`title.${lang}`]: {},
+          [`abstract.${lang}`]: {},
           'attachment.content': {}
         }
       }
@@ -47,7 +46,7 @@ export class SearchUtil {
         search.aggs.hierarchie = {
           terms: {
             size: 1000,
-            field: 'hierarchie'
+            field: 'hierarchy'
           }
         }
       }
@@ -71,7 +70,7 @@ export class SearchUtil {
           date_histogram: {
             // eslint-disable-next-line @typescript-eslint/camelcase
             calendar_interval: SearchUtil.getCalendarInterval(filters),
-            field: 'edatum'
+            field: 'date'
           }
         }
       }
@@ -101,7 +100,7 @@ export class SearchUtil {
       search.aggs.hierarchie = {
         terms: {
           size: 1000,
-          field: 'hierarchie'
+          field: 'hierarchy'
         }
       }
     } else if (filter.type === 'language') {
@@ -117,15 +116,15 @@ export class SearchUtil {
         date_histogram: {
           // eslint-disable-next-line @typescript-eslint/camelcase
           calendar_interval: SearchUtil.getCalendarInterval(filters),
-          field: 'edatum'
+          field: 'date'
         }
       }
     }
     return search
   }
 
-  public static async search (query: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
-    const primarySearch = this.buildPrimarySearch(query, filters, sortOrder, searchAfter)
+  public static async search (query: string, lang: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
+    const primarySearch = this.buildPrimarySearch(query, lang, filters, sortOrder, searchAfter)
     const searches: Array<any> = []
     if (searchAfter === undefined && Object.keys(filters).length > 0) {
       for (const type in filters) {
@@ -141,7 +140,7 @@ export class SearchUtil {
         maxContentLength: Infinity,
         maxBodyLength: Infinity
       }).then(resp => {
-      const [searchResults, total, aggregations] = SearchUtil.extractSearchResults(resp)
+      const [searchResults, total, aggregations] = SearchUtil.extractSearchResults(resp, lang)
       if (searches.length === 0) {
         return [searchResults, total, aggregations]
       } else {
@@ -200,7 +199,7 @@ export class SearchUtil {
       if (filter.payload.from !== undefined && filter.payload.to !== undefined) {
         return {
           range: {
-            edatum: {
+            date: {
               gte: filter.payload.from,
               lte: filter.payload.to
             }
@@ -209,7 +208,7 @@ export class SearchUtil {
       } else if (filter.payload.from !== undefined) {
         return {
           range: {
-            edatum: {
+            date: {
               gte: filter.payload.from
             }
           }
@@ -217,7 +216,7 @@ export class SearchUtil {
       } else if (filter.payload.to !== undefined) {
         return {
           range: {
-            edatum: {
+            date: {
               lte: filter.payload.to
             }
           }
@@ -227,7 +226,7 @@ export class SearchUtil {
     if (filter.type === 'hierarchie') {
       return {
         terms: {
-          hierarchie: filter.payload
+          hierarchy: filter.payload
         }
       }
     }
@@ -240,7 +239,7 @@ export class SearchUtil {
     }
   }
 
-  private static extractSearchResults (resp: any): [Array<SearchResult>, number, Aggregations | undefined] {
+  private static extractSearchResults (resp: any, lang: string): [Array<SearchResult>, number, Aggregations | undefined] {
     const results: Array<SearchResult> = []
     let total = 0
     let aggregations: Aggregations | undefined
@@ -249,22 +248,29 @@ export class SearchUtil {
       total = resp.data.hits.total.value
       for (const hit of hits) {
         let text = ''
+        let title = hit._source.title !== undefined ? hit._source.title[lang] : ''
+        let _abstract = hit._source.abstract !== undefined ? hit._source.abstract[lang] : ''
         if (hit.highlight !== undefined) {
-          text = text.concat(SearchUtil.getExtract(hit.highlight.titel), SearchUtil.getExtract(hit.highlight.leitsatz),
-            SearchUtil.getExtract(hit.highlight['attachment.author']), SearchUtil.getExtract(hit.highlight['attachment.content']))
+          text = SearchUtil.getExtract(hit.highlight['attachment.content'])
+          if (hit.highlight[`title.${lang}`] !== undefined) {
+            title = SearchUtil.getExtract(hit.highlight[`title.${lang}`])
+          }
+          if (hit.highlight[`abstract.${lang}`] !== undefined) {
+            _abstract = SearchUtil.getExtract(hit.highlight[`abstract.${lang}`])
+          }
         }
         let date = ''
-        if (hit._source.edatum !== undefined && hit._source.edatum.length === 10) {
-          date = SearchUtil.formatDate(hit._source.edatum)
+        if (hit._source.date !== undefined && hit._source.date.length === 10) {
+          date = SearchUtil.formatDate(hit._source.date)
         }
-        let pdf = false
-        pdf = SearchUtil.getDocType(hit._source.attachment.content_type)
+        const pdf = SearchUtil.getDocType(hit._source.attachment.content_type)
         results.push({
           id: hit._id,
           text,
-          title: hit._source.titel,
+          title,
+          abstract: _abstract,
           date,
-          canton: hit._source.kanton.toUpperCase(),
+          canton: hit._source.canton.toUpperCase(),
           pdf,
           url: hit._source.attachment.content_url,
           sort: hit.sort
