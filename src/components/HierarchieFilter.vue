@@ -7,7 +7,10 @@
       :show-count="true"
       :maxHeight="2000"
       :clearable="false"
-      :z-index="997">
+      :z-index="997"
+      :openOnClick="false"
+      :openOnFocus="false"
+      :searchable="this.getSearchable()">
       @input="onHierarchieChanged"
       <label slot="option-label" slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName}" v-bind:class="[labelClassName, node.raw.count === 0 ? 'empty' : '']">
         <div class="text-wrapper">
@@ -176,6 +179,10 @@ export default class HierarchieFilter extends Vue {
       }
     })
     return tree
+  }
+
+  public getSearchable (): boolean {
+    return window.innerWidth > 1024
   }
 }
 </script>
