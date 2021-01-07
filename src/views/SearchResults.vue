@@ -68,9 +68,9 @@
             </div>
             <div class="abstract" v-if="result.abstract.length > 0">
               <div class="first-row">
-                <b-button v-on:click.stop="onToggleAbstract(result.id)" v-bind:class="['show-more']" v-bind:id="('button-' + result.id)" style="border:none;outline:none;box-shadow:none;">
+                <div v-on:click.stop="onToggleAbstract(result.id)" v-bind:class="['show-more']" v-bind:id="('button-' + result.id)" style="border:none;outline:none;box-shadow:none;">
                   <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
-                </b-button>
+                </div>
                 <p class="card-text" v-html="result.abstract" v-bind:id="result.id"/>
               </div>
             </div>
@@ -111,9 +111,9 @@
           </div>
           <div class="abstract" v-if="selectedResult.abstract !== undefined && selectedResult.abstract.length > 0">
             <div class="first-row">
-              <b-button v-on:click.stop="onToggleAbstract((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
+              <div v-on:click.stop="onToggleAbstract((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
                 <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
-              </b-button>
+              </div>
               <p class="card-text" v-html="selectedResult.abstract" v-bind:id="(selectedResult.id + '-preview')"/>
             </div>
           </div>
@@ -197,7 +197,7 @@
       }
       .button-wrapper{
         position:absolute;
-        width:26px;
+        width:20px;
         top:calc(((100vh - 38px) / 2) - 70px );
         right:0;
 
@@ -209,7 +209,7 @@
           display:flex;
           position: fixed;
           height:38px;
-          width:26px;
+          width:20px;
           border-radius: 4px 0 0 4px;
           background-color: #6183ec;
           color:#fff;
@@ -226,6 +226,13 @@
           background-color: #3f68e8;
         }
       }
+      .button-wrapper:hover{
+        width:26px;
+        .hide-filter{
+          width:26px;
+        }
+      }
+
       .total-hits{
         margin-bottom:2px;
         .title{
@@ -271,7 +278,7 @@
       }
       .button-wrapper{
         position:absolute;
-        width:26px;
+        width:20px;
         height:38px;
         left:0;
         top: calc(((100vh - 38px) / 2) - 70px );
@@ -282,7 +289,7 @@
         .show-filter{
           position: fixed;
           height:38px;
-          width:26px;
+          width:20px;
           border-radius: 0 4px 4px 0;
           background-color: #6183ec;
           color:#fff;
@@ -295,7 +302,7 @@
           clip:rect(0px,26px,38px,0px);
           transition: all 0.2s linear;
           &.visible{
-            width:26px;
+            width:20px;
           }
           &.fullScreen{
             display:none;
@@ -307,6 +314,7 @@
         }
         .show-filter:hover{
           background-color: #3f68e8;
+          width:26px;
         }
       }
       .no-results{
@@ -394,12 +402,13 @@
                 align-items: center;
                 flex-shrink: 0;
                 height:21px;
-                width:28px;
-                margin-right: 10px;
+                width:21px;
+                margin-right: 14px;
                 background-color: transparent;
+                margin-left:4px;
 
                 svg{
-                  font-size:16px;
+                  font-size:14px;
                 }
 
                 &.hidden {
@@ -562,12 +571,13 @@
                 align-items: center;
                 flex-shrink: 0;
                 height:21px;
-                width:28px;
-                margin-right: 10px;
+                width:21px;
+                margin-right: 14px;
                 background-color: transparent;
+                margin-left:4px;
 
                 svg{
-                  font-size:16px;
+                  font-size:14px;
                 }
 
                 &.hidden {
