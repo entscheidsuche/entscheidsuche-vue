@@ -3,7 +3,6 @@ import { store } from '@/store'
 import { SearchUtil } from '@/util/search/search'
 import _ from 'lodash'
 import router from '@/router'
-import { Dictionary } from 'vue-router/types/router'
 import { AppModule } from '@/store/modules/app'
 
 const FILTER_DELIMITER = '@'
@@ -43,20 +42,23 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
     }
   }
   if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters) || existingSort !== newSort) {
-    const newQuery: Dictionary<string | string[]> = {}
     if (newQueryString !== undefined) {
-      newQuery.query = newQueryString
+      query.query = newQueryString
+    } else {
+      delete query.query
     }
     if (newFilters !== undefined) {
-      newQuery.filter = newFilters
+      query.filter = newFilters
+    } else {
+      delete query.filter
     }
     if (newSort !== undefined) {
-      newQuery.sort = newSort
+      query.sort = newSort
     } else {
-      delete newQuery.sort
+      delete query.sort
     }
     if (name !== undefined && name !== null && newQueryString !== undefined) {
-      router.push({ name: name, query: newQuery })
+      router.push({ name: name, query: query })
     }
   }
 }

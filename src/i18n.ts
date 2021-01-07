@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueI18n, { LocaleMessages } from 'vue-i18n'
 import getBrowserLocale from '@/util/i18n/get-browser-locale'
+import router from '@/router'
 
 Vue.use(VueI18n)
 
@@ -23,7 +24,7 @@ function loadLocaleMessages (): LocaleMessages {
   return messages
 }
 
-function getStartingLocale () {
+export function getStartingLocale () {
   const browserLocale = getBrowserLocale({ languageCodeOnly: true })
 
   if (browserLocale && Object.keys(supportedLocales).includes(browserLocale)) {
@@ -32,6 +33,7 @@ function getStartingLocale () {
     return process.env.VUE_APP_I18N_LOCALE || 'de'
   }
 }
+
 export default new VueI18n({
   locale: getStartingLocale(),
   fallbackLocale: process.env.VUE_APP_I18N_FALLBACK_LOCALE || 'de',

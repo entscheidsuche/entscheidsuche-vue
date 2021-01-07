@@ -1,6 +1,24 @@
-import { VuexModule, Module, Mutation, Action, getModule } from 'vuex-module-decorators'
+import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import { store } from '@/store'
-import i18n from '@/i18n'
+import i18n, { getStartingLocale } from '@/i18n'
+import router from '@/router'
+
+function updateRoute (locale: string): void {
+  const name = router.currentRoute.name
+  const query = { ...router.currentRoute.query }
+  const existingLocaleString = query.lang
+  const newLocaleString = locale !== getStartingLocale() ? locale : undefined
+  if (existingLocaleString !== newLocaleString) {
+    if (newLocaleString !== undefined) {
+      query.lang = newLocaleString
+    } else {
+      delete query.lang
+    }
+    if (name !== undefined && name !== null) {
+      router.push({ name: name, query: query })
+    }
+  }
+}
 
 export enum MessageState {
   VISIBLE, EMPTY, CLOSED
@@ -22,10 +40,11 @@ export class App extends VuexModule implements AppState {
   public SET_LOCALE (locale: string) {
     i18n.locale = locale.toLowerCase()
     this.lang = locale
+    updateRoute(locale)
   }
 
   @Action({ commit: 'SET_LOCALE' })
-  public SetLocale (locale: string) {
+  public async SetLocale (locale: string) {
     return locale
   }
 

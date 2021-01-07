@@ -5,6 +5,8 @@ import SearchResults from '@/views/SearchResults.vue'
 import { SearchModule, SortOrder } from '@/store/modules/search'
 import { sync } from 'vuex-router-sync'
 import { store } from '@/store'
+import { AppModule } from '@/store/modules/app'
+import { getStartingLocale } from '@/i18n'
 
 Vue.use(VueRouter)
 
@@ -78,6 +80,34 @@ router.beforeEach((to, from, next) => {
     const clearQuery = SearchModule.SetQuery('')
     if (clearQuery !== undefined) {
       clearQuery.then(() => next())
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.query.lang !== undefined && AppModule.locale !== to.query.lang) {
+    const setLocale = AppModule.SetLocale(to.query.lang as string)
+    if (setLocale !== undefined) {
+      setLocale.then(() => next())
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.query.lang === undefined && AppModule.locale !== getStartingLocale()) {
+    if (to.path !== from.path) {
+      console.log('lang mismatch')
+      const newQuery = { ...to.query }
+      newQuery.lang = AppModule.locale
+      next({ path: to.path, name: to.name !== null ? to.name : undefined, query: newQuery })
     } else {
       next()
     }
