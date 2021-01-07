@@ -204,15 +204,9 @@ export default class LocaleSelector extends Vue {
       AppModule.SetShowLocaleSelector(false)
     }
   }
-  /*
+
   public onCancelLocaleChange (): void {
     AppModule.SetShowLocaleSelector(false)
   }
-
-  public onSaveLocaleChange (): void {
-    AppModule.SetLocale(this.localeChangeSelected)
-    AppModule.SetShowLocaleSelector(false)
-  }
-  */
 }
 </script>
