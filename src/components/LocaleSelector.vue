@@ -1,7 +1,9 @@
 <template>
   <div id="language-overlay" v-if="showLocaleSelector">
     <div class="language-wrapper">
-      <div v-b-toggle id="close-language-overlay" v-on:click="onCancelLocaleChange()"></div>
+      <b-button v-on:click="onCancelLocaleChange()" variant="primary" id="close-language-overlay">
+        <b-icon id="close-menu"></b-icon>
+      </b-button>
       <div class="language-body">
         <div class="dialog">
           <h3 id="language-title">{{ $t('question') }}</h3>
@@ -11,12 +13,6 @@
             <b-form-radio v-model="localeChangeSelected" name="some-radios" value="it">{{ $t('italian') }}</b-form-radio>
           </b-form-group>
         </div>
-        <!--
-        <div class="language-buttons">
-          <b-button variant="secondary" id="left" v-on:click="onCancelLocaleChange()">{{ $t('cancel') }}</b-button>
-          <b-button variant="outline-primary" v-on:click="onSaveLocaleChange()">{{ $t('save') }}</b-button>
-        </div>
-        -->
       </div>
     </div>
   </div>
@@ -66,7 +62,7 @@
 
   .language-wrapper{
     width:400px;
-    height:250px;
+    height:auto;
     background-color: #fff;
     position: fixed;
     top: 50%;
@@ -77,24 +73,23 @@
 
     #close-language-overlay{
       position: absolute;
-      top:15px;
-      right:15px;
-      cursor:pointer;
-      background: url('../assets/close.svg') no-repeat center;
+      top:10px;
+      right:10px;
       background-size: 20px;
-      height:20px;
-      width:20px;
       transition: all .2s ease-in-out;
-    }
-    #close-language-overlay:focus{
-      outline:none;
-    }
-    #close-language-overlay:hover{
-      transform: scale(1.1);
+      height:30px;
+      width:30px;
+
+      #close-menu {
+        background: url('../assets/bootstrap-close-big-white.svg') no-repeat center;
+        position:absolute;
+        height:28px;
+        width:28px;
+        top:0;
+        left:0;
+      }
     }
     .language-body{
-      height:220px;
-      width:320px;
       margin:40px;
       position:relative;
 
@@ -138,7 +133,7 @@
       margin-left: -50%;
 
       .language-body{
-        top:0%;
+        top:10px;
         height: calc(100% - 60px);
         margin-top:40px;
         width: calc(100vw - 40px);
@@ -146,13 +141,10 @@
         margin-left: 20px;
         margin-right: 20px;
         display: flex;
-        justify-content: center;
-        align-items: center;
 
         .dialog{
           position:relative;
           top:-76px;
-          text-align: center;
           .form-group{
             .custom-radio{
               padding-top:10px;
