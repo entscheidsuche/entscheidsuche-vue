@@ -86,43 +86,43 @@
           <b-spinner variant="primary" label="Loading..."></b-spinner>
         </div>
       </div>
-      <div v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '']">
+      <div v-if="this.previewVisible" v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '']">
         <div class="preview-content" v-show="this.selectedResult">
-        <div class="doc-info">
-          <div class="doc-header">
-            <div class="flex-row">
-              <div v-if="selectedResult.canton !== undefined">
-                <img :src="getImgUrl(selectedResult.canton)" class="canton-logo">
+          <div class="doc-info">
+            <div class="doc-header">
+              <div class="flex-row">
+                <div v-if="selectedResult.canton !== undefined">
+                  <img :src="getImgUrl(selectedResult.canton)" class="canton-logo">
+                </div>
+                <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
+                <div class="controls-wrapper">
+                  <b-button variant="primary"  v-on:click="onFullScreen()" id="maximize-preview-btn">
+                    <b-icon id="maximize-preview" icon="arrows-fullscreen"></b-icon>
+                  </b-button>
+                  <b-button variant="primary"  v-on:click="onFullScreen()" id="minimize-preview-btn">
+                    <b-icon id="minimize-preview" icon="fullscreen-exit"></b-icon>
+                  </b-button>
+                  <b-button variant="primary" v-on:click="onClosePreview()" id="close-preview-btn">
+                    <b-icon id="close-preview"></b-icon>
+                  </b-button>
+                </div>
               </div>
-              <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
-              <div class="controls-wrapper">
-                <b-button variant="primary"  v-on:click="onFullScreen()" id="maximize-preview-btn">
-                  <b-icon id="maximize-preview" icon="arrows-fullscreen"></b-icon>
-                </b-button>
-                <b-button variant="primary"  v-on:click="onFullScreen()" id="minimize-preview-btn">
-                  <b-icon id="minimize-preview" icon="fullscreen-exit"></b-icon>
-                </b-button>
-                <b-button variant="primary" v-on:click="onClosePreview()" id="close-preview-btn">
-                  <b-icon id="close-preview"></b-icon>
-                </b-button>
+              <h4 v-if="this.windowWidth <= 1024" class="result-title-mobile" v-html="selectedResult.title"/>
+            </div>
+            <div class="abstract" v-if="selectedResult.abstract !== undefined && selectedResult.abstract.length > 0">
+              <div class="first-row">
+                <div v-on:click.stop="onToggleAbstract((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
+                  <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
+                </div>
+                <p class="card-text" v-html="selectedResult.abstract" v-bind:id="(selectedResult.id + '-preview')"/>
               </div>
             </div>
-            <h4 v-if="this.windowWidth <= 1024" class="result-title-mobile" v-html="selectedResult.title"/>
           </div>
-          <div class="abstract" v-if="selectedResult.abstract !== undefined && selectedResult.abstract.length > 0">
-            <div class="first-row">
-              <div v-on:click.stop="onToggleAbstract((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
-                <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
-              </div>
-              <p class="card-text" v-html="selectedResult.abstract" v-bind:id="(selectedResult.id + '-preview')"/>
-            </div>
+          <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
+            <iframe v-if="this.windowWidth > 1024" frameborder="0"  class="desktop-pdf" scrolling="auto" :src="selectedResult.url + (this.fullScreen ? '' : '#view=FitH')" width="100%" height="100%" type='application/pdf' title="Title"></iframe>
+            <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" scrolling="auto" :src="getMobileDocUrl(selectedResult.url)" width="100%" height="100%" type='application/pdf' title="Title"></iframe>
           </div>
         </div>
-        <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
-          <iframe v-if="this.windowWidth > 1024" frameborder="0"  class="desktop-pdf" scrolling="auto" :src="selectedResult.url + (this.fullScreen ? '' : '#view=FitH')" width="100%" height="100%" type='application/pdf' title="Title"></iframe>
-          <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" scrolling="auto" :src="getMobileDocUrl(selectedResult.url)" width="100%" height="100%" type='application/pdf' title="Title"></iframe>
-        </div>
-      </div>
       </div>
     </div>
   <router-view/>
@@ -289,7 +289,7 @@
         .show-filter{
           position: fixed;
           height:38px;
-          width:20px;
+          width:0px;
           border-radius: 0 4px 4px 0;
           background-color: #6183ec;
           color:#fff;
@@ -301,18 +301,18 @@
           width:0;
           clip:rect(0px,26px,38px,0px);
           transition: all 0.2s linear;
+          svg{
+            flex-shrink: 0;
+            font-size:20px;
+          }
           &.visible{
             width:20px;
           }
           &.fullScreen{
             display:none;
           }
-          svg{
-            flex-shrink: 0;
-            font-size:20px;
-          }
         }
-        .show-filter:hover{
+        .show-filter.visible:hover{
           background-color: #3f68e8;
           width:26px;
         }
