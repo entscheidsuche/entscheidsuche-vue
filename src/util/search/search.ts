@@ -22,6 +22,7 @@ export class SearchUtil {
               fields: [
                 'title.*',
                 'abstract.*',
+                'meta.*',
                 'attachment.content',
                 'reference'
               ]
