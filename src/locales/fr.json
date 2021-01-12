@@ -17,5 +17,9 @@
   "dataUsage": "FR Wer unsere Daten weiterverwendet",
   "status": "FR Hinweis / Status",
   "search": "FR Suchen",
-  "searchterm": "FR Suchbegriff"
+  "searchterm": "FR Suchbegriff",
+  "question": "Quelle langue voulez vous utiliser?",
+  "german": "Allemand",
+  "french": "Français",
+  "italian": "Italien"
 }

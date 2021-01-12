@@ -18,35 +18,6 @@
   </div>
 </template>
 
-<i18n>
-{
-  "de": {
-    "save": "Speichern",
-    "cancel": "Abbrechen",
-    "question": "Welche Sprache möchten Sie nutzen?",
-    "german": "Deutsch",
-    "french": "Französisch",
-    "italian": "Italienisch"
-  },
-  "fr": {
-    "save": "Enregistrer",
-    "cancel": "Annuler",
-    "question": "Quelle langue voulez vous utiliser?",
-    "german": "Allemand",
-    "french": "Français",
-    "italian": "Italien"
-  },
-  "it": {
-    "save": "Salva",
-    "cancel": "Annulla",
-    "question": "Che lingua vuoi usare?",
-    "german": "Tedesco",
-    "french": "Francese",
-    "italian": "Italiano"
-  }
-}
-</i18n>
-
 <style lang="scss">
 #language-overlay {
   position: fixed;
