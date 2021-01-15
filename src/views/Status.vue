@@ -141,7 +141,7 @@ export default class Status extends Vue {
       }
       let zusatz = ''
       if ('signaturen' in data) zusatz = ' <a href="https://entscheidsuche.ch/docs/' + spider + '/" title="Verzeichnis mit den Urteilen öffnen"><img src="https://entscheidsuche.ch/img/Ordner.png" width="20px"></a>'
-      setzeInfoString(gesamt, 'Spider-' + spider, text + zusatz, jobtyp, datum, zusatz)
+      setzeInfoString(gesamt, 'Spider-' + spider, text, jobtyp, datum, zusatz)
       for (const s of signaturen) {
         if ('signaturen' in data && s in data.signaturen) setzeInfoString(data.signaturen[s], s, text, jobtyp, datum, zusatz)
         else {
