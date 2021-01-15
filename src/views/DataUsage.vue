@@ -2,7 +2,7 @@
   <div id="dataUsage">
     <template v-if="locale==='de'">
       <h1>Wer unsere Daten weiterverwendet</h1>
-      <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+      <p>Die Entscheide sind frei und können heruntergeladen werden. Wir bitten Sie dabei, unseren Server nicht zu überlasten. Bitte nennen Sie uns als Quelle. Demnächst planen wir eine spezielle Download-Schnittstelle, auf der Sie auch gezielt nur die Aktualisierungen herunterladen können.
       </p>
     </template>
   </div>
