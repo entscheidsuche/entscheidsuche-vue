@@ -204,55 +204,9 @@
         <div class="search-placeholder"></div>
       </b-card-group>
       <div class="other-sponsors">
-        <h1>Weitere Unterstützung erhalten wir von:</h1>
-        <ul>
-          <li>Timur Acemoglu, Olten</li>
-          <li>Martina Arioli, Zürich</li>
-          <li>Fatih Aslantas, Weinfelden</li>
-          <li>Stephan Bernard, Zürich</li>
-          <li>Harold Bouchex-Bellomie, Bienne</li>
-          <li>Renato Bucher, Zürich</li>
-          <li>Bertil Cottier, Préverenges</li>
-          <li>deju.re, Bern</li>
-          <li>Philipp do Canto, Zürich</li>
-          <li>DomizilPlus Treuhand, Zürich</li>
-          <li>Daniel Emch, Bern</li>
-          <li>Lucien Fluri, Solothurn</li>
-          <li>Marco Fritschi, Winterthur</li>
-          <li>Markus Gehrig, Fehraltorf</li>
-          <li>Patrick Gehrig, Biglen</li>
-          <li>Daniela Giovanoli, Bern</li>
-          <li>Nils Güggi, Bern</li>
-          <li>André Golliez, Zürich</li>
-          <li>Ralph Hemsley, Luzern</li>
-          <li>Mathias Hemsley, Zürich</li>
-          <li>Elias Hofstetter, Bern</li>
-          <li>Kanzlei 5, Steffisburg</li>
-          <li>Pranvera Këllezi, Genève</li>
-          <li>Kneubühl Recht, Mühlethurnen</li>
-          <li>Karola Krell, Food Lex, Bern</li>
-          <li>Oleg Lavrovsky, Köniz</li>
-          <li>Kilian Meyer, Schaffhausen</li>
-          <li>Lukas Müller, Zürich</li>
-          <li>Gregor Münch, Zürich</li>
-          <li>Elia Nesti, Solothurn</li>
-          <li>Dario Picecchi, Luzern</li>
-          <li>Sarah Progin, Granges-Paccot</li>
-          <li>Reinhard Riedl, Effretikon</li>
-          <li>Stefan Rolli, Rubigen</li>
-          <li>Nora Scheidegger, Bern</li>
-          <li>Clemens Schuster, Zürich</li>
-          <li>Mark Schweizer, Winterthur</li>
-          <li>Charlotte Sieber-Gasser, Bern</li>
-          <li>Advokatur Spycher, Bern</li>
-          <li>Sabine Steiger-Sackmann, Winterthur</li>
-          <li>Dominique Strebel, Zürich</li>
-          <li>sui generis Verlag, Zürich</li>
-          <li>Rolf A. Tobler, Bern</li>
-          <li>Johannes Wagner, Appenzell</li>
-        </ul>
-        <p>... sowie vielen weiteren Unterstützerinnen und Unterstützern, die anonym bleiben wollen.</p>
-      </div>
+       <h1>Weitere Unterstützung erhalten wir von:</h1>
+Timur <b>Acemoglu</b>, Olten; Martina <b>Arioli</b>, Zürich; Fatih <b>Aslantas</b>, Weinfelden; Stephan <b>Bernard</b>, Basel; Harold <b>Bouchex-Bellomie</b>, Bienne; Renato <b>Bucher</b>, Zürich; Bertil <b>Cottier</b>, Préverenges; <b>deju.re</b>; Philipp <b>do Canto</b>, Zürich; <b>Domizilplus Treuhand</b>, Zürich; Daniel <b>Emch</b>, Bern; Lucien <b>Fluri</b>, Solothurn; Marco <b>Fritschi</b>, Winterthur; Markus <b>Gehrig</b>, Fehraltorf; Patrick <b>Gehrig</b>, Biglen; Daniela <b>Giovanoli</b>, Bern; Nils <b>Güggi</b>, Bern; André <b>Golliez</b>, Zürich; Ralph <b>Hemsley</b>, Zürich; Mathias <b>Hemsley</b>, Zürich; Elias <b>Hofstetter</b>, Bern; <b>Kanzlei 5</b>, Steffisburg; Pranvera <b>Këllezi</b>, Genève; <b>Kneubühl Recht</b>, Mühlethurnen; Karola <b>Krell, Foodlex</b>, Bern; Oleg <b>Lavrovsky</b>, Köniz; Kilian <b>Meyer</b>, Schaffhausen; Lukas <b>Müller</b>, Zürich; Gregor <b>Münch</b>, Zürich; Elias <b>Nesti</b>, Solothurn; Dario <b>Piececchi</b>, Luzern; Sarah <b>Progin</b>, Granges-Paccot; Reinhard <b>Riedl</b>, Effretikon; Stefan <b>Rolli</b>, Rubigen; Nora <b>Scheidegger</b>, Bern; Clemens <b>Schuster</b>, Zürich; Mark <b>Schweizer</b>, Winterthur; Charlotte <b>Sieber-Gasser</b>, Bern; <b>Advokatur Spycher</b>, Bern; Sabine <b>Steiger-Sachmann</b>, Winterthur; Dominique <b>Strebel</b>, Zürich; <b>sui generis Verlag</b>, Zürich; Rolf A. <b>Tobler</b>, Bern; Johannes <b>Wagner</b>, Appenzell; <b>sowie</b> vielen weiteren Unterstützerinnen und Unterstützern, die anonym bleiben wollen.
+     </div>
     </div>
   </div>
 </template>
