@@ -10,6 +10,7 @@
       :z-index="997"
       :openOnClick="false"
       :openOnFocus="false"
+      :disableFuzzyMatching="true"
       :searchable="this.getSearchable()">
       @input="onHierarchieChanged"
       <label slot="option-label" slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName}" v-bind:class="[labelClassName, node.raw.count === 0 ? 'empty' : '']">

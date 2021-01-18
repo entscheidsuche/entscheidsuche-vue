@@ -747,6 +747,7 @@ import DateFilter from '@/components/DateFilter.vue'
 import HierarchieFilter from '@/components/HierarchieFilter.vue'
 import LanguageFilter from '@/components/LanguageFilter.vue'
 import SortOrderSelector from '@/components/SortOrderSelector.vue'
+import { Route } from 'vue-router'
 
 @Component({
   name: 'SearchResult',
@@ -815,7 +816,11 @@ export default class SearchResults extends Vue {
 
   @Watch('locale')
   public onLocaleChanged () {
-    SearchModule.SetResults()
+    if (SearchModule.document !== '') {
+      SearchModule.SetDocumentResult()
+    } else {
+      SearchModule.SetResults()
+    }
   }
 
   @Watch('selectedResult')
@@ -831,7 +836,18 @@ export default class SearchResults extends Vue {
     this.allowUndoFilter = Object.keys(filters).length > 0
   }
 
+  @Watch('$route', { immediate: true, deep: true })
+  onRouteChange (to: Route) {
+    if (this.fullScreen && to.name === 'Search') {
+      this.onFullScreen()
+    }
+  }
+
   created () {
+    this.fullScreen = SearchModule.document !== '' && Object.prototype.hasOwnProperty.call(SearchModule.selectedResult, 'id')
+    if (this.fullScreen) {
+      this.previewVisible = true
+    }
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
     this.getFilterInnerWidth()
@@ -866,12 +882,19 @@ export default class SearchResults extends Vue {
 
   public onFullScreen (): void{
     if (!this.fullScreen) {
-      this.fullScreen = true
-    } else if (this.fullScreen && this.windowWidth <= 534) {
-      this.previewVisible = false
-      this.fullScreen = false
+      if ('id' in SearchModule.selectedResult) {
+        SearchModule.SetDocument(SearchModule.selectedResult.id)
+        this.fullScreen = true
+      }
     } else {
-      this.fullScreen = false
+      if (SearchModule.document !== '') {
+        SearchModule.SetDocument('')
+      } else if (this.fullScreen && this.windowWidth <= 534) {
+        this.previewVisible = false
+        this.fullScreen = false
+      } else {
+        this.fullScreen = false
+      }
     }
   }
 

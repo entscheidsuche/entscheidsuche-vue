@@ -41,7 +41,7 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
       }
     }
   }
-  if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters) || existingSort !== newSort) {
+  if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters) || existingSort !== newSort || name !== 'Search') {
     if (newQueryString !== undefined) {
       query.query = newQueryString
     } else {
@@ -58,7 +58,29 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
       delete query.sort
     }
     if (name !== undefined && name !== null && newQueryString !== undefined) {
-      router.push({ name: name, query: query })
+      router.push({ name: 'Search', query: query })
+    }
+  }
+}
+
+function updateViewRoute (document: string): void {
+  const name = router.currentRoute.name
+  const params = { ...router.currentRoute.params }
+  const existingDocument = router.currentRoute.params.doc
+  const existingLang = router.currentRoute.query.lang
+
+  if (existingDocument !== document || name !== 'View') {
+    let query: {} | { lang: string } = {}
+    if (document !== undefined) {
+      params.doc = document
+    } else {
+      delete params.doc
+    }
+    if (existingLang !== undefined) {
+      query = { lang: existingLang }
+    }
+    if (name !== undefined && name !== null && document !== undefined) {
+      router.push({ name: 'View', params: params, query: query })
     }
   }
 }
@@ -109,6 +131,7 @@ export type Aggregations = {
 export interface SearchState {
   pristine: boolean;
   query: string;
+  document: string;
   filters: Filters;
   sortOrder: SortOrder;
   searchTotal: number;
@@ -124,6 +147,7 @@ export interface SearchState {
 export class Search extends VuexModule implements SearchState {
   private prist = true
   private queryString = ''
+  private doc = ''
   private resPending = false
   private total = 0
   private results: Array<SearchResult> = []
@@ -141,6 +165,7 @@ export class Search extends VuexModule implements SearchState {
   @Mutation
   public SET_QUERY (query: string) {
     this.queryString = query
+    this.doc = ''
     if (query === '') {
       this.filt = {}
     }
@@ -164,14 +189,54 @@ export class Search extends VuexModule implements SearchState {
     }
   }
 
+  public get query (): string {
+    return this.queryString
+  }
+
+  @Mutation
+  public SET_DOCUMENT (doc: string) {
+    this.doc = doc
+    if (doc === '') {
+      if (this.queryString !== '') {
+        updateRoute(this.queryString, this.filt, this.sort)
+      } else {
+        router.push({ name: 'Home', query: { ...router.currentRoute.query } })
+      }
+    }
+  }
+
+  @Action
+  public SetDocument (doc: string) {
+    if (doc !== this.doc) {
+      this.context.commit('SET_DOCUMENT', doc)
+      if (doc !== '') {
+        if ('id' in this.selectedRes && this.selectedRes.id === doc) {
+          updateViewRoute(this.doc)
+        } else {
+          return this.context.dispatch('SetDocumentResult').then(() => {
+            updateViewRoute(this.doc)
+          })
+        }
+      } else {
+        return this.context.dispatch('SetResults')
+      }
+    }
+  }
+
+  public get document (): string {
+    return this.doc
+  }
+
   public get sortOrder (): SortOrder {
     return this.sort
   }
 
   @Mutation
   public SET_SORT_ORDER (sortOrder: SortOrder) {
-    this.sort = sortOrder
-    updateRoute(this.queryString, this.filt, sortOrder)
+    if (this.sort !== sortOrder) {
+      this.sort = sortOrder
+      updateRoute(this.queryString, this.filt, sortOrder)
+    }
   }
 
   @Action
@@ -180,10 +245,6 @@ export class Search extends VuexModule implements SearchState {
     if (this.queryString !== '') {
       return this.context.dispatch('SetResults')
     }
-  }
-
-  public get query (): string {
-    return this.queryString
   }
 
   @Mutation
@@ -213,8 +274,10 @@ export class Search extends VuexModule implements SearchState {
         newFilters[filter.type] = filter
       }
     }
-    this.filt = newFilters
-    updateRoute(this.queryString, newFilters, this.sort)
+    if (!_.isEqual(this.filt, newFilters)) {
+      this.filt = newFilters
+      updateRoute(this.queryString, newFilters, this.sort)
+    }
   }
 
   @Mutation
@@ -233,9 +296,11 @@ export class Search extends VuexModule implements SearchState {
 
   @Action
   public SetFilters (filters: Array<Filter | string>) {
-    this.context.commit('SET_FILTERS', filters)
-    if (this.queryString !== '') {
-      return this.context.dispatch('SetResults')
+    if (!(filters.length === 0 && Object.keys(this.filt).length === 0)) {
+      this.context.commit('SET_FILTERS', filters)
+      if (this.queryString !== '') {
+        return this.context.dispatch('SetResults')
+      }
     }
   }
 
@@ -310,6 +375,18 @@ export class Search extends VuexModule implements SearchState {
   }
 
   @Mutation
+  public SET_DOCUMENT_RESULT (result: SearchResult) {
+    if (this.prist) {
+      this.prist = false
+    }
+    this.results = [result]
+    this.selectedRes = result
+    this.total = 1
+    this.aggs = {}
+    this.allResLoaded = true
+  }
+
+  @Mutation
   public SET_MORE_RESULTS (results: [Array<SearchResult>, number] | undefined) {
     if (results !== undefined) {
       this.allResLoaded = results[0].length === 0
@@ -321,6 +398,13 @@ export class Search extends VuexModule implements SearchState {
   public async SetResults () {
     this.context.commit('RESULTS_PENDING', true)
     return SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort)
+      .finally(() => this.context.commit('RESULTS_PENDING', false))
+  }
+
+  @Action({ commit: 'SET_DOCUMENT_RESULT' })
+  public async SetDocumentResult () {
+    this.context.commit('RESULTS_PENDING', true)
+    return SearchUtil.document(this.doc, AppModule.locale)
       .finally(() => this.context.commit('RESULTS_PENDING', false))
   }
 

@@ -94,10 +94,12 @@ export default class Search extends Vue {
     }
     if (this.searchterm !== '') {
       SearchModule.SetQuery(this.searchterm)
+      /*
       if (this.$route.name !== 'Search' ||
             (this.$route.query.query === undefined || this.$route.query.query !== this.searchterm)) {
         router.push({ name: 'Search', query: { query: this.searchterm } })
       }
+       */
     }
   }
 }

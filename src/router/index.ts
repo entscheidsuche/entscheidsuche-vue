@@ -40,6 +40,23 @@ const routes: Array<RouteConfig> = [
     }
   },
   {
+    path: '/view/:doc',
+    name: 'View',
+    component: SearchResults,
+    beforeEnter: (to, from, next) => {
+      if (to.params.doc !== undefined && SearchModule.document !== to.params.doc) {
+        const result = SearchModule.SetDocument(to.params.doc)
+        if (result !== undefined) {
+          result.then(() => next())
+        } else {
+          next()
+        }
+      } else {
+        next()
+      }
+    }
+  },
+  {
     path: '/about',
     name: 'About',
     // route level code-splitting
@@ -76,7 +93,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.name !== 'Search' && from.name === 'Search') {
+  if ((to.name !== 'Search' && to.name !== 'View') && from.name === 'Search') {
     const clearQuery = SearchModule.SetQuery('')
     if (clearQuery !== undefined) {
       clearQuery.then(() => next())
@@ -104,7 +121,6 @@ router.beforeEach((to, from, next) => {
 router.beforeEach((to, from, next) => {
   if (to.query.lang === undefined && AppModule.locale !== getStartingLocale()) {
     if (to.path !== from.path) {
-      console.log('lang mismatch')
       const newQuery = { ...to.query }
       newQuery.lang = AppModule.locale
       next({ path: to.path, name: to.name !== null ? to.name : undefined, query: newQuery })

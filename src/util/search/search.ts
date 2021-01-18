@@ -7,6 +7,16 @@ export class SearchUtil {
       .then(resp => SearchUtil.transformResultToFacets(resp))
   }
 
+  private static buildDocumentSearch (document: string): any {
+    return {
+      query: {
+        ids: {
+          values: [document]
+        }
+      }
+    }
+  }
+
   private static buildPrimarySearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): any {
     const search: any = {
       size: 20,
@@ -162,6 +172,19 @@ export class SearchUtil {
       } else {
         return SearchUtil.searchAggs(searches, searchResults, total, aggregations)
       }
+    })
+  }
+
+  public static async document (document: string, lang: string): Promise<SearchResult | undefined> {
+    const documentSearch = this.buildDocumentSearch(document)
+    return axios.post('https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search',
+      documentSearch,
+      {
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
+      }).then(resp => {
+      const [searchResults] = SearchUtil.extractSearchResults(resp, lang)
+      return searchResults[0]
     })
   }
 
