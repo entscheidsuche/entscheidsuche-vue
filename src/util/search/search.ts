@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios'
 
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
-    return axios.get('https://s3.eu-west-3.amazonaws.com/entscheidsuche.ch/scraper/Facetten.json')
+    return axios.get('https://entscheidsuche.ch/docs/Facetten.json')
       .then(resp => SearchUtil.transformResultToFacets(resp))
   }
 
