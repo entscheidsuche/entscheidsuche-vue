@@ -1,7 +1,7 @@
 <template>
   <div id="home">
     <div class="content">
-      <h1>Wer uns untersützt:</h1>
+      <h1>Wer uns unterstützt:</h1>
       <b-card-group deck>
         <b-card>
           <div class="card-img-wapper">
@@ -107,10 +107,10 @@
               <b-card-img src="~/../assets/sponsors/sponsor8.png" alt="Image" top></b-card-img>
             </a>
           </div>
-          <div class="card-footer" v-b-tooltip.hover title="Züricher Hochschule für Angewandte Wissenschaften">
+          <div class="card-footer" v-b-tooltip.hover title="Zürcher Hochschule für Angewandte Wissenschaften">
             <div class="card-text-wrapper">
               <b-card-text>
-                Züricher Hochschule für Angewandte Wissenschaften
+                Zürcher Hochschule für Angewandte Wissenschaften
               </b-card-text>
             </div>
           </div>
