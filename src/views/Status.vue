@@ -134,6 +134,7 @@ export default class Status extends Vue {
       } else {
         if ('jobtyp' in data) jobtyp = data.jobtyp
         if (jobtyp === 'komplett') text += 'Komplett gelesen am '
+        else if (jobtyp == 'neu') text += 'Neu gelesen am '
         else text += 'Update am '
         text += data.time + ' (UTC)</small>'
         if ('gesamt' in data && 'gesamt' in data.gesamt) gesamt = data.gesamt
