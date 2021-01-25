@@ -20,6 +20,8 @@ export class SearchUtil {
   private static buildPrimarySearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): any {
     const search: any = {
       size: 20,
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      track_total_hits: true,
       query: {
         bool: {
           must: {
