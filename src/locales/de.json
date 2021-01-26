@@ -21,5 +21,15 @@
   "question": "Welche Sprache möchten Sie nutzen?",
   "german": "Deutsch",
   "french": "Französisch",
-  "italian": "Italienisch"
+  "italian": "Italienisch",
+  "Egesamt": "Entscheide insgesamt:",
+  "Eneu": "davon neu:",
+  "neu:": "neu:",
+  "aktualisiert:": "aktualisiert:",
+  "entfernt:": "entfernt:",
+  "keine aktuelle Änderung": "keine aktuelle Änderung",
+  "kein Lauf vorhanden": "kein Lauf vorhanden",
+  "Komplett gelesen am": "Komplett gelesen am",
+  "Neu gelesen am": "Neu gelesen am",
+  "Update am": "Update am"
 }

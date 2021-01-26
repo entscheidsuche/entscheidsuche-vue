@@ -1,6 +1,6 @@
 <template>
   <div id="status">
-    <template v-if="locale==='de'">
+    <template>
       <h1 id="title">Entscheide insgesamt: <span id="all">0</span>, davon neu: <span id="all-new">0</span>, <span name="1900-01-01" id="all-date">???</span></h1>
       <div id='inhalt'></div>
     </template>

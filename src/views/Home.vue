@@ -201,7 +201,7 @@
         </b-card>
         <b-card>
           <div class="card-img-wapper">
-            <a href="https://www.sgav.ch/" target="_blank">
+            <a href="https://pansoft.de/" target="_blank">
               <b-card-img src="~/../assets/sponsors/sponsor15.jpg" alt="Image" top></b-card-img>
             </a>
           </div>
