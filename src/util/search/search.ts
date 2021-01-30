@@ -400,15 +400,26 @@ export class SearchUtil {
               }
             })
           }
-          firstLevelChildren.push({
-            id: secondKey,
-            label: {
-              de: secondFacet.de,
-              fr: secondFacet.fr,
-              it: secondFacet.it
-            },
-            children: secondLevelChildren
-          })
+          if (secondLevelChildren.length === 1) {
+            firstLevelChildren.push({
+              id: secondKey,
+              label: {
+                de: secondFacet.de,
+                fr: secondFacet.fr,
+                it: secondFacet.it
+              }
+            })
+          } else {
+            firstLevelChildren.push({
+              id: secondKey,
+              label: {
+                de: secondFacet.de,
+                fr: secondFacet.fr,
+                it: secondFacet.it
+              },
+              children: secondLevelChildren
+            })
+          }
         }
         facets.push({
           id: key,
