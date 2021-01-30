@@ -213,6 +213,20 @@
             </div>
           </div>
         </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.betreibung-konkurs.ch/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor16.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Konferenz der Betreibungs- und Konkursbeamten der Schweiz">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Konferenz der Betreibungs- und Konkursbeamten der Schweiz
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
