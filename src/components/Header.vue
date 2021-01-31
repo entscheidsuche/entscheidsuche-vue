@@ -19,10 +19,11 @@
         <nav>
           <ul class="menu-desktop">
             <li><router-link :to="{ name: 'About' }" class="desktop-menu-item">{{ $t('about') }}</router-link></li>
-            <li><router-link :to="{ name: 'Organization' }" class="desktop-menu-item">{{ $t('organization') }}</router-link></li>
+            <li><router-link :to="{ name: 'Suchhilfe' }" class="desktop-menu-item">{{ $t('suchhilfe') }}</router-link></li>
             <li><router-link :to="{ name: 'Upload' }" class="desktop-menu-item">{{ $t('upload') }}</router-link></li>
             <li><router-link :to="{ name: 'DataUsage' }" class="desktop-menu-item">{{ $t('dataUsage') }}</router-link></li>
             <li><router-link :to="{ name: 'Status' }" class="desktop-menu-item">{{ $t('status') }}</router-link></li>
+            <li><router-link :to="{ name: 'Datenschutz' }" class="desktop-menu-item">{{ $t('datenschutz') }}</router-link></li>
           </ul>
         </nav>
       </div>

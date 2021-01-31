@@ -12,10 +12,11 @@
   "hit": "Treffer",
   "of": "von",
   "about": "Über uns",
-  "organization": "Verein entscheidsuche.ch",
-  "upload": "Upload von Urteilen / Entscheiden",
-  "dataUsage": "Weiterverwendung der Daten",
-  "status": "Gerichte",
+  "upload": "Upload",
+  "dataUsage": "Daten/API",
+  "status": "Datenstand",
+  "datenschutz": "Datenschutz",
+  "suchhilfe": "Suchhilfe",
   "search": "Suchen",
   "searchterm": "Suchbegriff",
   "question": "Welche Sprache möchten Sie nutzen?",
@@ -31,5 +32,7 @@
   "kein Lauf vorhanden": "kein Lauf vorhanden",
   "Komplett gelesen am": "Komplett gelesen am",
   "Neu gelesen am": "Neu gelesen am",
-  "Update am": "Update am"
+  "Update am": "Update am",
+  "intro": "Wir bieten Ihnen die Suche in einer freien Sammlung publizierter schweizer Gerichtsurteile aller Instanzen.",
+  "support": "Wer uns unterstützt:"
 }

@@ -1,7 +1,10 @@
 <template>
   <div id="home">
     <div class="content">
-      <h1>Wer uns unterstützt:</h1>
+      <div class="intro">
+        <p>{{$t('intro')}}</p>
+      </div>
+      <h1>{{$t('support')}}</h1>
       <b-card-group deck>
         <b-card>
           <div class="card-img-wapper">
@@ -202,7 +205,7 @@
         <b-card>
           <div class="card-img-wapper">
             <a href="https://pansoft.de/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor15.jpg" alt="Image" top></b-card-img>
+              <b-card-img src="~/../assets/sponsors/sponsor15.png" alt="Image" top></b-card-img>
             </a>
           </div>
           <div class="card-footer" v-b-tooltip.hover title="Pansoft GmbH">
@@ -240,6 +243,10 @@ Timur <b>Acemoglu</b>, Olten; Martina <b>Arioli</b>, Zürich; Fatih <b>Aslantas<
 </template>
 
 <style lang="scss">
+  div.intro{
+    padding-top: 10px;
+  }
+
 #home {
   .content{
     .card-deck{
