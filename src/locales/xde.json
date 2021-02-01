@@ -12,7 +12,6 @@
   "hit": "Treffer",
   "of": "von",
   "about": "Über uns",
-  "organization": "Suchhilfe",
   "upload": "Upload",
   "dataUsage": "Daten/API",
   "status": "Datenstand",
@@ -34,6 +33,6 @@
   "Komplett gelesen am": "Komplett gelesen am",
   "Neu gelesen am": "Neu gelesen am",
   "Update am": "Update am",
-  "intro": "Das frei zugängliche Portal entscheidsuche.ch bietet eine Suche in allen publizierten Gerichtsurteilen von Schweizer Gerichten aller Instanzen.",
+  "intro": "Wir bieten Ihnen die Suche in einer freien Sammlung publizierter schweizer Gerichtsurteile aller Instanzen.",
   "support": "Wer uns unterstützt:"
 }
