@@ -1,7 +1,10 @@
 <template>
   <div id="home">
     <div class="content">
-      <h1>Wer uns untersützt:</h1>
+      <div class="intro">
+        <p>{{$t('intro')}}</p>
+      </div>
+      <h1>{{$t('support')}}</h1>
       <b-card-group deck>
         <b-card>
           <div class="card-img-wapper">
@@ -107,10 +110,10 @@
               <b-card-img src="~/../assets/sponsors/sponsor8.png" alt="Image" top></b-card-img>
             </a>
           </div>
-          <div class="card-footer" v-b-tooltip.hover title="Züricher Hochschule für Angewandte Wissenschaften">
+          <div class="card-footer" v-b-tooltip.hover title="Zürcher Hochschule für Angewandte Wissenschaften">
             <div class="card-text-wrapper">
               <b-card-text>
-                Züricher Hochschule für Angewandte Wissenschaften
+                Zürcher Hochschule für Angewandte Wissenschaften
               </b-card-text>
             </div>
           </div>
@@ -199,6 +202,34 @@
             </div>
           </div>
         </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://pansoft.de/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor15.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Pansoft GmbH">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Pansoft GmbH
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.betreibung-konkurs.ch/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor16.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Konferenz der Betreibungs- und Konkursbeamten der Schweiz">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Konferenz der Betreibungs- und Konkursbeamten der Schweiz
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
@@ -212,6 +243,10 @@ Timur <b>Acemoglu</b>, Olten; Martina <b>Arioli</b>, Zürich; Fatih <b>Aslantas<
 </template>
 
 <style lang="scss">
+  div.intro{
+    padding-top: 10px;
+  }
+
 #home {
   .content{
     .card-deck{

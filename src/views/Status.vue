@@ -1,6 +1,6 @@
 <template>
   <div id="status">
-    <template v-if="locale==='de'">
+    <template>
       <h1 id="title">Entscheide insgesamt: <span id="all">0</span>, davon neu: <span id="all-new">0</span>, <span name="1900-01-01" id="all-date">???</span></h1>
       <div id='inhalt'></div>
     </template>
@@ -134,6 +134,7 @@ export default class Status extends Vue {
       } else {
         if ('jobtyp' in data) jobtyp = data.jobtyp
         if (jobtyp === 'komplett') text += 'Komplett gelesen am '
+        else if (jobtyp == 'neu') text += 'Neu gelesen am '
         else text += 'Update am '
         text += data.time + ' (UTC)</small>'
         if ('gesamt' in data && 'gesamt' in data.gesamt) gesamt = data.gesamt
