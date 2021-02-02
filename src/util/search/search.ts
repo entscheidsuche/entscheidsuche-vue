@@ -1,6 +1,9 @@
 import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult, SortOrder } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
 
+// const searchUrl = 'https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search'
+const searchUrl = 'https://entscheidsuche.ch/_search.php'
+
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
     return axios.get('https://entscheidsuche.ch/docs/Facetten.json')
@@ -162,7 +165,7 @@ export class SearchUtil {
         searches.push(this.buildAggregationSearch(query, filter, remainingFilters))
       }
     }
-    return axios.post('https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search',
+    return axios.post(searchUrl,
       primarySearch,
       {
         maxContentLength: Infinity,
@@ -179,7 +182,7 @@ export class SearchUtil {
 
   public static async document (document: string, lang: string): Promise<SearchResult | undefined> {
     const documentSearch = this.buildDocumentSearch(document)
-    return axios.post('https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search',
+    return axios.post(searchUrl,
       documentSearch,
       {
         maxContentLength: Infinity,
@@ -192,7 +195,7 @@ export class SearchUtil {
 
   private static searchAggs (searches: Array<any>, searchResults: Array<SearchResult>, total: number, aggregations: Aggregations | undefined): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
     const search = searches.pop()
-    return axios.post('https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search',
+    return axios.post(searchUrl,
       search,
       {
         maxContentLength: Infinity,
