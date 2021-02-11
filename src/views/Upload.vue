@@ -7,12 +7,12 @@
     </template>
     <template v-if="locale==='fr'">
       <h1>Téléversement des arrêts / décisions</h1>
-      <p>L'association entscheidsuche.ch a l'intention d'introduire une fonction de téléchargement qui permettra aux avocat/e/s de mettre à disposition du public les jugements non publiés par les autorités sous une forme appropriée via entscheidsuche.ch. Nous aimerions mettre en place cette fonctionnalité en 2021.
+      <p>L'association entscheidsuche.ch a l'intention d'introduire une fonction de téléversement qui permettra aux avocat/e/s de mettre à disposition du public les jugements non publiés par les autorités sous une forme appropriée via entscheidsuche.ch. Nous aimerions mettre en place cette fonctionnalité en 2021.
       </p>
     </template>
     <template v-if="locale==='it'">
       <h1>Caricamento di sentenze / decisioni</h1>
-      <p>L'associazione entscheidsuche.ch intende introdurre una funzione di download che permetterà agli avvocati di mettere a disposizione del pubblico le sentenze non pubblicate delle autorità in una forma adeguata tramite entscheidsuche.ch. Vorremmo implementare questa funzionalità nel 2021.
+      <p>L'associazione entscheidsuche.ch intende introdurre una funzione di upload che permetterà agli avvocati di mettere a disposizione del pubblico le sentenze non pubblicate delle autorità in una forma adeguata tramite entscheidsuche.ch. Vorremmo implementare questa funzionalità nel 2021.
       </p>
     </template>
   </div>
