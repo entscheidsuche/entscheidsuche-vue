@@ -238,14 +238,22 @@ export class SearchUtil {
     return filterArray.length === 1 ? filterArray[0] : filterArray
   }
 
+  private static transformDate (milliseconds: number): number | string {
+    if (milliseconds >= 0) {
+      return milliseconds
+    }
+    const date = new Date(milliseconds)
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+  }
+
   private static buildFilter (filter: Filter): any {
     if (filter.type === 'edatum') {
       if (filter.payload.from !== undefined && filter.payload.to !== undefined) {
         return {
           range: {
             date: {
-              gte: filter.payload.from,
-              lte: filter.payload.to
+              gte: SearchUtil.transformDate(filter.payload.from),
+              lte: SearchUtil.transformDate(filter.payload.to)
             }
           }
         }
@@ -253,7 +261,7 @@ export class SearchUtil {
         return {
           range: {
             date: {
-              gte: filter.payload.from
+              gte: SearchUtil.transformDate(filter.payload.from)
             }
           }
         }
@@ -261,7 +269,7 @@ export class SearchUtil {
         return {
           range: {
             date: {
-              lte: filter.payload.to
+              lte: SearchUtil.transformDate(filter.payload.to)
             }
           }
         }
