@@ -1,7 +1,7 @@
 <template>
   <div id="status">
     <template>
-      <h1 id="title">Entscheide insgesamt: <span id="all">0</span>, davon neu: <span id="all-new">0</span>, <span name="1900-01-01" id="all-date">???</span></h1>
+      <h1 id="title">{{ $t('Egesamt') }} <span id="all">0</span>, {{ $t('Eneu') }} <span id="all-new">0</span>, <span name="1900-01-01" id="all-date">???</span></h1>
       <div id='inhalt'></div>
     </template>
   </div>
@@ -79,7 +79,7 @@ export default class Status extends Vue {
       if (element != null) element.innerHTML = text
     }
 
-    function setzeInfoString (dict, eintrag, text, jobtyp, datum, zusatz) {
+    function setzeInfoString (dict, eintrag, text, jobtyp, datum, zusatz, thist) {
       let subtext = ''
       const gesamt = 0
       let neu = 0
@@ -88,21 +88,23 @@ export default class Status extends Vue {
       if ('gesamt' in dict) {
         const gesamtzahl = dict.gesamt
         if ('aktuell_neu' in dict) {
-          subtext = 'neu: ' + dict.aktuell_neu
+          subtext = thist.$t('neu:') + ' ' + dict.aktuell_neu
           neu = dict.aktuell_neu
         }
         if ('aktuell_aktualisiert' in dict) {
           if (subtext !== '') subtext += ', '
-          subtext += 'aktualisiert: ' + dict.aktuell_aktualisiert
+          subtext += thist.$t('aktualisiert:') + ' ' + dict.aktuell_aktualisiert
           changed = dict.aktuell_aktualisiert
         }
         if ('aktuell_entfernt' in dict) {
-          if (subtext !== '') subtext += ', '
-          subtext += 'entfernt: ' + dict.aktuell_entfernt
+          if (subtext !== '') {
+            subtext += ', '
+          }
+          subtext += thist.$t('entfernt:') + ' ' + dict.aktuell_entfernt
           entfernt = dict.aktuell_entfernt
         }
         if (subtext === '') {
-          subtext = 'keine aktuelle Änderung'
+          subtext = thist.$t('keine aktuelle Änderung')
         }
         if (subtext !== '') subtext = ', <small>' + subtext + '</small>'
         // setInfo(eintrag + '-date', ' ' + text + subtext)
@@ -123,35 +125,35 @@ export default class Status extends Vue {
       }
     }
 
-    function eintragen (data, spider, signaturen) {
+    function eintragen (data, spider, signaturen, thist) {
       let text = '<small>'
       let jobtyp = 'update'
       let gesamt = { gesamt: 0 }
       let datum = '1901'
       if (data.job === 'nojob') {
-        text += 'kein Lauf vorhanden</small>'
+        text += thist.$t('kein Lauf vorhanden')+'</small>'
         jobtyp = 'noch nicht gelaufen'
       } else {
         if ('jobtyp' in data) jobtyp = data.jobtyp
-        if (jobtyp === 'komplett') text += 'Komplett gelesen am '
-        else if (jobtyp == 'neu') text += 'Neu gelesen am '
-        else text += 'Update am '
+        if (jobtyp === 'komplett') text += thist.$t('Komplett gelesen am')+' '
+        else if (jobtyp == 'neu') text += thist.$t('Neu gelesen am')+' '
+        else text += thist.$t('Update am')+' '
         text += data.time + ' (UTC)</small>'
         if ('gesamt' in data && 'gesamt' in data.gesamt) gesamt = data.gesamt
         datum = data.time
       }
       let zusatz = ''
       if ('signaturen' in data) zusatz = ' <a href="https://entscheidsuche.ch/docs/' + spider + '/" title="Verzeichnis mit den Urteilen öffnen"><img src="https://entscheidsuche.ch/img/Ordner.png" width="20px"></a>'
-      setzeInfoString(gesamt, 'Spider-' + spider, text, jobtyp, datum, zusatz)
+      setzeInfoString(gesamt, 'Spider-' + spider, text, jobtyp, datum, zusatz, thist)
       for (const s of signaturen) {
-        if ('signaturen' in data && s in data.signaturen) setzeInfoString(data.signaturen[s], s, text, jobtyp, datum, zusatz)
+        if ('signaturen' in data && s in data.signaturen) setzeInfoString(data.signaturen[s], s, text, jobtyp, datum, zusatz, thist)
         else {
-          setzeInfoString({ gesamt: 0 }, s, text, jobtyp, datum, zusatz)
+          setzeInfoString({ gesamt: 0 }, s, text, jobtyp, datum, zusatz, thist)
         }
       }
     }
 
-    function process (data) {
+    function process (data, thist) {
       const spiders = {}
       let text = ''
       for (const kanton in data) {
@@ -192,11 +194,11 @@ export default class Status extends Vue {
       for (const spider in spiders) {
         fetch('https://entscheidsuche.ch/docs/Index/' + spider + '/last')
           .then(response => response.json())
-          .then(data => eintragen(data, spider, spiders[spider]))
+          .then(data => eintragen(data, spider, spiders[spider], thist))
       }
     }
 
-    function holeInhalt () {
+    function holeInhalt (thist) {
       if (flag === 0) {
         flag = 1
         const head=document.getElementsByTagName('head')[0]
@@ -208,16 +210,12 @@ export default class Status extends Vue {
         const url = 'https://entscheidsuche.ch/docs/Facetten.json'
         fetch(url).then(function (response) {
           response.json().then(function (content) {
-            process(content)
-          }, function (message) {
-            alert(message)
+            process(content, thist)
           })
-        }, function (message) {
-          alert(message)
         })
       }
     }
-    holeInhalt()
+    holeInhalt(this)
   }
   public get locale () {
     return AppModule.locale
