@@ -4,7 +4,7 @@
       <h1>Datenschutz</h1>
       <p>Bei der Nutzung dieser Website werden Ihre Requests an entscheidsuche.ch übertragen. In den übertragenen Daten sind technisch
          notwendigerweise Ihre IP-Adresse, sowie die aufgerufenen Dokumente und gestellten Suchanfragen enthalten. Diese Daten werden
-         durch unsere Auftragsverarbeiter cyon.ch und pansoft.de verarbeitet. Eine Weiterleitung an Dritte findet nicht statt.
+         durch unsere Auftragsverarbeiter cyon.ch und pansoft.de verarbeitet. Eine Weiterleitung an weitere Dritte findet nicht statt.
          Wir führen keine individuellen Statistiken, sondern machen lediglich eine rudimentäre Logfile-Analyse, um die Anzahl der Zugriffe
          und die Auslastung unserer Systeme zu monitoren und im Bedarfsfall bei Angriffen zu reagieren. Im Fall konkreter Angriffe
          behalten wir uns ein detailliertes Logging und eine detaillierte Nachverfolgung vor.

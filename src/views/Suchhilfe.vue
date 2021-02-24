@@ -21,9 +21,9 @@
       <h3>Logische Verknüpfung</h3>
       <p>Wenn Sie mit zwei Suchbegriffen suchen, werden diese automatisch mit <i>AND</i> verknüpft. Das bedeutet, dass beide Begriffe gleichzeitig in der Suche enthalten sein müssen.
          Wenn Sie Dokumente finden möchten, in denen mindestens einer der Suchbegriffe enthalten ist, verwenden Sie die <i>OR</i>-Verknüpfung. Bei den Verknüpfungsoperatoren ist die
-         Grossschreibweise wichtig, da sie sonst als normale Suchbegriffe gesucht werden. Sie können auch <i>AND</i> und <i>OR</i>-Operatoren verbinden. Dabei müssen jedoch ZWINGEND Klammern
-         gesetzt werden. So findet <i>(Mord OR Totschlag) AND Alkohol</i> alle Dokumente, die <i>Mord</i> oder <i>Totschlag</i> sowie auch <i>Alkohol</i> enthalten. Ohne Klammern würde der
-         Suchbegriff <i>Mord</i> ignoriert werden.
+         Grossschreibweise wichtig, da sie sonst als normale Suchbegriffe gesucht werden. Sie können auch <i>AND</i> und <i>OR</i>-Operatoren verbinden. So findet
+         <i>(Mord OR Totschlag) AND Alkohol</i> alle Dokumente, die <i>Mord</i> oder <i>Totschlag</i> sowie auch <i>Alkohol</i> enthalten. Dabei müssen jedoch <b>ZWINGEND</b> Klammern
+         gesetzt werden. Ohne Klammern würde der Suchbegriff <i>Mord</i> ignoriert werden.
       </p>
       <p>Sie können auch nach allen Dokumenten suchen, die einen Begriff nicht enthalten. So findet <i>NOT Mord</i> alle Dokumente, in denen der Begriff <i>Mord</i> nicht vorkommt.
       </p>
@@ -36,18 +36,14 @@
          von 5 Wörtern.
       </p>
       <h2>Metadaten</h2>
-      <p>Die Suche kann mit Metadaten kombiniert werden. Als Metadaten stehen Ihnen das Entscheiddatum (wenn das nicht vorhanden ist, wird das Publikationsdatum verwendet), der Kanton,
+      <p>Die Suche kann mit Metadaten kombiniert werden. Als Metadaten stehen Ihnen das Entscheiddatum (wenn dieses nicht vorhanden ist, wird das Publikationsdatum verwendet), der Kanton,
          das Gericht und teilweise auch die Kammer zur Verfügung.</p>
       <p>Den Datumsbereich können Sie mit dem Datumsschieber einschränken.</p>
-      <p>Die Suche kann auf die eidgenössischen Gerichte oder verschieden Kantone eingeschränkt werden, in dem Sie diese links anklicken. Die können den Kanton expandieren und sehen dann
+      <p>Die Suche kann auf die eidgenössischen Gerichte oder verschieden Kantone eingeschränkt werden, in dem Sie diese Links anklicken. Diese können den Kanton expandieren und sehen dann
          die dort verfügbaren Gerichte und darunter teilweise auch die Kammern.</p>
       <p>Die Metadaten werden stets mit den aktuellen Suchbegriffen verknüpft. Sollten Sie nur mit Metadaten suchen wollen, geben Sie als Suchbegriff <i>*</i> ein.</p>
       <h2>Aktualisierungen</h2>
       <p>Unter <b-link href="status">Datenstand</b-link> finden Sie eine Übersicht unserer Quellen mit dem Datum des jeweils letzten Abgleichs.</p>
-    </template>
-    <template v-if="locale==='fr'">
-    </template>
-    <template v-if="locale==='it'">
     </template>
   </div>
 </template>

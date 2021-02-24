@@ -2,8 +2,8 @@
   <div id="betatest">
     <template>
       <h1>Betatest</h1>
-      <p>Willkommen zum Betatest. Die neue Entscheidsuche.ch ist fast fertig. Jetzt bitten wir Sie um Ihre Mithilfe: Wo hakt es noch, was sind Punkte, die noch nicht rund funktionieren.
-         Bitte teilen Sie uns Ihre Kritik und Anregungen per email <a href="mailto:info@entscheidsuche.ch">info@entscheidsuche.ch</a> mit. Haben Sie vielen Dank!</p>
+      <p>Willkommen zum Betatest. Die neue Plattform entscheidsuche.ch ist fast fertig. Jetzt bitten wir Sie um Ihre Mithilfe: Wo hakt es noch?
+         Bitte teilen Sie uns Ihre Kritik und Anregungen per email <a href="mailto:info@entscheidsuche.ch">info@entscheidsuche.ch</a> mit. Wir danken Ihnen schon jetzt für Ihre Unterstützung.</p>
       <h2>Bekannte Probleme, an denen wir aktuell arbeiten:</h2>
       <ul style="text-align:left">
       <li>Einzelne Dokumente werden noch nicht indexiert, d.h. sie werden ggf. mit der Suche noch nicht gefunden</li>
