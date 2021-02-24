@@ -67,7 +67,17 @@ const routes: Array<RouteConfig> = [
   {
     path: '/organization',
     name: 'Organization',
+    component: () => import('../views/About.vue')
+  },
+  {
+    path: '/suchhilfe',
+    name: 'Suchhilfe',
     component: () => import('../views/Suchhilfe.vue')
+  },
+  {
+    path: '/betatest',
+    name: 'Betatest',
+    component: () => import('../views/Betatest.vue')
   },
   {
     path: '/upload',
