@@ -64,7 +64,7 @@ export default class DateFilterUI extends Vue {
       const d = new Date(date)
       return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`
     }
-    return '2020'
+    return '2021'
   }
 }
 </script>
