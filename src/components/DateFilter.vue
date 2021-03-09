@@ -133,6 +133,7 @@ export default class DateFilter extends Vue {
     } else if (edatum.length > 0) {
       max = edatum[edatum.length - 1].key as number
     }
+    max += 7776000000
     if (this.dateInterval === undefined || min !== this.dateInterval.min || max !== this.dateInterval.max) {
       this.dateInterval = { min, max }
       changed = true
