@@ -143,7 +143,7 @@ export default class Status extends Vue {
         datum = data.time
       }
       let zusatz = ''
-      if ('signaturen' in data) zusatz = ' <a href="https://entscheidsuche.ch/docs/' + spider + '/" title="Verzeichnis mit den Urteilen öffnen"><img src="https://entscheidsuche.ch/img/Ordner.png" width="20px"></a>'
+      if ('signaturen' in data) zusatz = ' <a href="https://entscheidsuche.ch/docs/' + spider + '/" title="Verzeichnis mit den Urteilen öffnen"><img src="https://entscheidsuche.ch/imgalt/Ordner.png" width="20px"></a>'
       setzeInfoString(gesamt, 'Spider-' + spider, text, jobtyp, datum, zusatz, thist)
       for (const s of signaturen) {
         if ('signaturen' in data && s in data.signaturen) setzeInfoString(data.signaturen[s], s, text, jobtyp, datum, zusatz, thist)
@@ -157,7 +157,7 @@ export default class Status extends Vue {
       const spiders = {}
       let text = ''
       for (const kanton in data) {
-        text += '<h2><svg id="Button-' + kanton + '" onclick="toggle(\'' + kanton + '\')" viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img" aria-label="caret right fill" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi-caret-right-fill b-icon bi"><g><path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"></path></g></svg><img src="https://entscheidsuche.ch/img/' + kanton + '.png" width="20px"> <a href="/search?query=*&filter=h%40' + kanton + '&sort=date">' + data[kanton].de + '</a> <span id="' + kanton + '">0</span> (+<span id="' + kanton + '-new">0</span>) <span name="1900-01-01" id="' + kanton + '-date">???</span></h2>'
+        text += '<h2><svg id="Button-' + kanton + '" onclick="toggle(\'' + kanton + '\')" viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img" aria-label="caret right fill" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi-caret-right-fill b-icon bi"><g><path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"></path></g></svg><img src="https://entscheidsuche.ch/imgalt/' + kanton + '.png" width="20px"> <a href="/search?query=*&filter=h%40' + kanton + '&sort=date">' + data[kanton].de + '</a> <span id="' + kanton + '">0</span> (+<span id="' + kanton + '-new">0</span>) <span name="1900-01-01" id="' + kanton + '-date">???</span></h2>'
         text += '<dl id="Toggle-' + kanton + '" style="display:none">'
         for (const gericht in data[kanton].gerichte) {
           if (Object.keys(data[kanton].gerichte[gericht].kammern).length > 1) {
