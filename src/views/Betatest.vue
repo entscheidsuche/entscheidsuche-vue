@@ -6,8 +6,6 @@
          Bitte teilen Sie uns Ihre Kritik und Anregungen per email <a href="mailto:info@entscheidsuche.ch">info@entscheidsuche.ch</a> mit. Wir danken Ihnen schon jetzt für Ihre Unterstützung.</p>
       <h2>Bekannte Probleme, an denen wir aktuell arbeiten:</h2>
       <ul style="text-align:left">
-      <li>Bei einem grösseren Teil der Dokumente funktioniert aktuell die Volltextsuche nicht. Die Suche mit den Metadaten geht aber.</li>
-      <li>Einige Gerichte fehlen noch, so z.B. auch der Kanton Solothurn.</li>
       <li>Die Übersetzung einiger statischer Seiten ins Französische und Italienische fehlt noch.</li>
       <li>Das Icon für HTML bzw. PDF-Dokumente fehlt</li>
       </ul>
