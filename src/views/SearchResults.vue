@@ -64,7 +64,8 @@
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
               <h4 class="result-title" v-html="result.title"/>
-              <img v-bind:class="['link-logo', result.pdf ? 'pdf' : 'html']">
+              <img v-if="result.pdf" src="../assets/pdf.png" class="link-logo">
+              <img v-else src="../assets/html.png" class="link-logo">
             </div>
             <div class="abstract" v-if="result.abstract.length > 0">
               <div class="first-row">
@@ -359,13 +360,6 @@
               width:auto;
               height: auto;
               margin-left:10px;
-
-              &.pdf{
-                content: url('../assets/pdf.png');
-              }
-              &.html{
-                content: url('../assets/html.png');
-              }
             }
             .result-title{
               font-size: 16px;
