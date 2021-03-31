@@ -22,3 +22,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+php/Index_2021-03-01_06:00:37_446973-52-98.json
+src/views/Betatest.vue.alt
+src/views/Datenschutz.vue.alt
+src/views/Suchhilfe.vue.alt
