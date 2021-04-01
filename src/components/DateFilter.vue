@@ -115,25 +115,39 @@ export default class DateFilter extends Vue {
     let from: number | undefined
     let to: number | undefined
     const edatum = SearchModule.aggregations.edatum || []
+    const minEdatum = SearchModule.aggregations.min_edatum || []
+    const maxEdatum = SearchModule.aggregations.max_edatum || []
+
     if (Object.prototype.hasOwnProperty.call(this.filters, 'edatum')) {
       from = this.filters.edatum.payload.from
       to = this.filters.edatum.payload.to
     }
-    if (from !== undefined && edatum.length > 0) {
-      min = Math.min(from, edatum[0].key as number)
+    let tempMin: number | undefined
+    let tempMax: number | undefined
+    if (minEdatum.length > 0) {
+      tempMin = minEdatum[0].key as number
+    } else if (edatum.length > 0) {
+      tempMin = edatum[0].key as number
+    }
+    if (maxEdatum.length > 0) {
+      tempMax = maxEdatum[0].key as number
+    } else if (edatum.length > 0) {
+      tempMax = edatum[edatum.length - 1].key as number
+    }
+    if (from !== undefined && tempMin !== undefined) {
+      min = Math.min(from, tempMin)
     } else if (from !== undefined) {
       min = from
-    } else if (edatum.length > 0) {
-      min = edatum[0].key as number
+    } else if (tempMin !== undefined) {
+      min = tempMin
     }
-    if (to !== undefined && edatum.length > 0) {
-      max = Math.max(to, edatum[edatum.length - 1].key as number)
+    if (to !== undefined && tempMax !== undefined) {
+      max = Math.max(to, tempMax)
     } else if (to !== undefined) {
       max = to
-    } else if (edatum.length > 0) {
-      max = edatum[edatum.length - 1].key as number
+    } else if (tempMax !== undefined) {
+      max = tempMax
     }
-    max += 7776000000
     if (this.dateInterval === undefined || min !== this.dateInterval.min || max !== this.dateInterval.max) {
       this.dateInterval = { min, max }
       changed = true
