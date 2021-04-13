@@ -344,6 +344,7 @@ export class Search extends VuexModule implements SearchState {
       this.prist = false
     }
     this.results = results[0]
+    this.allResLoaded = false
     if ('id' in this.selectedRes) {
       const id = this.selectedRes.id
       let found = false
