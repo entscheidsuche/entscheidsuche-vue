@@ -7,7 +7,8 @@
       <h2>Bekannte Probleme, an denen wir aktuell arbeiten:</h2>
       <ul style="text-align:left">
       <li>Die Übersetzung einiger statischer Seiten ins Französische und Italienische fehlt noch.</li>
-      <li>Das Icon für HTML bzw. PDF-Dokumente fehlt</li>
+      <li>In wenigen Fällen werden Entscheide nur mit den Metadaten, aber nicht mit dem Entscheidtext gefunden.</li>
+      <li>Beim Scrollen zu mehr als 20, 40 oder 60 Treffern, wird in seltenen Fällen nicht nachgeladen.</li>
       </ul>
       <h2>Anregungen, die wir erhalten haben:</h2>
       <ul style="text-align:left">
