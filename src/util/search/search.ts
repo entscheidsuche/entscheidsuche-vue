@@ -104,6 +104,18 @@ export class SearchUtil {
             field: 'date'
           }
         }
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        search.aggs.min_edatum = {
+          min: {
+            field: 'date'
+          }
+        }
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        search.aggs.max_edatum = {
+          max: {
+            field: 'date'
+          }
+        }
       }
     }
     return search
@@ -147,6 +159,18 @@ export class SearchUtil {
         date_histogram: {
           // eslint-disable-next-line @typescript-eslint/camelcase
           calendar_interval: SearchUtil.getCalendarInterval(filters),
+          field: 'date'
+        }
+      }
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      search.aggs.min_edatum = {
+        min: {
+          field: 'date'
+        }
+      }
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      search.aggs.max_edatum = {
+        max: {
           field: 'date'
         }
       }
@@ -201,9 +225,10 @@ export class SearchUtil {
         maxContentLength: Infinity,
         maxBodyLength: Infinity
       }).then(resp => {
-      const [key, aggregation] = SearchUtil.extractAggregation(resp)
-      const newAggregations = (aggregations !== undefined) ? aggregations : {}
-      newAggregations[key] = aggregation
+      const partialAggregations = SearchUtil.extractAggregations(resp)
+      const newAggregations = (partialAggregations !== undefined)
+        ? (aggregations !== undefined) ? { ...aggregations, ...partialAggregations } : { ...partialAggregations }
+        : aggregations
       if (searches.length === 0) {
         return [searchResults, total, newAggregations]
       } else {
@@ -328,9 +353,24 @@ export class SearchUtil {
           sort: hit.sort
         })
       }
-      if (resp.data !== undefined && resp.data.aggregations !== undefined) {
-        aggregations = {}
-        for (const name in resp.data.aggregations) {
+      aggregations = SearchUtil.extractAggregations(resp)
+    }
+    return [results, total, aggregations]
+  }
+
+  private static extractAggregations (resp: AxiosResponse<any>): Aggregations | undefined {
+    let aggregations: Aggregations | undefined
+    if (resp.data !== undefined && resp.data.aggregations !== undefined) {
+      aggregations = {}
+      for (const name in resp.data.aggregations) {
+        if (name.startsWith('min_') || name.startsWith('max_')) {
+          const aggs: Array<Aggregation> = []
+          aggs.push({
+            key: resp.data.aggregations[name].value,
+            count: 1
+          })
+          aggregations[name] = aggs
+        } else {
           const buckets = resp.data.aggregations[name].buckets
           if (buckets !== undefined) {
             const aggs: Array<Aggregation> = []
@@ -345,26 +385,7 @@ export class SearchUtil {
         }
       }
     }
-    return [results, total, aggregations]
-  }
-
-  private static extractAggregation (resp: AxiosResponse<any>): [string, Array<Aggregation>] {
-    if (resp.data !== undefined && resp.data.aggregations !== undefined) {
-      for (const name in resp.data.aggregations) {
-        const buckets = resp.data.aggregations[name].buckets
-        if (buckets !== undefined) {
-          const aggs: Array<Aggregation> = []
-          for (const agg of buckets) {
-            aggs.push({
-              key: agg.key,
-              count: agg.doc_count
-            })
-          }
-          return [name, aggs]
-        }
-      }
-    }
-    return ['unknown', []]
+    return aggregations
   }
 
   private static getExtract (highlight: Array<string>): string {
