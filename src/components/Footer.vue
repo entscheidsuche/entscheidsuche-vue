@@ -1,7 +1,7 @@
 <template>
   <div id="footer">
     <footer>
-      <a class="logo" href="#" onclick=""></a> powered by <a href="https://pansoft.de"><img src="~/../assets/sponsors/sponsor15.png" height="35px"></a>
+      <a class="logo" href="#" onclick=""></a> <a class="twitter" title="entscheidsuche.ch on Twitter" href="https://twitter.com/entscheidsuche"></a>  powered by <a href="https://pansoft.de"><img src="~/../assets/sponsors/sponsor15.png" height="35px"></a>
     </footer>
   </div>
 </template>
@@ -31,6 +31,16 @@
       background-size: contain;
       flex-shrink: 0;
     }
+
+    .twitter{
+      width: 200px;
+      height: 20px;
+      background: url('../assets/twitter.svg') no-repeat center;
+      color:#fff;
+      background-size: contain;
+      flex-shrink: 0;
+    }
+
   }
 }
 </style>
