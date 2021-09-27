@@ -1,5 +1,5 @@
 {
-  "message": "Benvenuto al beta test. Siamo felici dei messaggi di errore a info@entscheidsuche.ch grazie.",
+  "message": "",
   "allHits": "Numero di risultati",
   "allFilter": "Tutti i filtri",
   "sort": "Ordinamento per",
@@ -33,7 +33,7 @@
   "Komplett gelesen am": "interrogato completamente su",
   "Neu gelesen am": "leggere per intero su",
   "Update am": "aggiornamento da",
-  "intro": "Il portale Internet entscheidsuche.ch, accessibile gratuitamente, permette di cercare tutte le decisioni giudiziarie svizzere pubblicate da tutte le istanze. ",
+  "intro": "Nota: Racchiudere i numeri di affari tra virgolette nella query di ricerca.",
   "support": "Chi ci sostiene:",
   "betatest": "beta test"
 }
