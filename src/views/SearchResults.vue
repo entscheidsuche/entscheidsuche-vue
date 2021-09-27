@@ -100,6 +100,9 @@
                   <b-button variant="primary"  v-on:click="onFullScreen()" id="maximize-preview-btn">
                     <b-icon id="maximize-preview" icon="arrows-fullscreen"></b-icon>
                   </b-button>
+                  <b-button variant="primary"  v-on:click="onNewTab()" id="separate-preview-btn">
+                    <b-icon id="separate-preview" icon="folder-plus"></b-icon>
+                  </b-button>
                   <b-button variant="primary"  v-on:click="onFullScreen()" id="minimize-preview-btn">
                     <b-icon id="minimize-preview" icon="fullscreen-exit"></b-icon>
                   </b-button>
@@ -482,7 +485,7 @@
                 flex-shrink: 0;
               }
               .controls-wrapper{
-                width:70px;
+                width:100px;
                 height:30px;
                 margin-left: 20px;
                 position:relative;
@@ -512,6 +515,18 @@
                     position:absolute;
                     top:4px;
                     left:4px;
+                  }
+                }
+                #separate-preview-btn{
+                  height:30px;
+                  width:30px;
+                  margin-left: 5px;
+                  #separate-preview{
+                    height:22px;
+                    width:22px;
+                    position:relative;
+                    top:-1px;
+                    left:-8px;
                   }
                 }
                 #minimize-preview-btn{
@@ -603,6 +618,9 @@
                     float:right;
                   }
                   #maximize-preview-btn{
+                    display:none;
+                  }
+                  #separate-preview-btn{
                     display:none;
                   }
                   #close-preview-btn{
@@ -888,6 +906,15 @@ export default class SearchResults extends Vue {
         this.fullScreen = false
       } else {
         this.fullScreen = false
+      }
+    }
+  }
+
+  public onNewTab (): void{
+    if (!this.fullScreen) {
+      if ('id' in SearchModule.selectedResult) {
+        window.open('/view/' + SearchModule.selectedResult.id, '_blank')
+        self.focus()
       }
     }
   }
