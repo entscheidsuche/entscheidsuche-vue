@@ -30,8 +30,17 @@
       </p>
     </template>
     <template v-if="locale==='fr'">
+      <h1>Protection des données</h1>
+      <p>Lorsque vous utilisez ce site web, vos demandes sont transmises à entscheidsuche.ch. Les données transmises comprennent nécessairement votre adresse IP, ainsi que les documents consultés et les requêtes de recherche effectuées. Ces données sont traitées par nos sous-traitants <a href="https://cyon.ch">cyon.ch</a> et <a href="https://pansoft.de">pansoft.de</a>. Elles ne sont pas transmises à d'autres tiers. Nous ne conservons pas de statistiques individuelles, mais procédons uniquement à une analyse rudimentaire des fichiers journaux afin de contrôler le nombre d'accès et l'utilisation de nos systèmes et de réagir aux attaques si nécessaire. En cas d'attaques spécifiques, nous nous réservons le droit d'effectuer une journalisation et un suivi détaillés.</p>
+      <p>Ce site web n'utilise pas de cookies. Votre navigateur peut stocker les fichiers de l'application web dans son cache. Toutefois, nous ne les analysons pas à des fins de profilage ou autres.</p>
+      <p>En tant que sponsor ou membre de entscheidsuche.ch, nous stockons vos données à des fins d'administration et de comptabilité des membres. Avec votre consentement, nous vous inscrivons également sur notre site web en tant que sympathisant. Dès que nous n'avons plus besoin de ces données à ces fins, nous les supprimons.</p>
+      <p>La <a href="https://www.fedlex.admin.ch/eli/cc/1993/1945_1945_1945/fr">loi suisse sur la protection des données</a> s'applique à ce site web. Dans des cas exceptionnels, les lois sur la protection des données d'autres pays, telles que le <a href="https://eur-lex.europa.eu/legal-content/FR/TXT/HTML/?uri=CELEX:32016R0679&from=FR">RGPD</a> de l'Union européenne, peuvent également s'appliquer.</p>
+      <p>Les données sont traitées parce que nous avons un intérêt prépondérant privé (RGPD : intérêt légitime), une obligation légale, un accord contractuel ou un consentement explicite.</p>
+      <p>Les lois sur la protection des données vous donnent, en tant que personne concernée, certains droits, tels que le droit d'être informé sur les données que nous traitons. Vous pouvez également demander la correction, la suppression ou limitation du traitement des données si nécessaire.</p>
+      <p>L'association <a href="https://entscheidsuche.ch">entscheidsuche.ch</a>, 3000 Berne, est responsable du traitement des données. Vous êtes également libre de contacter le <a href="https://www.edoeb.admin.ch/edoeb/fr/home.html">préposé fédéral à la protection des données</a> autorité compétente en la matière.</p>
     </template>
     <template v-if="locale==='it'">
+      <p>La versione in lingua italiana non è ancora disponibile</p>
     </template>
   </div>
 </template>
