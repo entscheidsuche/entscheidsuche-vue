@@ -134,20 +134,6 @@
         </b-card>
         <b-card>
           <div class="card-img-wapper">
-            <a href="https://www.legaltechradar.com/de" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor10.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="LegalTechRadar">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              LegalTechRadar
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
             <a href="https://www3.unifr.ch/federalism/en/" target="_blank">
               <b-card-img src="~/../assets/sponsors/sponsor11.jpg" alt="Image" top></b-card-img>
             </a>
@@ -230,6 +216,21 @@
             </div>
           </div>
         </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.oeffentlichkeitsgesetz.ch/deutsch" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor17.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Öffentlichkeitsgesetz">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Öffentlichkeitsgesetz
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
