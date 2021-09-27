@@ -75,11 +75,6 @@ const routes: Array<RouteConfig> = [
     component: () => import('../views/Suchhilfe.vue')
   },
   {
-    path: '/betatest',
-    name: 'Betatest',
-    component: () => import('../views/Betatest.vue')
-  },
-  {
     path: '/upload',
     name: 'Upload',
     component: () => import('../views/Upload.vue')
