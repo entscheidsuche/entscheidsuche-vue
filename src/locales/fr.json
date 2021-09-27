@@ -1,5 +1,5 @@
 {
-  "message": "Bienvenue au test beta. Veuillez envoyer des messages d'erreur à info@entscheidsuche.ch",
+  "message": "",
   "allHits": "Résultats",
   "allFilter": "Tous les filtres",
   "sort": "Trier par",
@@ -33,7 +33,7 @@
   "Komplett gelesen am": "Lu complètement le",
   "Neu gelesen am": "Premier passage le",
   "Update am": "Mis à jour le",
-  "intro": "Le portail entscheidsuche.ch, accessible gratuitement, permet d'effectuer des recherches dans tous les arrêts publiés de tribunaux suisses, de toutes les instances. ",
+  "intro": "Notez : Mettez les numéros d'arrêts entre guillemets dans la requête de recherche.",
   "support": "Nos soutiens:",
   "betatest": "test beta"
 }
