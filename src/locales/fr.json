@@ -1,5 +1,5 @@
 {
-  "message": "",
+  "message": "Merci de votre <a href='https://wemakeit.com/projects/upload-entscheide-urteile?locale=fr'>soutien</a> pour la mise en place de notre fonction de téléversement.",
   "allHits": "Résultats",
   "allFilter": "Tous les filtres",
   "sort": "Trier par",
@@ -18,7 +18,7 @@
   "datenschutz": "Protection des données",
   "suchhilfe": "Astuces pour la recherche",
   "search": "Rechercher",
-  "searchterm": "Critère(s) de recherche",
+  "searchterm": "Astuce : numéros d'arrêts entre guillemets",
   "question": "Sélectionnez la langue souhaitée",
   "german": "Allemand",
   "french": "Français",
@@ -33,7 +33,7 @@
   "Komplett gelesen am": "Lu complètement le",
   "Neu gelesen am": "Premier passage le",
   "Update am": "Mis à jour le",
-  "intro": "Notez : Mettez les numéros d'arrêts entre guillemets dans la requête de recherche.",
+  "intro": "Le portail entscheidsuche.ch, accessible gratuitement, permet d'effectuer des recherches dans tous les arrêts publiés de tribunaux suisses, de toutes les instances.",
   "support": "Nos soutiens:",
   "betatest": "test beta"
 }

@@ -1,6 +1,6 @@
 <template>
   <b-collapse visible id="optional-bar" v-if="showMessage">
-    {{ $t('message') }}
+    <span v-html="$t('message')"></span>
     <b-button variant="primary" v-on:click="onCloseMessageBar()" id="close-bar-btn">
       <b-icon id="close-optional-bar"></b-icon>
     </b-button>

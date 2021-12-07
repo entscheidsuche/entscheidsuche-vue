@@ -1,5 +1,5 @@
 {
-  "message": "",
+  "message": "Unterstützen Sie die Realisierung unserer Uploadfunktion zur Publikation bislang nicht veröffentlichter Urteile durch <a href='https://wemakeit.com/projects/upload-entscheide-urteile'>Crowdfunding</a>.",
   "allHits": "Trefferanzahl",
   "allFilter": "Alle Filter",
   "sort": "Sortieren nach",
@@ -19,7 +19,7 @@
   "datenschutz": "Datenschutz",
   "suchhilfe": "Suchhilfe",
   "search": "Suchen",
-  "searchterm": "Suchbegriff",
+  "searchterm": "Tipp: Entscheidnummer in Anführungszeichen",
   "question": "Welche Sprache möchten Sie nutzen?",
   "german": "Deutsch",
   "french": "Französisch",
@@ -34,7 +34,7 @@
   "Komplett gelesen am": "Komplett gelesen am",
   "Neu gelesen am": "Neu gelesen am",
   "Update am": "Update am",
-  "intro": "Hinweis: Stellen Sie Geschäftsnummern in der Suchanfrage in Anführungszeichen.",
+  "intro": "Das frei zugängliche Portal entscheidsuche.ch bietet eine Suche in allen publizierten Gerichtsurteilen von Schweizer Gerichten aller Instanzen.",
   "support": "Wer uns unterstützt:",
   "betatest": "Betatest"
 }

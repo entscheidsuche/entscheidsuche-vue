@@ -1,5 +1,5 @@
 {
-  "message": "",
+  "message": "Grazie per il vostro <a href='https://wemakeit.com/projects/upload-entscheide-urteile'>sostegno</a> nella creazione della nostra funzione di upload.",
   "allHits": "Numero di risultati",
   "allFilter": "Tutti i filtri",
   "sort": "Ordinamento per",
@@ -18,7 +18,7 @@
   "datenschutz": "Protezione dei dati",
   "suchhilfe": "Info ricerca",
   "search": "Ricercare",
-  "searchterm": "Parola/e da cercare",
+  "searchterm": "Consiglio: numeri di affari tra virgolette",
   "question": "Selezionare una lingua",
   "german": "Tedesco",
   "french": "Francese",
@@ -33,7 +33,7 @@
   "Komplett gelesen am": "interrogato completamente su",
   "Neu gelesen am": "leggere per intero su",
   "Update am": "aggiornamento da",
-  "intro": "Nota: Racchiudere i numeri di affari tra virgolette nella query di ricerca.",
+  "intro": "Il portale Internet entscheidsuche.ch, accessibile gratuitamente, permette di cercare tutte le decisioni giudiziarie svizzere pubblicate da tutte le istanze.",
   "support": "Chi ci sostiene:",
   "betatest": "beta test"
 }
