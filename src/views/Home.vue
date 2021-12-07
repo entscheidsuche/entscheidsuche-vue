@@ -230,6 +230,20 @@
             </div>
           </div>
         </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://steigerlegal.ch" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor18.svg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Steiger Legal">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Steiger Legal
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
 
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
