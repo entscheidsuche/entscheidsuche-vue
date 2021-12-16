@@ -94,7 +94,6 @@ import { Facet, Filters, FilterType, SearchModule } from '@/store/modules/search
 import { TreeModel } from '@/util/treeModel'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import i18n from '@/i18n'
 
 @Component({
   components: {
@@ -120,6 +119,62 @@ export default class HierarchieFilter extends Vue {
   mounted () {
     if (Object.prototype.hasOwnProperty.call(this.filters, 'hierarchie')) {
       this.hierarchieValues = this.filters.hierarchie.payload
+    }
+  }
+
+  created () {
+    window.addEventListener('popstate', this.handlePopState)
+  }
+
+  destroyed () {
+    window.removeEventListener('popstate', this.handlePopState)
+  }
+
+  private handlePopState () {
+    const filters = this.$route.query.filter
+    let hierarchie = ''
+    if (filters) {
+      if (Array.isArray(filters)) {
+        for (let i = 0; i < filters.length; i++) {
+          const currentFilter = filters[i]
+          if (currentFilter !== null) {
+            if (currentFilter.substring(0, 1) === 'h') {
+              hierarchie = currentFilter
+            }
+          }
+        }
+      } else {
+        if (filters.substring(0, 1) === 'h') {
+          hierarchie = filters
+        }
+      }
+    }
+    const hierarchies = hierarchie.substring(2)
+    const hierarchieFilters = hierarchies.split(',')
+    if (hierarchieFilters.includes('')) {
+      hierarchieFilters.splice(hierarchieFilters.indexOf(''), 1)
+    }
+    const stateHierarchie = SearchModule.filters.hierarchie
+    let stateHierarchieFilters: string[] = []
+    let updateHierarchy = false
+    if (stateHierarchie) {
+      stateHierarchieFilters = stateHierarchie.payload
+    }
+    if (hierarchieFilters.length === stateHierarchieFilters.length) {
+      for (let j = 0; j < hierarchieFilters.length; j++) {
+        if (!stateHierarchieFilters.includes(hierarchieFilters[j])) {
+          updateHierarchy = true
+        }
+      }
+    } else {
+      updateHierarchy = true
+    }
+    if (updateHierarchy) {
+      if (hierarchieFilters.length !== 0) {
+        this.hierarchieValues = hierarchieFilters
+      } else {
+        SearchModule.RemoveFilter(FilterType.HIERARCHY)
+      }
     }
   }
 

@@ -76,6 +76,76 @@ export default class DateFilter extends Vue {
     }
   }
 
+  created () {
+    window.addEventListener('popstate', this.handlePopState)
+  }
+
+  destroyed () {
+    window.removeEventListener('popstate', this.handlePopState)
+  }
+
+  private handlePopState () {
+    const filters = this.$route.query.filter
+    let edate = ''
+    if (filters) {
+      if (Array.isArray(filters)) {
+        for (let i = 0; i < filters.length; i++) {
+          const currentFilter = filters[i]
+          if (currentFilter !== null) {
+            if (currentFilter.substring(0, 1) === 'e') {
+              edate = currentFilter
+            }
+          }
+        }
+      } else {
+        if (filters.substring(0, 1) === 'e') {
+          edate = filters
+        }
+      }
+    }
+    const dates = edate.substring(2)
+    const dateStringFilters = dates.split(',')
+    const dateFilters: Array<number|undefined> = []
+    if (dateStringFilters[0] === '' || dateStringFilters[0] === undefined) {
+      dateFilters[0] = undefined
+    } else {
+      dateFilters[0] = Number(dateStringFilters[0])
+    }
+    if (dateStringFilters[1] === '' || dateStringFilters[1] === undefined) {
+      dateFilters[1] = undefined
+    } else {
+      dateFilters[1] = Number(dateStringFilters[1])
+    }
+    const stateDate = SearchModule.filters.edatum
+    const stateDateFilters: Array<number|undefined> = []
+    if (stateDate) {
+      if (stateDate.payload.from) {
+        stateDateFilters[0] = Number(stateDate.payload.from)
+      } else {
+        stateDateFilters[0] = undefined
+      }
+      if (stateDate.payload.to) {
+        stateDateFilters[1] = Number(stateDate.payload.to)
+      } else {
+        stateDateFilters[1] = undefined
+      }
+    } else {
+      stateDateFilters[0] = undefined
+      stateDateFilters[1] = undefined
+    }
+    if (dateFilters[0] !== stateDateFilters[0] || dateFilters[1] !== stateDateFilters[1]) {
+      this.dateRange = { from: dateFilters[0], to: dateFilters[1] }
+      if (this.dateRange.from !== undefined || this.dateRange.to !== undefined) {
+        SearchModule.AddFilter({ type: FilterType.DATE, payload: this.dateRange })
+        this.dateInterval = { min: Number(dateFilters[0]), max: Number(dateFilters[1]) }
+      } else {
+        SearchModule.RemoveFilter(FilterType.DATE)
+        this.dateInterval = { min: Number(dateFilters[0]), max: Number(dateFilters[1]) }
+      }
+      this.update()
+    }
+  }
+
   public onDateRangeChanged (value: { from: number; to: number }) {
     if (this.dateInterval) {
       this.dateRange = {

@@ -22,6 +22,26 @@ export default class SortOrderSelector extends Vue {
     this.sortOrder = SearchModule.sortOrder
   }
 
+  created () {
+    window.addEventListener('popstate', this.handlePopState)
+  }
+
+  destroyed () {
+    window.removeEventListener('popstate', this.handlePopState)
+  }
+
+  private handlePopState () {
+    const sort = this.$route.query.sort
+    const stateSort = SearchModule.sortOrder
+    if ((sort === undefined && stateSort === 'date') || (sort === 'date' && stateSort === 'relevance')) {
+      if (sort) {
+        this.sortOrder = SortOrder.DATE
+      } else {
+        this.sortOrder = SortOrder.RELEVANCE
+      }
+    }
+  }
+
   @Watch('sortOrder')
   public onSortOrderChange (sortOrder: SortOrder) {
     if (SearchModule.sortOrder === sortOrder) {
