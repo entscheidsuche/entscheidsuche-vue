@@ -132,7 +132,17 @@ export class SearchUtil {
           must: {
             // eslint-disable-next-line @typescript-eslint/camelcase
             query_string: {
-              query: query
+              query: query,
+              // eslint-disable-next-line @typescript-eslint/camelcase
+              default_operator: 'AND',
+              type: 'cross_fields',
+              fields: [
+                'title.*',
+                'abstract.*',
+                'meta.*',
+                'attachment.content',
+                'reference'
+              ]
             }
           }
         }
