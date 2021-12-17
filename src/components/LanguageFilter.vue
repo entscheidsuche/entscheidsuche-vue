@@ -36,7 +36,7 @@ import { Aggregations, Filters, FilterType, SearchModule } from '@/store/modules
 
 @Component
 export default class LanguageFilter extends Vue {
-  selected = []
+  selected: Array<string> = []
   myOptions = [
     { text: 'DE', value: 'de', count: 0 },
     { text: 'FR', value: 'fr', count: 0 },
@@ -61,6 +61,62 @@ export default class LanguageFilter extends Vue {
     }
     if (Object.prototype.hasOwnProperty.call(this.aggregations, 'language')) {
       this.update()
+    }
+  }
+
+  created () {
+    window.addEventListener('popstate', this.handlePopState)
+  }
+
+  destroyed () {
+    window.removeEventListener('popstate', this.handlePopState)
+  }
+
+  private handlePopState () {
+    const filters = this.$route.query.filter
+    let language = ''
+    if (filters) {
+      if (Array.isArray(filters)) {
+        for (let i = 0; i < filters.length; i++) {
+          const currentFilter = filters[i]
+          if (currentFilter !== null) {
+            if (currentFilter.substring(0, 1) === 'l') {
+              language = currentFilter
+            }
+          }
+        }
+      } else {
+        if (filters.substring(0, 1) === 'l') {
+          language = filters
+        }
+      }
+    }
+    const languages = language.substring(2)
+    const languageFilters = languages.split(',')
+    if (languageFilters.includes('')) {
+      languageFilters.splice(languageFilters.indexOf(''), 1)
+    }
+    const stateLanguage = SearchModule.filters.language
+    let stateLanguageFilters: string[] = []
+    let updateLanguage = false
+    if (stateLanguage) {
+      stateLanguageFilters = stateLanguage.payload
+    }
+    if (languageFilters.length === stateLanguageFilters.length) {
+      for (let j = 0; j < languageFilters.length; j++) {
+        if (!stateLanguageFilters.includes(languageFilters[j])) {
+          updateLanguage = true
+        }
+      }
+    } else {
+      updateLanguage = true
+    }
+    if (updateLanguage) {
+      if (languageFilters.length !== 0) {
+        this.selected = languageFilters
+      } else {
+        SearchModule.RemoveFilter(FilterType.LANGUAGE)
+      }
     }
   }
 

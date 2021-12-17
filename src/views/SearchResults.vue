@@ -861,6 +861,7 @@ export default class SearchResults extends Vue {
       this.previewVisible = true
     }
     window.addEventListener('resize', this.handleResize)
+    window.addEventListener('popstate', this.handlePopState)
     this.handleResize()
     this.getFilterInnerWidth()
   }
@@ -871,6 +872,7 @@ export default class SearchResults extends Vue {
 
   destroyed () {
     window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener('popstate', this.handlePopState)
   }
 
   handleResize () {
@@ -885,6 +887,13 @@ export default class SearchResults extends Vue {
       if (searchResultsDiv.scrollTop + searchResultsDiv.clientHeight >= searchResultsDiv.scrollHeight - 10) {
         this.getMoreResults()
       }
+    }
+  }
+
+  handlePopState () {
+    const query = this.$route.query.query
+    if (query && query !== SearchModule.query) {
+      SearchModule.SetQuery(query.toString())
     }
   }
 
