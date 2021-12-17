@@ -5,7 +5,7 @@
         <p>{{$t('intro')}}</p>
       </div>
       <h1>{{$t('support')}}</h1>
-      <b-card-group deck>
+      <b-card-group id='bcards' deck>
         <b-card>
           <div class="card-img-wapper">
             <a href="https://my-d.org/index.php/www-my-d-org" target="_blank">
@@ -543,6 +543,43 @@ import { Component } from 'vue-property-decorator'
   name: 'Home'
 })
 
-export default class Home extends Vue {}
+export default class Home extends Vue {
+  mounted () {
+    const bcards = document.getElementById('bcards')
+    if (bcards) {
+      const cards1 = bcards.children
+      const zahl = cards1.length
+      let belegt = 0
+      for (let i = 0; i < zahl; i++) {
+        if (cards1[i].getAttribute('class') !== 'search-placeholder') belegt++
+      }
+      for (let i = 0; i < zahl; i++) {
+        bcards.appendChild(cards1[Math.floor(Math.random() * zahl)])
+      }
+      for (let i = 0; i < belegt;) {
+        const cards2 = bcards.children
+        if (cards2[i].getAttribute('class') === 'search-placeholder') {
+          bcards.appendChild(cards2[i])
+        } else i++
+      }
+    }
+  }
+}
 
 </script>
+<!--
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://my-d.org/index.php/www-my-d-org" target="_blank" id='bc-a1'>
+            <b-card-img id='bc-b1' src="~/../assets/sponsors/sponsor2.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div id='bc-c1' class="card-footer" v-b-tooltip.hover title="XXXXMY-D Foundation, Geneva">
+            <div class="card-text-wrapper">
+              <b-card-text id='bc-d1'>
+              XXXMY-D Foundation, Geneva
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+-->
