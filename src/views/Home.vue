@@ -244,14 +244,103 @@
             </div>
           </div>
         </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://aslantas.ch" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor19.jpg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Anwaltskanzlei Aslantas">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Anwaltskanzlei Aslantas
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.sedlex-avocats.ch/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor20.jpg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="sedlex Rechtsanwälte Lausanne">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              sedlex Rechtsanwälte Lausanne
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
 
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
       </b-card-group>
       <div class="other-sponsors">
-       <h1>Weitere Unterstützung erhalten wir von:</h1>
-Timur <b>Acemoglu</b>, Olten; Martina <b>Arioli</b>, Zürich; Fatih <b>Aslantas</b>, Weinfelden; Stephan <b>Bernard</b>, Basel; Harold <b>Bouchex-Bellomie</b>, Bienne; Renato <b>Bucher</b>, Zürich; Bertil <b>Cottier</b>, Préverenges; <b>deju.re</b>; Philipp <b>do Canto</b>, Zürich; <b>Domizilplus Treuhand</b>, Zürich; Daniel <b>Emch</b>, Bern; Lucien <b>Fluri</b>, Solothurn; Marco <b>Fritschi</b>, Winterthur; Markus <b>Gehrig</b>, Fehraltorf; Patrick <b>Gehrig</b>, Biglen; Daniela <b>Giovanoli</b>, Bern; Nils <b>Güggi</b>, Bern; André <b>Golliez</b>, Zürich; Ralph <b>Hemsley</b>, Zürich; Mathias <b>Hemsley</b>, Zürich; Elias <b>Hofstetter</b>, Bern; <b>Kanzlei 5</b>, Steffisburg; Pranvera <b>Këllezi</b>, Genève; <b>Kneubühl Recht</b>, Mühlethurnen; Karola <b>Krell, Foodlex</b>, Bern; Oleg <b>Lavrovsky</b>, Köniz; Kilian <b>Meyer</b>, Schaffhausen; Lukas <b>Müller</b>, Zürich; Gregor <b>Münch</b>, Zürich; Elias <b>Nesti</b>, Solothurn; Dario <b>Piececchi</b>, Luzern; Sarah <b>Progin</b>, Granges-Paccot; Reinhard <b>Riedl</b>, Effretikon; Stefan <b>Rolli</b>, Rubigen; Nora <b>Scheidegger</b>, Bern; Clemens <b>Schuster</b>, Zürich; Mark <b>Schweizer</b>, Winterthur; Charlotte <b>Sieber-Gasser</b>, Bern; <b>Advokatur Spycher</b>, Bern; Sabine <b>Steiger-Sachmann</b>, Winterthur; Dominique <b>Strebel</b>, Zürich; <b>sui generis Verlag</b>, Zürich; Rolf A. <b>Tobler</b>, Bern; Johannes <b>Wagner</b>, Appenzell; <b>sowie</b> vielen weiteren Unterstützerinnen und Unterstützern, die anonym bleiben wollen.
+      <h1 v-if="locale==='de'">Weitere Unterstützung erhalten wir von:</h1>
+      <h1 v-if="locale==='fr'">Autres soutiens :</h1>
+      <h1 v-if="locale==='it'">Altro sostegno:</h1>
+Timur <b>Acemoglu</b>, Olten;
+Martina <b>Arioli</b>, Zürich;
+Fatih <b>Aslantas</b>, Weinfelden;
+Stephan <b>Bernard</b>, Basel;
+Daniel <b>Boos</b>, Zürich;
+Harold <b>Bouchex-Bellomie</b>, Bienne;
+Renato <b>Bucher</b>, Zürich;
+Simon <b>Canonica</b>, Stadel;
+Bertil <b>Cottier</b>, Préverenges;
+<b>deju.re</b>;
+Philipp <b>do Canto</b>, Zürich;
+<b>Domizilplus Treuhand</b>, Zürich;
+Daniel <b>Emch</b>, Bern;
+Lucien <b>Fluri</b>, Solothurn;
+Marco <b>Fritschi</b>, Winterthur;
+Markus <b>Gehrig</b>, Fehraltorf;
+Patrick <b>Gehrig</b>, Biglen;
+Daniela <b>Giovanoli</b>, Bern;
+André <b>Golliez</b>, Zürich;
+Sven <b>Gretler</b>, Zürich;
+Angelina <b>Grossenbacher</b>, Burgdorf;
+Nils <b>Güggi</b>, Bern;
+J. <b>Haefeli</b>, Gipf-Oberfrick;
+Ralph <b>Hemsley</b>, Zürich;
+Mathias <b>Hemsley</b>, Zürich;
+Ruedi <b>Herzig</b>, Arbon;
+Elias <b>Hofstetter</b>, Bern;
+<b>Kanzlei 5</b>, Steffisburg;
+Pranvera <b>Këllezi</b>, Genève;
+Daniel <b>Kettiger</b>, Bolligen;
+<b>Kneubühl Recht</b>, Mühlethurnen;
+Karola <b>Krell, Foodlex</b>, Bern;
+Oleg <b>Lavrovsky</b>, Köniz;
+Simona <b>Liechti</b>, Bern;
+Kilian <b>Meyer</b>, Schaffhausen;
+Daniel <b>Moccand</b>, Meggen;
+Lukas <b>Müller</b>, Zürich;
+Moritz <b>Müller</b>, Bern;
+Gregor <b>Münch</b>, Zürich;
+Elias <b>Nesti</b>, Solothurn;
+Stefan <b>Oderbolz</b>, Thalwil;
+Markus <b>Prazeller</b>, Basel;
+Dario <b>Piececchi</b>, Luzern;
+Sarah <b>Progin</b>, Granges-Paccot;
+Luca <b>Ranzoni</b>, St. Gallen;
+Reinhard <b>Riedl</b>, Effretikon;
+Stefan <b>Rolli</b>, Rubigen;
+Nora <b>Scheidegger</b>, Bern;
+Clemens <b>Schuster</b>, Zürich;
+Mark <b>Schweizer</b>, Winterthur;
+Charlotte <b>Sieber-Gasser</b>, Bern;
+<b>Advokatur Spycher</b>, Bern;
+Sabine <b>Steiger-Sachmann</b>, Winterthur;
+Dominique <b>Strebel</b>, Zürich;
+<b>sui generis Verlag</b>, Zürich;
+Rolf A. <b>Tobler</b>, Bern;
+Johannes <b>Wagner</b>, Appenzell;
+<font v-if="locale==='de'"><b>sowie</b> vielen weiteren Unterstützerinnen und Unterstützern, die anonym bleiben wollen.</font>
+<font v-if="locale==='fr'"><b>ainsi</b> que de nombreux autres soutiens qui souhaitent rester anonymes.</font>
+<font v-if="locale==='it'"><b>e</b> molti altri sostenitori che desiderano rimanere anonimi</font>
      </div>
     </div>
   </div>
@@ -538,6 +627,7 @@ Timur <b>Acemoglu</b>, Olten; Martina <b>Arioli</b>, Zürich; Fatih <b>Aslantas<
 <script lang="ts">
 import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
+import { AppModule } from '@/store/modules/app'
 
 @Component({
   name: 'Home'
@@ -564,8 +654,11 @@ export default class Home extends Vue {
       }
     }
   }
-}
 
+  public get locale () {
+    return AppModule.locale
+  }
+}
 </script>
 <!--
         <b-card>
