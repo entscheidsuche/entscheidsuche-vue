@@ -122,9 +122,9 @@
               </div>
             </div>
           </div>
-          <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
-            <iframe v-if="this.windowWidth > 1024" frameborder="0"  class="desktop-pdf" scrolling="auto" :src="selectedResult.url + (this.fullScreen ? '' : '#view=FitH')" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
-            <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : selectedResult.url" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+          <div id="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
+            <iframe v-if="this.windowWidth > 1024" frameborder="0" id="result-iframe" class="desktop-pdf" scrolling="auto" :src="this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+            <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" id="mobile-result-iframe" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : selectedResult.url" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
           </div>
         </div>
       </div>
@@ -633,7 +633,7 @@
         }
       }
     }
-    .outer-pdf{
+    #outer-pdf{
       bottom:0;
       height:calc(100% - 75px);
       width:100%;
@@ -778,6 +778,7 @@ export default class SearchResults extends Vue {
   private previewVisible = false
   private sliderWidth = 1
   private allowUndoFilter = false
+  private iframeUrl = ''
 
   data () {
     return {
@@ -835,11 +836,41 @@ export default class SearchResults extends Vue {
     }
   }
 
+  @Watch('results')
+  public onResultsChanged () {
+    const selectedId = this.$route.query.selected
+    if (selectedId && !('id' in this.selectedResult)) {
+      const oldSelectedResult = this.getResultbyId(selectedId.toString())
+      if (oldSelectedResult) {
+        SearchModule.Select(oldSelectedResult)
+        if (!this.previewVisible) {
+          this.onOpenPreview()
+        }
+      }
+    }
+  }
+
   @Watch('selectedResult')
   public onSelectedResultChanged (selectedResult: SearchResult) {
     if (!('id' in selectedResult)) {
       this.previewVisible = false
       this.fullScreen = false
+      return
+    }
+    let iFrame = document.getElementById('result-iframe')
+    if (this.windowWidth <= 1024) {
+      iFrame = document.getElementById('mobile-result-iframe')
+    }
+    const iFrameParent = document.getElementById('outer-pdf')
+    if (iFrame && iFrameParent && selectedResult.url) {
+      const newUrl = selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
+      const url = iFrame.getAttribute('src')
+      if (url !== newUrl) {
+        iFrame.remove()
+        iFrame.setAttribute('src', newUrl)
+        this.iframeUrl = newUrl
+        iFrameParent.append(iFrame)
+      }
     }
   }
 
@@ -850,9 +881,29 @@ export default class SearchResults extends Vue {
 
   @Watch('$route', { immediate: true, deep: true })
   onRouteChange (to: Route) {
-    if (this.fullScreen && to.name === 'Search') {
-      this.onFullScreen()
+    const query = this.$route.query.query
+    const preview = this.$route.query.preview
+    if (query && (this.windowWidth > 534 || (this.windowWidth <= 534 && query !== this.query))) {
+      if (this.fullScreen && to.name === 'Search') {
+        if (preview === undefined) {
+          this.previewVisible = false
+        }
+        this.fullScreen = false
+      }
     }
+    if (query === undefined && to.name === 'View') {
+      if (!this.previewVisible && !this.fullScreen) {
+        this.previewVisible = true
+        this.fullScreen = true
+        // TODO set old query
+      }
+    }
+  }
+
+  @Watch('query')
+  public onQueryChange () {
+    this.previewVisible = false
+    this.fullScreen = false
   }
 
   created () {
@@ -891,10 +942,50 @@ export default class SearchResults extends Vue {
   }
 
   handlePopState () {
+    const name = this.$route.name
     const query = this.$route.query.query
-    if (query && query !== SearchModule.query) {
+    if (query && query !== this.query) {
       SearchModule.SetQuery(query.toString())
     }
+    const selectedId = this.$route.query.selected
+    const preview = this.$route.query.preview
+    if ('id' in this.selectedResult) {
+      if (this.selectedResult.id !== selectedId) {
+        if (selectedId) {
+          const oldSelectedResult = this.getResultbyId(selectedId.toString())
+          if (oldSelectedResult) {
+            SearchModule.Select(oldSelectedResult)
+            if (preview === undefined && this.previewVisible) {
+              this.previewVisible = false
+            }
+          }
+        } else if (name !== 'View') {
+          SearchModule.Select()
+        }
+      } else if (preview === undefined && this.previewVisible) {
+        this.previewVisible = false
+      } else if (preview && !this.previewVisible) {
+        this.previewVisible = true
+      }
+    }
+    if (name === 'Search' && this.fullScreen) {
+      this.fullScreen = false
+      if (this.windowWidth <= 534) {
+        this.previewVisible = false
+      }
+    }
+    if (name === 'View') {
+      this.fullScreen = true
+    }
+  }
+
+  getResultbyId (id: string): SearchResult | undefined {
+    for (let i = 0; i < this.results.length; i++) {
+      if (this.results[i].id === id) {
+        return this.results[i]
+      }
+    }
+    return undefined
   }
 
   public onToggleFilter (): void {
@@ -910,7 +1001,8 @@ export default class SearchResults extends Vue {
     } else {
       if (SearchModule.document !== '') {
         SearchModule.SetDocument('')
-      } else if (this.fullScreen && this.windowWidth <= 534) {
+      }
+      if (this.fullScreen && this.windowWidth <= 534) {
         this.previewVisible = false
         this.fullScreen = false
       } else {
@@ -941,6 +1033,7 @@ export default class SearchResults extends Vue {
 
   public onClosePreview (): void{
     this.previewVisible = false
+    SearchModule.SetPreview(false)
     if (this.fullScreen) {
       this.fullScreen = false
       if (this.windowWidth > 534) {

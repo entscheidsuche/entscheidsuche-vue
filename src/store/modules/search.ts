@@ -17,7 +17,7 @@ export enum SortOrder {
   RELEVANCE = 'relevance', DATE = 'date'
 }
 
-function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrder): void {
+function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrder, selectedId?: string, preview?: string): void {
   const name = router.currentRoute.name
   const query = { ...router.currentRoute.query }
   const existingQueryString = query.query
@@ -26,6 +26,10 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
   const newQueryString = queryString !== '' ? queryString : undefined
   const existingSort = query.sort !== undefined && query.sort === SortOrder.DATE ? SortOrder.DATE : undefined
   const newSort = sortOrder === SortOrder.DATE ? SortOrder.DATE : undefined
+  const existingSelectedId = query.selectedId
+  const newSelectedId = selectedId !== '' ? selectedId : undefined
+  const existingPreview = query.preview
+  const newPreview = preview !== '' ? preview : undefined
 
   if (newFilters !== undefined) {
     for (const filterKey in filters) {
@@ -41,7 +45,8 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
       }
     }
   }
-  if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters) || existingSort !== newSort || name !== 'Search') {
+  if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters) || existingSort !== newSort ||
+    name !== 'Search' || newSelectedId !== existingSelectedId || newPreview !== existingPreview) {
     if (newQueryString !== undefined) {
       query.query = newQueryString
     } else {
@@ -56,6 +61,16 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
       query.sort = newSort
     } else {
       delete query.sort
+    }
+    if (newSelectedId !== undefined) {
+      query.selected = newSelectedId
+    } else {
+      delete query.selected
+    }
+    if (newPreview !== undefined) {
+      query.preview = newPreview
+    } else {
+      delete query.preview
     }
     if (name !== undefined && name !== null && newQueryString !== undefined) {
       router.push({ name: 'Search', query: query })
@@ -157,6 +172,7 @@ export class Search extends VuexModule implements SearchState {
   private fac: Facets = []
   private filt: Filters = {}
   private sort = SortOrder.RELEVANCE
+  private preview = ''
 
   public get pristine () {
     return this.prist
@@ -195,10 +211,13 @@ export class Search extends VuexModule implements SearchState {
 
   @Mutation
   public SET_DOCUMENT (doc: string) {
+    const name = router.currentRoute.name
     this.doc = doc
     if (doc === '') {
       if (this.queryString !== '') {
-        updateRoute(this.queryString, this.filt, this.sort)
+        if ('id' in this.selectedRes && name === 'View') {
+          updateRoute(this.queryString, this.filt, this.sort, this.selectedRes.id, this.preview)
+        }
       } else {
         router.push({ name: 'Home', query: { ...router.currentRoute.query } })
       }
@@ -428,13 +447,37 @@ export class Search extends VuexModule implements SearchState {
   }
 
   @Mutation
-  public SELECT_RESULT (selectedResult: SearchResult) {
-    this.selectedRes = selectedResult
+  public SELECT_RESULT (selectedResult?: SearchResult) {
+    if (selectedResult) {
+      const query = { ...router.currentRoute.query }
+      const selectedId = query.selected
+      const preview = query.preview
+      if (selectedResult.id && (selectedId !== selectedResult.id || preview === undefined)) {
+        this.preview = 'true'
+        updateRoute(this.queryString, this.filt, this.sort, selectedResult.id, this.preview)
+      }
+      this.selectedRes = selectedResult
+    } else {
+      this.selectedRes = {}
+    }
+  }
+
+  @Mutation
+  public SET_PREVIEW (visible: boolean) {
+    if (!visible && 'id' in this.selectedRes) {
+      this.preview = ''
+      updateRoute(this.queryString, this.filt, this.sort, this.selectedRes.id, this.preview)
+    }
   }
 
   @Action({ commit: 'SELECT_RESULT' })
-  public Select (selectedResult: SearchResult) {
+  public Select (selectedResult?: SearchResult) {
     return selectedResult
+  }
+
+  @Action({ commit: 'SET_PREVIEW' })
+  public SetPreview (visible: boolean) {
+    return visible
   }
 
   public get selectedResult (): SearchResult | {} {
