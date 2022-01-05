@@ -760,6 +760,7 @@ import HierarchieFilter from '@/components/HierarchieFilter.vue'
 import LanguageFilter from '@/components/LanguageFilter.vue'
 import SortOrderSelector from '@/components/SortOrderSelector.vue'
 import { Route } from 'vue-router'
+import router from '@/router'
 
 @Component({
   name: 'SearchResult',
@@ -839,11 +840,12 @@ export default class SearchResults extends Vue {
   @Watch('results')
   public onResultsChanged () {
     const selectedId = this.$route.query.selected
+    const preview = this.$route.query.preview
     if (selectedId && !('id' in this.selectedResult)) {
       const oldSelectedResult = this.getResultbyId(selectedId.toString())
       if (oldSelectedResult) {
         SearchModule.Select(oldSelectedResult)
-        if (!this.previewVisible) {
+        if (!this.previewVisible && preview) {
           this.onOpenPreview()
         }
       }
@@ -880,30 +882,28 @@ export default class SearchResults extends Vue {
   }
 
   @Watch('$route', { immediate: true, deep: true })
-  onRouteChange (to: Route) {
-    const query = this.$route.query.query
-    const preview = this.$route.query.preview
-    if (query && (this.windowWidth > 534 || (this.windowWidth <= 534 && query !== this.query))) {
-      if (this.fullScreen && to.name === 'Search') {
-        if (preview === undefined) {
-          this.previewVisible = false
+  onRouteChange (from: Route, to: Route) {
+    const name = this.$route.name
+    if (name === 'View') {
+      if ('url' in this.selectedResult) {
+        if (!this.previewVisible) {
+          this.previewVisible = true
+          this.fullScreen = true
         }
-        this.fullScreen = false
-      }
-    }
-    if (query === undefined && to.name === 'View') {
-      if (!this.previewVisible && !this.fullScreen) {
-        this.previewVisible = true
-        this.fullScreen = true
-        // TODO set old query
+        const newUrl = this.selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
+        this.iframeUrl = newUrl
       }
     }
   }
 
   @Watch('query')
   public onQueryChange () {
-    this.previewVisible = false
-    this.fullScreen = false
+    const preview = this.$route.query.preview
+    const fullScreen = this.$route.query.fullScreen
+    if (!preview && !fullScreen) {
+      this.previewVisible = false
+      this.fullScreen = false
+    }
   }
 
   created () {
@@ -942,39 +942,60 @@ export default class SearchResults extends Vue {
   }
 
   handlePopState () {
-    const name = this.$route.name
     const query = this.$route.query.query
-    if (query && query !== this.query) {
-      SearchModule.SetQuery(query.toString())
-    }
     const selectedId = this.$route.query.selected
     const preview = this.$route.query.preview
+    const fullScreen = this.$route.query.fullScreen
+    const name = this.$route.name
+    if (query && query !== this.query && ((fullScreen && this.windowWidth > 534) || (preview && this.windowWidth <= 534))) {
+      this.fullScreen = true
+      this.previewVisible = true
+      SearchModule.ResetQuery(query.toString())
+      return
+    } else if (query && query !== this.query) {
+      SearchModule.ResetQuery(query.toString())
+      return
+    }
     if ('id' in this.selectedResult) {
       if (this.selectedResult.id !== selectedId) {
         if (selectedId) {
           const oldSelectedResult = this.getResultbyId(selectedId.toString())
           if (oldSelectedResult) {
             SearchModule.Select(oldSelectedResult)
-            if (preview === undefined && this.previewVisible) {
-              this.previewVisible = false
-            }
           }
-        } else if (name !== 'View') {
+        } else {
           SearchModule.Select()
         }
-      } else if (preview === undefined && this.previewVisible) {
-        this.previewVisible = false
-      } else if (preview && !this.previewVisible) {
+      }
+    } else if (preview && !this.previewVisible && this.windowWidth <= 534) {
+      const oldSelectedResult = this.getResultbyId(selectedId.toString())
+      if (oldSelectedResult) {
+        SearchModule.Select(oldSelectedResult)
         this.previewVisible = true
+        this.fullScreen = true
+        return
       }
     }
-    if (name === 'Search' && this.fullScreen) {
+    if (preview && !this.previewVisible) {
+      this.previewVisible = true
+      if (this.windowWidth <= 534) {
+        this.fullScreen = true
+      }
+      return
+    }
+    if (preview === undefined && this.previewVisible) {
+      this.previewVisible = false
+      if (this.windowWidth <= 534) {
+        this.fullScreen = false
+      }
+    }
+    if (fullScreen === undefined && this.fullScreen) {
       this.fullScreen = false
       if (this.windowWidth <= 534) {
         this.previewVisible = false
       }
     }
-    if (name === 'View') {
+    if (fullScreen === 'true' && !this.fullScreen) {
       this.fullScreen = true
     }
   }
@@ -993,21 +1014,24 @@ export default class SearchResults extends Vue {
   }
 
   public onFullScreen (): void{
-    if (!this.fullScreen) {
-      if ('id' in SearchModule.selectedResult) {
-        SearchModule.SetDocument(SearchModule.selectedResult.id)
-        this.fullScreen = true
-      }
-    } else {
-      if (SearchModule.document !== '') {
-        SearchModule.SetDocument('')
-      }
-      if (this.fullScreen && this.windowWidth <= 534) {
-        this.previewVisible = false
-        this.fullScreen = false
+    const name = this.$route.name
+    if (name !== 'View') {
+      if (!this.fullScreen) {
+        if ('id' in SearchModule.selectedResult) {
+          SearchModule.SetFullScreen('true')
+          this.fullScreen = true
+        }
       } else {
+        if (this.windowWidth <= 534) {
+          this.previewVisible = false
+          SearchModule.SetPreview(false)
+        } else {
+          SearchModule.SetFullScreen('')
+        }
         this.fullScreen = false
       }
+    } else if (this.fullScreen) {
+      router.push({ name: 'Home' })
     }
   }
 

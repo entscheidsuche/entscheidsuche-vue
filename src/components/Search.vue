@@ -91,6 +91,9 @@ export default class Search extends Vue {
       this.searchterm = ''
       SearchModule.SetQuery('')
     }
+    if (name === 'View' && this.searchterm !== '') {
+      this.searchterm = ''
+    }
   }
 
   @Watch('query')

@@ -17,7 +17,7 @@ export enum SortOrder {
   RELEVANCE = 'relevance', DATE = 'date'
 }
 
-function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrder, selectedId?: string, preview?: string): void {
+function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrder, selectedId?: string, preview?: string, fullScreen?: string): void {
   const name = router.currentRoute.name
   const query = { ...router.currentRoute.query }
   const existingQueryString = query.query
@@ -30,6 +30,8 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
   const newSelectedId = selectedId !== '' ? selectedId : undefined
   const existingPreview = query.preview
   const newPreview = preview !== '' ? preview : undefined
+  const existingFullScreen = query.fullScreen
+  const newFullScreen = fullScreen !== '' ? fullScreen : undefined
 
   if (newFilters !== undefined) {
     for (const filterKey in filters) {
@@ -46,7 +48,7 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
     }
   }
   if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters) || existingSort !== newSort ||
-    name !== 'Search' || newSelectedId !== existingSelectedId || newPreview !== existingPreview) {
+    name !== 'Search' || newSelectedId !== existingSelectedId || newPreview !== existingPreview || newFullScreen !== existingFullScreen) {
     if (newQueryString !== undefined) {
       query.query = newQueryString
     } else {
@@ -71,6 +73,11 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
       query.preview = newPreview
     } else {
       delete query.preview
+    }
+    if (newFullScreen !== undefined) {
+      query.fullScreen = newFullScreen
+    } else {
+      delete query.fullScreen
     }
     if (name !== undefined && name !== null && newQueryString !== undefined) {
       router.push({ name: 'Search', query: query })
@@ -173,6 +180,7 @@ export class Search extends VuexModule implements SearchState {
   private filt: Filters = {}
   private sort = SortOrder.RELEVANCE
   private preview = ''
+  private fullscreen = ''
 
   public get pristine () {
     return this.prist
@@ -205,19 +213,38 @@ export class Search extends VuexModule implements SearchState {
     }
   }
 
+  @Mutation
+  public RESET_QUERY (query: string) {
+    this.queryString = query
+  }
+
+  @Action
+  public ResetQuery (query: string) {
+    if (this.fac.length === 0) {
+      return this.context.dispatch('GetFacets').then(() => {
+        if (query !== this.queryString) {
+          this.context.commit('RESET_QUERY', query)
+          return this.context.dispatch('SetResults')
+        }
+      })
+    } else {
+      if (query !== this.queryString) {
+        this.context.commit('RESET_QUERY', query)
+        return this.context.dispatch('SetResults')
+      }
+    }
+  }
+
   public get query (): string {
     return this.queryString
   }
 
   @Mutation
   public SET_DOCUMENT (doc: string) {
-    const name = router.currentRoute.name
     this.doc = doc
     if (doc === '') {
       if (this.queryString !== '') {
-        if ('id' in this.selectedRes && name === 'View') {
-          updateRoute(this.queryString, this.filt, this.sort, this.selectedRes.id, this.preview)
-        }
+        updateRoute(this.queryString, this.filt, this.sort)
       } else {
         router.push({ name: 'Home', query: { ...router.currentRoute.query } })
       }
@@ -240,6 +267,28 @@ export class Search extends VuexModule implements SearchState {
         return this.context.dispatch('SetResults')
       }
     }
+  }
+
+  @Mutation
+  public SET_FULLSCREEN (fullscreen: string) {
+    if (fullscreen !== '') {
+      if ('id' in this.selectedRes) {
+        this.fullscreen = fullscreen
+        updateRoute(this.queryString, this.filt, this.sort, this.selectedRes.id, this.preview, this.fullscreen)
+      } else {
+        router.push({ name: 'Home', query: { ...router.currentRoute.query } })
+      }
+    } else {
+      if ('id' in this.selectedRes) {
+        this.fullscreen = ''
+        updateRoute(this.queryString, this.filt, this.sort, this.selectedRes.id, this.preview)
+      }
+    }
+  }
+
+  @Action({ commit: 'SET_FULLSCREEN' })
+  public SetFullScreen (fullscreen: string) {
+    return fullscreen
   }
 
   public get document (): string {
@@ -446,13 +495,28 @@ export class Search extends VuexModule implements SearchState {
     return this.total
   }
 
+  public getResultbyId (id: string): SearchResult | undefined {
+    for (let i = 0; i < this.results.length; i++) {
+      if (this.results[i].id === id) {
+        return this.results[i]
+      }
+    }
+    return undefined
+  }
+
   @Mutation
   public SELECT_RESULT (selectedResult?: SearchResult) {
     if (selectedResult) {
       const query = { ...router.currentRoute.query }
       const selectedId = query.selected
       const preview = query.preview
-      if (selectedResult.id && (selectedId !== selectedResult.id || preview === undefined)) {
+      if ('id' in this.selectedRes) {
+        if (selectedResult.id && preview === undefined && selectedId === selectedResult.id && selectedId === this.selectedRes.id) {
+          this.preview = 'true'
+          updateRoute(this.queryString, this.filt, this.sort, selectedResult.id, this.preview)
+        }
+      }
+      if (selectedResult.id && (selectedId !== selectedResult.id)) {
         this.preview = 'true'
         updateRoute(this.queryString, this.filt, this.sort, selectedResult.id, this.preview)
       }
