@@ -122,9 +122,9 @@
               </div>
             </div>
           </div>
-          <div class="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
-            <iframe v-if="this.windowWidth > 1024" frameborder="0"  class="desktop-pdf" scrolling="auto" :src="selectedResult.url + (this.fullScreen ? '' : '#view=FitH')" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
-            <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : selectedResult.url" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+          <div id="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
+            <iframe v-if="this.windowWidth > 1024" frameborder="0" id="result-iframe" class="desktop-pdf" scrolling="auto" :src="this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+            <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" id="mobile-result-iframe" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : selectedResult.url" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
           </div>
         </div>
       </div>
@@ -633,7 +633,7 @@
         }
       }
     }
-    .outer-pdf{
+    #outer-pdf{
       bottom:0;
       height:calc(100% - 75px);
       width:100%;
@@ -760,6 +760,7 @@ import HierarchieFilter from '@/components/HierarchieFilter.vue'
 import LanguageFilter from '@/components/LanguageFilter.vue'
 import SortOrderSelector from '@/components/SortOrderSelector.vue'
 import { Route } from 'vue-router'
+import router from '@/router'
 
 @Component({
   name: 'SearchResult',
@@ -778,6 +779,7 @@ export default class SearchResults extends Vue {
   private previewVisible = false
   private sliderWidth = 1
   private allowUndoFilter = false
+  private iframeUrl = ''
 
   data () {
     return {
@@ -835,11 +837,42 @@ export default class SearchResults extends Vue {
     }
   }
 
+  @Watch('results')
+  public onResultsChanged () {
+    const selectedId = this.$route.query.selected
+    const preview = this.$route.query.preview
+    if (selectedId && !('id' in this.selectedResult)) {
+      const oldSelectedResult = this.getResultbyId(selectedId.toString())
+      if (oldSelectedResult) {
+        SearchModule.Select(oldSelectedResult)
+        if (!this.previewVisible && preview) {
+          this.onOpenPreview()
+        }
+      }
+    }
+  }
+
   @Watch('selectedResult')
   public onSelectedResultChanged (selectedResult: SearchResult) {
     if (!('id' in selectedResult)) {
       this.previewVisible = false
       this.fullScreen = false
+      return
+    }
+    let iFrame = document.getElementById('result-iframe')
+    if (this.windowWidth <= 1024) {
+      iFrame = document.getElementById('mobile-result-iframe')
+    }
+    const iFrameParent = document.getElementById('outer-pdf')
+    if (iFrame && iFrameParent && selectedResult.url) {
+      const newUrl = selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
+      const url = iFrame.getAttribute('src')
+      if (url !== newUrl) {
+        iFrame.remove()
+        iFrame.setAttribute('src', newUrl)
+        this.iframeUrl = newUrl
+        iFrameParent.append(iFrame)
+      }
     }
   }
 
@@ -849,9 +882,27 @@ export default class SearchResults extends Vue {
   }
 
   @Watch('$route', { immediate: true, deep: true })
-  onRouteChange (to: Route) {
-    if (this.fullScreen && to.name === 'Search') {
-      this.onFullScreen()
+  onRouteChange (from: Route, to: Route) {
+    const name = this.$route.name
+    if (name === 'View') {
+      if ('url' in this.selectedResult) {
+        if (!this.previewVisible) {
+          this.previewVisible = true
+          this.fullScreen = true
+        }
+        const newUrl = this.selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
+        this.iframeUrl = newUrl
+      }
+    }
+  }
+
+  @Watch('query')
+  public onQueryChange () {
+    const preview = this.$route.query.preview
+    const fullScreen = this.$route.query.fullScreen
+    if (!preview && !fullScreen) {
+      this.previewVisible = false
+      this.fullScreen = false
     }
   }
 
@@ -892,9 +943,70 @@ export default class SearchResults extends Vue {
 
   handlePopState () {
     const query = this.$route.query.query
-    if (query && query !== SearchModule.query) {
-      SearchModule.SetQuery(query.toString())
+    const selectedId = this.$route.query.selected
+    const preview = this.$route.query.preview
+    const fullScreen = this.$route.query.fullScreen
+    const name = this.$route.name
+    if (query && query !== this.query && ((fullScreen && this.windowWidth > 534) || (preview && this.windowWidth <= 534))) {
+      this.fullScreen = true
+      this.previewVisible = true
+      SearchModule.ResetQuery(query.toString())
+      return
+    } else if (query && query !== this.query) {
+      SearchModule.ResetQuery(query.toString())
+      return
     }
+    if ('id' in this.selectedResult) {
+      if (this.selectedResult.id !== selectedId) {
+        if (selectedId) {
+          const oldSelectedResult = this.getResultbyId(selectedId.toString())
+          if (oldSelectedResult) {
+            SearchModule.Select(oldSelectedResult)
+          }
+        } else {
+          SearchModule.Select()
+        }
+      }
+    } else if (preview && !this.previewVisible && this.windowWidth <= 534) {
+      const oldSelectedResult = this.getResultbyId(selectedId.toString())
+      if (oldSelectedResult) {
+        SearchModule.Select(oldSelectedResult)
+        this.previewVisible = true
+        this.fullScreen = true
+        return
+      }
+    }
+    if (preview && !this.previewVisible) {
+      this.previewVisible = true
+      if (this.windowWidth <= 534) {
+        this.fullScreen = true
+      }
+      return
+    }
+    if (preview === undefined && this.previewVisible) {
+      this.previewVisible = false
+      if (this.windowWidth <= 534) {
+        this.fullScreen = false
+      }
+    }
+    if (fullScreen === undefined && this.fullScreen) {
+      this.fullScreen = false
+      if (this.windowWidth <= 534) {
+        this.previewVisible = false
+      }
+    }
+    if (fullScreen === 'true' && !this.fullScreen) {
+      this.fullScreen = true
+    }
+  }
+
+  getResultbyId (id: string): SearchResult | undefined {
+    for (let i = 0; i < this.results.length; i++) {
+      if (this.results[i].id === id) {
+        return this.results[i]
+      }
+    }
+    return undefined
   }
 
   public onToggleFilter (): void {
@@ -902,20 +1014,24 @@ export default class SearchResults extends Vue {
   }
 
   public onFullScreen (): void{
-    if (!this.fullScreen) {
-      if ('id' in SearchModule.selectedResult) {
-        SearchModule.SetDocument(SearchModule.selectedResult.id)
-        this.fullScreen = true
-      }
-    } else {
-      if (SearchModule.document !== '') {
-        SearchModule.SetDocument('')
-      } else if (this.fullScreen && this.windowWidth <= 534) {
-        this.previewVisible = false
-        this.fullScreen = false
+    const name = this.$route.name
+    if (name !== 'View') {
+      if (!this.fullScreen) {
+        if ('id' in SearchModule.selectedResult) {
+          SearchModule.SetFullScreen('true')
+          this.fullScreen = true
+        }
       } else {
+        if (this.windowWidth <= 534) {
+          this.previewVisible = false
+          SearchModule.SetPreview(false)
+        } else {
+          SearchModule.SetFullScreen('')
+        }
         this.fullScreen = false
       }
+    } else if (this.fullScreen) {
+      router.push({ name: 'Home' })
     }
   }
 
@@ -941,6 +1057,7 @@ export default class SearchResults extends Vue {
 
   public onClosePreview (): void{
     this.previewVisible = false
+    SearchModule.SetPreview(false)
     if (this.fullScreen) {
       this.fullScreen = false
       if (this.windowWidth > 534) {

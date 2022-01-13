@@ -70,6 +70,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SearchModule } from '@/store/modules/search'
 import router from '@/router'
+import { Route } from 'vue-router'
 
 @Component
 export default class Search extends Vue {
@@ -81,6 +82,18 @@ export default class Search extends Vue {
 
   created () {
     this.searchterm = this.query
+  }
+
+  @Watch('$route')
+  onRouteChange () {
+    const name = this.$route.name
+    if (name === 'Home' && this.searchterm !== '') {
+      this.searchterm = ''
+      SearchModule.SetQuery('')
+    }
+    if (name === 'View' && this.searchterm !== '') {
+      this.searchterm = ''
+    }
   }
 
   @Watch('query')

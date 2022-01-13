@@ -17,7 +17,7 @@ export enum SortOrder {
   RELEVANCE = 'relevance', DATE = 'date'
 }
 
-function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrder): void {
+function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrder, selectedId?: string, preview?: string, fullScreen?: string): void {
   const name = router.currentRoute.name
   const query = { ...router.currentRoute.query }
   const existingQueryString = query.query
@@ -26,6 +26,12 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
   const newQueryString = queryString !== '' ? queryString : undefined
   const existingSort = query.sort !== undefined && query.sort === SortOrder.DATE ? SortOrder.DATE : undefined
   const newSort = sortOrder === SortOrder.DATE ? SortOrder.DATE : undefined
+  const existingSelectedId = query.selectedId
+  const newSelectedId = selectedId !== '' ? selectedId : undefined
+  const existingPreview = query.preview
+  const newPreview = preview !== '' ? preview : undefined
+  const existingFullScreen = query.fullScreen
+  const newFullScreen = fullScreen !== '' ? fullScreen : undefined
 
   if (newFilters !== undefined) {
     for (const filterKey in filters) {
@@ -41,7 +47,8 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
       }
     }
   }
-  if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters) || existingSort !== newSort || name !== 'Search') {
+  if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters) || existingSort !== newSort ||
+    name !== 'Search' || newSelectedId !== existingSelectedId || newPreview !== existingPreview || newFullScreen !== existingFullScreen) {
     if (newQueryString !== undefined) {
       query.query = newQueryString
     } else {
@@ -56,6 +63,21 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
       query.sort = newSort
     } else {
       delete query.sort
+    }
+    if (newSelectedId !== undefined) {
+      query.selected = newSelectedId
+    } else {
+      delete query.selected
+    }
+    if (newPreview !== undefined) {
+      query.preview = newPreview
+    } else {
+      delete query.preview
+    }
+    if (newFullScreen !== undefined) {
+      query.fullScreen = newFullScreen
+    } else {
+      delete query.fullScreen
     }
     if (name !== undefined && name !== null && newQueryString !== undefined) {
       router.push({ name: 'Search', query: query })
@@ -157,6 +179,8 @@ export class Search extends VuexModule implements SearchState {
   private fac: Facets = []
   private filt: Filters = {}
   private sort = SortOrder.RELEVANCE
+  private preview = ''
+  private fullscreen = ''
 
   public get pristine () {
     return this.prist
@@ -184,6 +208,28 @@ export class Search extends VuexModule implements SearchState {
     } else {
       if (query !== this.queryString) {
         this.context.commit('SET_QUERY', query)
+        return this.context.dispatch('SetResults')
+      }
+    }
+  }
+
+  @Mutation
+  public RESET_QUERY (query: string) {
+    this.queryString = query
+  }
+
+  @Action
+  public ResetQuery (query: string) {
+    if (this.fac.length === 0) {
+      return this.context.dispatch('GetFacets').then(() => {
+        if (query !== this.queryString) {
+          this.context.commit('RESET_QUERY', query)
+          return this.context.dispatch('SetResults')
+        }
+      })
+    } else {
+      if (query !== this.queryString) {
+        this.context.commit('RESET_QUERY', query)
         return this.context.dispatch('SetResults')
       }
     }
@@ -221,6 +267,28 @@ export class Search extends VuexModule implements SearchState {
         return this.context.dispatch('SetResults')
       }
     }
+  }
+
+  @Mutation
+  public SET_FULLSCREEN (fullscreen: string) {
+    if (fullscreen !== '') {
+      if ('id' in this.selectedRes) {
+        this.fullscreen = fullscreen
+        updateRoute(this.queryString, this.filt, this.sort, this.selectedRes.id, this.preview, this.fullscreen)
+      } else {
+        router.push({ name: 'Home', query: { ...router.currentRoute.query } })
+      }
+    } else {
+      if ('id' in this.selectedRes) {
+        this.fullscreen = ''
+        updateRoute(this.queryString, this.filt, this.sort, this.selectedRes.id, this.preview)
+      }
+    }
+  }
+
+  @Action({ commit: 'SET_FULLSCREEN' })
+  public SetFullScreen (fullscreen: string) {
+    return fullscreen
   }
 
   public get document (): string {
@@ -427,14 +495,53 @@ export class Search extends VuexModule implements SearchState {
     return this.total
   }
 
+  public getResultbyId (id: string): SearchResult | undefined {
+    for (let i = 0; i < this.results.length; i++) {
+      if (this.results[i].id === id) {
+        return this.results[i]
+      }
+    }
+    return undefined
+  }
+
   @Mutation
-  public SELECT_RESULT (selectedResult: SearchResult) {
-    this.selectedRes = selectedResult
+  public SELECT_RESULT (selectedResult?: SearchResult) {
+    if (selectedResult) {
+      const query = { ...router.currentRoute.query }
+      const selectedId = query.selected
+      const preview = query.preview
+      if ('id' in this.selectedRes) {
+        if (selectedResult.id && preview === undefined && selectedId === selectedResult.id && selectedId === this.selectedRes.id) {
+          this.preview = 'true'
+          updateRoute(this.queryString, this.filt, this.sort, selectedResult.id, this.preview)
+        }
+      }
+      if (selectedResult.id && (selectedId !== selectedResult.id)) {
+        this.preview = 'true'
+        updateRoute(this.queryString, this.filt, this.sort, selectedResult.id, this.preview)
+      }
+      this.selectedRes = selectedResult
+    } else {
+      this.selectedRes = {}
+    }
+  }
+
+  @Mutation
+  public SET_PREVIEW (visible: boolean) {
+    if (!visible && 'id' in this.selectedRes) {
+      this.preview = ''
+      updateRoute(this.queryString, this.filt, this.sort, this.selectedRes.id, this.preview)
+    }
   }
 
   @Action({ commit: 'SELECT_RESULT' })
-  public Select (selectedResult: SearchResult) {
+  public Select (selectedResult?: SearchResult) {
     return selectedResult
+  }
+
+  @Action({ commit: 'SET_PREVIEW' })
+  public SetPreview (visible: boolean) {
+    return visible
   }
 
   public get selectedResult (): SearchResult | {} {
