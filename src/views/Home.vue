@@ -272,6 +272,34 @@
             </div>
           </div>
         </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.ub.unibe.ch/teilbibliotheken/rechtswissenschaft/juristische_bibliothek_jbb/index_ger.html" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor21.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Universitätsbibliothek Bern, Juristische Bibliothek">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Universitätsbibliothek Bern, Juristische Bibliothek
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://fritschi.foundation/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor22.jpg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Marco Fritschi, Fritschi Foundation">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Marco Fritschi, Fritschi Foundation
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
 
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
@@ -295,7 +323,6 @@ Philipp <b>do Canto</b>, Zürich;
 <b>Domizilplus Treuhand</b>, Zürich;
 Daniel <b>Emch</b>, Bern;
 Lucien <b>Fluri</b>, Solothurn;
-Marco <b>Fritschi</b>, Winterthur;
 Markus <b>Gehrig</b>, Fehraltorf;
 Patrick <b>Gehrig</b>, Biglen;
 Daniela <b>Giovanoli</b>, Bern;
