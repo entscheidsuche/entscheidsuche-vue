@@ -667,7 +667,7 @@ export default class Home extends Vue {
       const cards1 = bcards.children
       const zahl = cards1.length
       let belegt = 0
-      const karten: {'card': Node; 'position': number;)}[] = []
+      const karten: {'card': Node; 'position': number}[] = []
       for (let i = 0; i < zahl; i++) {
         if (cards1[i].getAttribute('class') !== 'search-placeholder') {
           belegt++
