@@ -667,11 +667,17 @@ export default class Home extends Vue {
       const cards1 = bcards.children
       const zahl = cards1.length
       let belegt = 0
+      const karten: {'card': Node; 'position': number;)}[] = []
       for (let i = 0; i < zahl; i++) {
-        if (cards1[i].getAttribute('class') !== 'search-placeholder') belegt++
+        if (cards1[i].getAttribute('class') !== 'search-placeholder') {
+          belegt++
+          karten[i] = { card: cards1[i], position: Math.random() }
+        }
       }
-      for (let i = 0; i < zahl; i++) {
-        bcards.appendChild(cards1[Math.floor(Math.random() * zahl)])
+      karten.sort((a, b) => { return Math.sign(a.position - b.position) })
+
+      for (let i = 0; i < belegt; i++) {
+        bcards.appendChild((karten[i]).card)
       }
       for (let i = 0; i < belegt;) {
         const cards2 = bcards.children
