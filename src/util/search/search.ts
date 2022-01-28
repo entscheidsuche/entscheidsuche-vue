@@ -38,11 +38,11 @@ export class SearchUtil {
               default_operator: 'AND',
               type: 'cross_fields',
               fields: [
-                'title.*^5',
-                'abstract.*^3',
-                'meta.*^10',
+                'title.*',
+                'abstract.*',
+                'meta.*',
                 'attachment.content',
-                'reference^3'
+                'reference'
               ]
             }
           }
