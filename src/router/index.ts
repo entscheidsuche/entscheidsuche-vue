@@ -80,6 +80,21 @@ const routes: Array<RouteConfig> = [
     component: () => import('../views/Upload.vue')
   },
   {
+    path: '/decisionRequest',
+    name: 'DecisionRequest',
+    component: () => import('../views/DecisionRequest.vue')
+  },
+  {
+    path: '/generatedDecisionRequest',
+    name: 'GeneratedDecisionRequest',
+    component: () => import('../views/GeneratedDecisionRequest.vue')
+  },
+  {
+    path: '/decisionSuggestion',
+    name: 'DecisionSuggestion',
+    component: () => import('../views/DecisionSuggestion.vue')
+  },
+  {
     path: '/dataUsage',
     name: 'DataUsage',
     component: () => import('../views/DataUsage.vue')
