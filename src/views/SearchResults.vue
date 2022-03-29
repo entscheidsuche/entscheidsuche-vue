@@ -455,21 +455,20 @@
       .preview-content{
         height:100%;
         width:auto;
+        display: flex;
+        flex-direction: column;
         .doc-info{
           width:100%;
           padding:15px 11px 15px 11px;
           border: 1px solid rgba(0, 0, 0, 0.125);
           border-radius: 4px;
           margin-bottom: 0.5em;
-          position:relative;
+          display: flex;
+          flex-direction: column;
 
           .doc-header{
             width:100%;
             height:100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-
             .flex-row{
               width:100%;
               display: flex;
