@@ -4,6 +4,9 @@
       <div class="intro">
         <p>{{$t('intro')}}</p>
       </div>
+      <a href="https://jobfairzav.ch" target="_blank">
+      <img class="banner" src="~/../assets/sponsors/Banner.jpg" alt="Banner Job Fair ZAV" top v-b-tooltip.hover title="Job Fair ZAV"/>
+      </a>
       <h1>{{$t('support')}}</h1>
       <b-card-group id='bcards' deck>
         <b-card>
@@ -394,6 +397,19 @@ Johannes <b>Wagner</b>, Appenzell;
 
 #home {
   .content{
+    .banner{
+      background-color: #fff;
+      border:none;
+      box-shadow: 0 2px 30px rgba(0,0,0,.15);
+      border-radius: 0 0 20px 0;
+      margin: 5px 0 5px 0;
+      width: 100%;
+      .banner:hover{
+        .banner{
+           transform: matrix(1,0,0,1,0,0);
+        }
+      }
+    }
     .card-deck{
       width:100%;
       display:flex;
@@ -437,6 +453,7 @@ Johannes <b>Wagner</b>, Appenzell;
               bottom: 0;
             }
           }
+
           .card-footer{
             height:60px;
             width:100%;
