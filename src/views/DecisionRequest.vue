@@ -100,16 +100,6 @@
           ></b-form-select>
         </b-form-group>
         <b-form-group id="court-group" :label="$t('courtLabel')" label-for="court">
-          <b-form-select
-            id="court"
-            v-model="form.court"
-            :options="courts"
-            required
-            :oninvalid="this.customErrorMessage()"
-            oninput="this.setCustomValidity('')"
-          ></b-form-select>
-        </b-form-group>
-        <div v-if="form.court === 'other'">
           <b-form-input
             id="courtName"
             v-model="form.courtName"
@@ -125,7 +115,7 @@
             v-model="form.courtAddress"
             :placeholder="$t('courtAddress')"
           ></b-form-textarea>
-        </div>
+        </b-form-group>
         <b-form-group id="date-group" class="mt-16" :label="$t('decisionDateLabel')" label-for="date-form">
           <b-form-datepicker id="date-form" v-model="form.date" placeholder="" :hide-header="true" :locale="locale"></b-form-datepicker>
         </b-form-group>
