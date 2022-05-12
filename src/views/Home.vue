@@ -317,6 +317,20 @@
             </div>
           </div>
         </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.lauxlawyers.ch/" target="_blank">
+              <b-card-img src="~/../assets/sponsors/sponsor24.svg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="LAUX LAWYERS AG">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              LAUX LAWYERS AG
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
 
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
