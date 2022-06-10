@@ -165,7 +165,7 @@
             </b-form-checkbox>
           </b-form-checkbox-group>
           <p class="mt-16">{{ $t('privacyAgreementPartOne') }}<br>{{ $t('privacyAgreementPartTwo') }}<b-link href='https://entscheidsuche.ch/datenschutz' target='_blank'>{{ $t('privacyAgreementPartThree') }}</b-link></p>
-          <b-button type="submit" variant="primary">{{ $t('requestDecision') }}</b-button>
+          <b-button type="submit" v-on:click="onRequest($event)" variant="primary">{{ $t('requestDecision') }}</b-button>
         </div>
       </b-form>
     </template>
@@ -323,9 +323,8 @@ export default class DecisionRequest extends Vue {
     return returnValue
   }
 
-  public onSubmit (event) {
-    event.preventDefault()
-    window.console.log(this.form)
+  public onRequest (event) {
+    window.console.log(this.data)
   }
 }
 </script>

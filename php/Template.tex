@@ -1,0 +1,35 @@
+
+    \documentclass[
+      SN,% lco file for swiss letters (SN 010 130))
+      refline=dateleft,
+      firstfoot=false,
+      enlargefirstpage,
+      backaddress=false,
+      foldmarks=false,
+      parskip=half-
+      ]{scrlttr2}
+    \usepackage[english]{babel}
+
+    \setkomavar{fromname}{@sender1\newline @sender2}
+    \setkomavar{fromaddress}{@sender3\newline @sender4\newline @sender5\newline @email}
+    \setkomavar{date}{\today}
+    \setkomavar{subject}{Anforderung von Entscheiden}
+    \setkomafont{title}{\bfseries\normalsize\raggedright}
+
+
+    \makeatletter
+      \@setplength{firstheadwidth}{\textwidth}
+      \@addtoplength{firstheadvpos}{.5cm}% <- shift the head with your address .5cm down
+    \makeatother
+
+    \renewcommand\raggedsignature{\raggedright}
+    
+    \usepackage{blindtext}% dummy text
+    \begin{document}
+      \begin{letter}{@gerName\\@gerStrasse\\@gerPostfach\\@gerStadt}
+        \opening{@letterText}
+        \closing{Mit freundlichen Grüssen}
+      \end{letter}
+    \end{document}
+
+enter image description here

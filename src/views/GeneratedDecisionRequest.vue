@@ -4,8 +4,16 @@
       <h1>{{ $t('decisionRequest') }}</h1>
       <p>{{ $t('generatedDecisionRequestText') }}</p>
       <b-form class="decisionRequestForm" @submit="onSubmit">
-        <div v-html="generatedForm.sender" class="readonly"></div>
-        <div v-html="generatedForm.recipient" class="readonly right mb-16"></div>
+        <div v-html="generatedForm.sender1" class="readonly"></div>
+        <div v-html="generatedForm.sender2" class="readonly"></div>
+        <div v-html="generatedForm.sender3" class="readonly"></div>
+        <div v-html="generatedForm.sender4" class="readonly"></div>
+        <div v-html="generatedForm.sender5" class="readonly"></div>
+        <div v-html="generatedForm.email" class="readonly"></div>
+        <div v-html="generatedForm.gerName" class="readonly right"></div>
+        <div v-html="generatedForm.gerStrasse" class="readonly right"></div>
+        <div v-html="generatedForm.gerPostfach" class="readonly right"></div>
+        <div v-html="generatedForm.gerStadt" class="readonly right mb-16"></div>
         <b-form-textarea
           id="letterText"
           v-model="generatedForm.letterText"
@@ -52,7 +60,7 @@
       font-style: italic;
 
       &.right {
-        float: right;
+        text-align: right;
       }
     }
 
@@ -76,6 +84,8 @@ import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import { AppModule } from '@/store/modules/app'
 
+const requestUrl = 'http://v2202109132150164038.luckysrv.de/pdf/index.py'
+
 @Component({
   name: 'GeneratedDecisionRequest'
 })
@@ -86,8 +96,16 @@ export default class GeneratedDecisionRequest extends Vue {
   }
 
   private generatedForm: object = {
-    sender: 'Rechtsanwältin<br>Dagmar Immerrecht<br>Gerichtsstrasse 42<br>1205 Genf<br>dagmar@immerrecht.ch',
-    recipient: 'Bundesgericht<br>Avenue du Tribunal 29<br>1005 Lausanne<br><br>5.12.2021',
+    sender1: 'Rechtsanwältin',
+    sender2: 'Dagmar Immerrecht',
+    sender3: 'Gerichtsstrasse 42',
+    sender4: '1205 Genf',
+    sender5: '',
+    email: 'dagmar@immerrecht.ch',
+    gerName: 'Bundesgericht',
+    gerStrasse: 'Avenue du Tribunal 29',
+    gerPostfach: '',
+    gerStadt: '1005 Lausanne',
     letterText: 'Sehr geehrte Damen und Herren,\n\nGerne möchte ich Sie bitten, mir eine Kopie des Urteils 12T 3/2021 des ' +
      'Bundesgeichts vom 1.12.2021 vorzugsweise per E-Mail an die oben genannte Adresse zu schicken.\n\nGemäss Urteil des ' +
      'Bundesgerichts 1C_194/2020 vom 27. Juli 2021...\n\nMit freundlichen Grüßen\nDagmar Immerrecht',
@@ -108,6 +126,22 @@ export default class GeneratedDecisionRequest extends Vue {
   public onSubmit (event) {
     event.preventDefault()
     window.console.log(this.generatedForm)
+    const xhr = new XMLHttpRequest()
+    const url = requestUrl
+    xhr.open('POST', url, true)
+    // xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8')
+    // window.alert("Sende Suchanfrage für "+se.id+" mit Data:\n" + data);
+    xhr.send(JSON.stringify(this.generatedForm))
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        window.alert('Antwort: ' + xhr.responseText)
+        // var result=JSON.parse(xhr.responseText);
+        // se.hits=result.hits;
+        // window.alert("Antwort für "+se.id+": " + result.hits);
+        // this.searchEngines_result.result=result;
+        // document.getElementById("tab-content-"+se.id).title="XY";
+      }
+    }
   }
 }
 </script>
