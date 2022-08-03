@@ -3,7 +3,7 @@
     <template>
       <h1>{{ $t('decisionRequest') }}</h1>
       <p>{{ $t('decisionRequestText') }}</p>
-      <b-form class="form" @submit="onSubmit">
+      <b-form class="form"> <!--@submit="onSubmit"-->
         <b-form-input
           id="salutation"
           class="w-15"
@@ -153,7 +153,8 @@
             <b-form-radio value="becomeMember">{{ $t('becomeMember') }}</b-form-radio>
             <b-form-radio value="notMember">{{ $t('notMember') }}</b-form-radio>
           </b-form-radio-group>
-          <!-- TODO: CAPTCHA-->
+          <div class="friendly-captcha mb-16" ref="container" data-sitekey="FCMIGAVGDGQ62M9H" :data-lang=$i18n.locale></div>
+          <div id="mtcaptcha-1" class='mtcaptcha' :data-lang=$i18n.locale></div>
           <b-form-checkbox-group required>
             <b-form-checkbox
               id="policyAgreement"
@@ -185,7 +186,7 @@
       }
     }
 
-    #date-group {
+    #date-group, .friendly-captcha, .mtcaptcha {
       width: 60%;
 
       @media (max-width: 534px) {
@@ -254,6 +255,7 @@
 import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import { AppModule } from '@/store/modules/app'
+import { WidgetInstance } from 'friendly-challenge'
 
 @Component({
   name: 'DecisionRequest'
@@ -280,6 +282,25 @@ export default class DecisionRequest extends Vue {
         { text: this.$t('otherCourt').toString(), value: 'other' }
       ]
     }
+  }
+
+  public mounted () {
+    global.mtcaptchaConfig.renderQueue.push('mtcaptcha-1')
+    const doneCallback = (solution) => {
+      console.log('Captcha was solved. The form can be submitted.')
+      console.log(solution)
+    }
+
+    const errorCallback = (err) => {
+      console.log('There was an error when trying to solve the Captcha.')
+      console.log(err)
+    }
+
+    const widget = new WidgetInstance(this.$refs.container as HTMLElement, {
+      startMode: 'auto',
+      doneCallback: doneCallback,
+      errorCallback: errorCallback
+    })
   }
 
   private form: object = {
