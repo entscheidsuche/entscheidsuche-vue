@@ -1,5 +1,6 @@
 <template>
   <div id="header">
+    <img src="../assets/trauerflor.png" width="200" height="200" alt="…" class="trauerflor">
     <div class="header-main">
       <router-link :to="{ name: 'Home' }" class="logo"></router-link>
       <Search/>
@@ -32,6 +33,15 @@
 </template>
 
 <style lang="scss">
+.trauerflor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150px;
+  height: 150px;
+  z-index: 2000;
+}
+
 #header {
   z-index: 1000;
   top: 0;
