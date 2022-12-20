@@ -293,10 +293,10 @@
               <b-card-img src="~/../assets/sponsors/sponsor22.jpg" alt="Image" top></b-card-img>
             </a>
           </div>
-          <div class="card-footer" v-b-tooltip.hover title="Marco Fritschi, Fritschi Foundation">
+          <div class="card-footer" v-b-tooltip.hover title="Fonds ÆQUITAS, Fritschi Foundation">
             <div class="card-text-wrapper">
               <b-card-text>
-              Marco Fritschi, Fritschi Foundation
+              Fonds ÆQUITAS, Fritschi Foundation
               </b-card-text>
             </div>
           </div>
