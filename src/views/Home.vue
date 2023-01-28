@@ -4,7 +4,6 @@
       <div class="intro">
         <p>{{$t('intro')}}</p>
       </div>
-      <img class="banner" src="~/../assets/sponsors/Banner Daniel.png" alt="Wir trauern um Daniel Hürlimann" top v-b-tooltip.hover title="Wir trauern um Daniel Hürlimann"/>
       <h1>{{$t('support')}}</h1>
       <b-card-group id='bcards' deck>
         <b-card>
@@ -413,7 +412,7 @@ Johannes <b>Wagner</b>, Appenzell;
       background-color: #fff;
       border:none;
       box-shadow: 0 2px 30px rgba(0,0,0,.15);
-      border-radius: 0 0 0 0;
+      border-radius: 0 0 20px 0;
       margin: 5px 0 5px 0;
       width: 100%;
       .banner:hover{
