@@ -104,6 +104,7 @@
             </div>
           </div>
         </b-card>
+        <!--
         <b-card>
           <div class="card-img-wapper">
             <a href="https://www.zhaw.ch/de/hochschule/" target="_blank">
@@ -118,6 +119,7 @@
             </div>
           </div>
         </b-card>
+        -->
         <b-card>
           <div class="card-img-wapper">
             <a href="https://www.kellerhals-carrard.ch/de/home/index.php" target="_blank">
@@ -146,6 +148,7 @@
             </div>
           </div>
         </b-card>
+        <!--
         <b-card>
           <div class="card-img-wapper">
             <a href="https://www.oav.ch/" target="_blank">
@@ -160,6 +163,7 @@
             </div>
           </div>
         </b-card>
+        -->
         <b-card>
           <div class="card-img-wapper">
             <a href="https://www.schkg-vereinigung.ch/" target="_blank">
@@ -174,6 +178,7 @@
             </div>
           </div>
         </b-card>
+        <!--
         <b-card>
           <div class="card-img-wapper">
             <a href="https://www.sgav.ch/" target="_blank">
@@ -188,6 +193,7 @@
             </div>
           </div>
         </b-card>
+        -->
         <b-card>
           <div class="card-img-wapper">
             <a href="https://pansoft.de/" target="_blank">
@@ -258,6 +264,7 @@
             </div>
           </div>
         </b-card>
+        <!--
         <b-card>
           <div class="card-img-wapper">
             <a href="https://www.sedlex-avocats.ch/" target="_blank">
@@ -272,6 +279,7 @@
             </div>
           </div>
         </b-card>
+        -->
         <b-card>
           <div class="card-img-wapper">
             <a href="https://www.ub.unibe.ch/teilbibliotheken/rechtswissenschaft/juristische_bibliothek_jbb/index_ger.html" target="_blank">
@@ -324,6 +332,132 @@
             <div class="card-text-wrapper">
               <b-card-text>
               LAUX LAWYERS AG
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.unilu.ch/fakultaeten/rf/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor25.jpg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="UNIVERSITÄT LUZERN, Rechtswissenschaftliche Fakultät">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Rechtswissenschaftliche Fakultät
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.cooprecht.ch/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor26.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Coop Rechtsschutz AG">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Coop Rechtsschutz AG
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.lenzstaehelin.com/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor27.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Lenz & Staehelin">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Lenz & Staehelin
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.5001.ch" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor28.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Schärer Rechtsanwälte">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Schärer Rechtsanwälte
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.wartmann-merker.ch/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor29.svg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Wartmann Merker AG">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Wartmann Merker AG
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.hol-law.ch/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor30.jpg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="HOLENSTEIN  BRUSA legal & tax">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              HOLENSTEIN  BRUSA legal & tax
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://unine.ch/droit" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor31.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Université de Neuchâtel, Faculté de droit">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Faculté de droit
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.zurich.ch/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor32.jpg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Zürich Versicherungs-Gesellschaft AG">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Zürich Versicherungs-Gesellschaft AG
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.arrestpraxis.ch/einfuehrung/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor33.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Vischer arrestpraxis.ch">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Vischer arrestpraxis.ch
               </b-card-text>
             </div>
           </div>
