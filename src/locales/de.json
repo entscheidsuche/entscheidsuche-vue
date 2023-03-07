@@ -36,5 +36,9 @@
   "Update am": "Update am",
   "intro": "Das frei zugängliche Portal entscheidsuche.ch bietet eine Suche in allen publizierten Gerichtsurteilen von Schweizer Gerichten aller Instanzen.",
   "support": "Wer uns unterstützt:",
-  "betatest": "Betatest"
+  "betatest": "Betatest",
+  "from": "Von",
+  "to": "Bis",
+  "confirmDateOverlay": "Übernehmen",
+  "cancelDateOverlay": "Abbrechen"
 }

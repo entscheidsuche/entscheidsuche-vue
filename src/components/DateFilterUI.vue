@@ -16,6 +16,7 @@
     :prettify="prettifyDate"
     :grid="false"
     @finish="onValueChanged"
+    @update="onValueChanged"
   />
 </template>
 
@@ -36,6 +37,8 @@ export default class DateFilterUI extends Vue {
   @Prop() dates
   @Prop() interval: { min: number; max: number } | undefined
   @Prop() range: { from: number | undefined; to: number | undefined } | undefined
+  public prevFrom = ''
+  public prevTo = ''
 
   public mounted () {
     if (this.range !== undefined && (this.range.from !== undefined || this.range.to !== undefined)) {
@@ -51,10 +54,78 @@ export default class DateFilterUI extends Vue {
         }
       }, 20)
     }
+    this.addHandleListeners()
+  }
+
+  destroyed () {
+    const fromHandle = document.getElementsByClassName('irs-from')[0]
+    const toHandle = document.getElementsByClassName('irs-to')[0]
+    const singleHandle = document.getElementsByClassName('irs-single')[0]
+    if (fromHandle) {
+      fromHandle.removeEventListener('click', this.showDateOverlay)
+      fromHandle.removeEventListener('touchend', this.showDateOverlay)
+    }
+    if (toHandle) {
+      toHandle.removeEventListener('click', this.showDateOverlay)
+      toHandle.removeEventListener('touchend', this.showDateOverlay)
+    }
+    if (singleHandle) {
+      singleHandle.removeEventListener('click', this.showDateOverlay)
+      singleHandle.removeEventListener('touchend', this.showDateOverlay)
+    }
+  }
+
+  public addHandleListeners () {
+    setTimeout(() => {
+      const fromHandle = document.getElementsByClassName('irs-from')[0]
+      const toHandle = document.getElementsByClassName('irs-to')[0]
+      const singleHandle = document.getElementsByClassName('irs-single')[0]
+      if (fromHandle) {
+        fromHandle.removeEventListener('click', this.showDateOverlay)
+        fromHandle.removeEventListener('touchend', this.showDateOverlay)
+        fromHandle.addEventListener('click', this.showDateOverlay)
+        fromHandle.addEventListener('touchend', this.showDateOverlay)
+      }
+      if (toHandle) {
+        toHandle.removeEventListener('click', this.showDateOverlay)
+        toHandle.removeEventListener('touchend', this.showDateOverlay)
+        toHandle.addEventListener('click', this.showDateOverlay)
+        toHandle.addEventListener('touchend', this.showDateOverlay)
+      }
+      if (singleHandle) {
+        singleHandle.removeEventListener('click', this.showDateOverlay)
+        singleHandle.removeEventListener('touchend', this.showDateOverlay)
+        singleHandle.addEventListener('click', this.showDateOverlay)
+        singleHandle.addEventListener('touchend', this.showDateOverlay)
+      }
+    }, 20)
+  }
+
+  public showDateOverlay () {
+    this.$emit('show-date-overlay')
   }
 
   public onValueChanged (value) {
-    this.$emit('value-changed', value)
+    if (!this.prevFrom) {
+      this.prevFrom = value.from_pretty
+    } if (!this.prevTo) {
+      this.prevTo = value.to_pretty
+    }
+    if (this.prevFrom !== value.from_pretty || this.prevTo !== value.to_pretty) {
+      this.prevFrom = value.from_pretty
+      this.prevTo = value.to_pretty
+      this.$emit('value-changed', value)
+    }
+  }
+
+  public handleRangeChange (fromUpdated: number, toUpdated: number) {
+    (this.$refs.histogram as HistogramSlider).update(
+      {
+        from: fromUpdated,
+        to: toUpdated
+      }
+    )
+    this.addHandleListeners()
   }
 
   public prettifyDate (date: Date | number): string {

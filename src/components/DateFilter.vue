@@ -1,11 +1,13 @@
 <template>
   <DateFilterUI
+    ref="dateFilterUI"
     v-if="showHistogram"
     :sliderWidth="sliderWidth"
     :interval="dateInterval"
     :range="dateRange"
     :dates="dates"
-    @value-changed="onDateRangeChanged"/>
+    @value-changed="onDateRangeChanged"
+    @show-date-overlay="onShowDateOverlay"/>
 </template>
 
 <style lang="scss">
@@ -14,16 +16,23 @@
     width:calc(100% - 10px);
     padding-left:2.5px;
   }
-  margin-left:20px;
+  margin: auto;
   .irs-handle{
     top: calc(50% - var(--handle-size)/2 + 13px);
   }
   .irs-from,.irs-to,.irs-single{
     top:56px;
+    @media (hover: none) and (pointer: coarse) {
+      font-size: 16px;
+    }
   }
   .irs-from::before,.irs-to::before,.irs-single::before{
     transform: scaleY(-1);
     bottom:19px;
+
+    @media (hover: none) and (pointer: coarse) {
+      bottom: 22px;
+    }
   }
 }
 @media (max-width: 534px){
@@ -160,6 +169,10 @@ export default class DateFilter extends Vue {
     }
   }
 
+  public onShowDateOverlay () {
+    this.$emit('show-date-overlay')
+  }
+
   @Watch('aggregations')
   public onAggregationsChange (aggs: Aggregations, oldAggs: Aggregations) {
     if (aggs === oldAggs) {
@@ -176,6 +189,10 @@ export default class DateFilter extends Vue {
     if (!Object.prototype.hasOwnProperty.call(filters, 'edatum')) {
       this.update()
     }
+  }
+
+  public handleRangeChange (fromUpdated: number, toUpdated: number) {
+    (this.$refs.dateFilterUI as DateFilterUI).handleRangeChange(fromUpdated, toUpdated)
   }
 
   private update () {
