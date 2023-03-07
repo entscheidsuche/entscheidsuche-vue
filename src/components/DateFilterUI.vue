@@ -62,15 +62,15 @@ export default class DateFilterUI extends Vue {
     const toHandle = document.getElementsByClassName('irs-to')[0]
     const singleHandle = document.getElementsByClassName('irs-single')[0]
     if (fromHandle) {
-      fromHandle.removeEventListener('click', this.showDateOverlay)
+      fromHandle.removeEventListener('mousedown', this.showDateOverlay)
       fromHandle.removeEventListener('touchend', this.showDateOverlay)
     }
     if (toHandle) {
-      toHandle.removeEventListener('click', this.showDateOverlay)
+      toHandle.removeEventListener('mousedown', this.showDateOverlay)
       toHandle.removeEventListener('touchend', this.showDateOverlay)
     }
     if (singleHandle) {
-      singleHandle.removeEventListener('click', this.showDateOverlay)
+      singleHandle.removeEventListener('mousedown', this.showDateOverlay)
       singleHandle.removeEventListener('touchend', this.showDateOverlay)
     }
   }
@@ -81,21 +81,21 @@ export default class DateFilterUI extends Vue {
       const toHandle = document.getElementsByClassName('irs-to')[0]
       const singleHandle = document.getElementsByClassName('irs-single')[0]
       if (fromHandle) {
-        fromHandle.removeEventListener('click', this.showDateOverlay)
+        fromHandle.removeEventListener('mousedown', this.showDateOverlay)
         fromHandle.removeEventListener('touchend', this.showDateOverlay)
-        fromHandle.addEventListener('click', this.showDateOverlay)
+        fromHandle.addEventListener('mousedown', this.showDateOverlay)
         fromHandle.addEventListener('touchend', this.showDateOverlay)
       }
       if (toHandle) {
-        toHandle.removeEventListener('click', this.showDateOverlay)
+        toHandle.removeEventListener('mousedown', this.showDateOverlay)
         toHandle.removeEventListener('touchend', this.showDateOverlay)
-        toHandle.addEventListener('click', this.showDateOverlay)
+        toHandle.addEventListener('mousedown', this.showDateOverlay)
         toHandle.addEventListener('touchend', this.showDateOverlay)
       }
       if (singleHandle) {
-        singleHandle.removeEventListener('click', this.showDateOverlay)
+        singleHandle.removeEventListener('mousedown', this.showDateOverlay)
         singleHandle.removeEventListener('touchend', this.showDateOverlay)
-        singleHandle.addEventListener('click', this.showDateOverlay)
+        singleHandle.addEventListener('mousedown', this.showDateOverlay)
         singleHandle.addEventListener('touchend', this.showDateOverlay)
       }
     }, 20)
