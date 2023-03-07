@@ -454,10 +454,10 @@
             <b-card-img src="~/../assets/sponsors/sponsor33.png" alt="Image" top></b-card-img>
             </a>
           </div>
-          <div class="card-footer" v-b-tooltip.hover title="Vischer arrestpraxis.ch">
+          <div class="card-footer" v-b-tooltip.hover title="VISCHER arrestpraxis.ch">
             <div class="card-text-wrapper">
               <b-card-text>
-              Vischer arrestpraxis.ch
+              VISCHER arrestpraxis.ch
               </b-card-text>
             </div>
           </div>
