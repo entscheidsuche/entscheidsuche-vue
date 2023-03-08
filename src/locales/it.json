@@ -36,8 +36,8 @@
   "intro": "Il portale Internet entscheidsuche.ch, accessibile gratuitamente, permette di cercare tutte le decisioni giudiziarie svizzere pubblicate da tutte le istanze.",
   "support": "Chi ci sostiene:",
   "betatest": "beta test",
-  "from": "$IT$Von",
-  "to": "$IT$Bis",
-  "confirmDateOverlay": "$IT$Übernehmen",
-  "cancelDateOverlay": "$IT$Abbrechen"
+  "from": "tra",
+  "to": "e",
+  "confirmDateOverlay": "applica",
+  "cancelDateOverlay": "cancellare"
 }

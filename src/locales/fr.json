@@ -36,8 +36,8 @@
   "intro": "Le portail entscheidsuche.ch, accessible gratuitement, permet d'effectuer des recherches dans tous les arrêts publiés de tribunaux suisses, de toutes les instances.",
   "support": "Nos soutiens:",
   "betatest": "test beta",
-  "from": "$FR$Von",
-  "to": "$FR$Bis",
-  "confirmDateOverlay": "$FR$Übernehmen",
-  "cancelDateOverlay": "$FR$Abbrechen"
+  "from": "du",
+  "to": "au",
+  "confirmDateOverlay": "accepter",
+  "cancelDateOverlay": "annuler"
 }
