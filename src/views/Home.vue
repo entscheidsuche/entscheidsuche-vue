@@ -250,6 +250,7 @@
             </div>
           </div>
         </b-card>
+        <!--
         <b-card>
           <div class="card-img-wapper">
             <a href="https://aslantas.ch" target="_blank">
@@ -264,6 +265,7 @@
             </div>
           </div>
         </b-card>
+        -->
         <!--
         <b-card>
           <div class="card-img-wapper">
@@ -458,6 +460,20 @@
             <div class="card-text-wrapper">
               <b-card-text>
               Vischer arrestpraxis.ch
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.ylex.ch" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor34.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="YLEX Rechtsberatung">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              YLEX Rechtsberatung
               </b-card-text>
             </div>
           </div>
