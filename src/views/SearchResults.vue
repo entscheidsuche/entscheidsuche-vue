@@ -30,7 +30,30 @@
               <p class="title">{{ $t('year') }}</p>
               <b-icon class="undo-filter" icon="x"></b-icon>
             </div>
-            <DateFilter :sliderWidth="sliderWidth"/>
+            <DateFilter ref="dateFilter"
+              :sliderWidth="sliderWidth"
+              @show-date-overlay="onShowOverlay"/>
+            <div class="date-overlay-bg" v-if="overlayVisible"></div>
+            <div class="date-overlay" v-if="overlayVisible">
+              <div class="focusguard" ref="focusguardFirst" tabindex="0"></div>
+              <b-form class="form">
+                <b-form-group id="from-date-group" class="mt-16" :label="$t('from')" label-for="form-date">
+                  <b-form-input :state="fromState && rangeState" ref="fromField" @keydown.enter="onConfirmOverlay" tabindex="1" lang="fr" id="from-date" type="date" v-model="overlayFrom"></b-form-input>
+                </b-form-group>
+                <b-form-group id="to-date-group" class="mt-16" :label="$t('to')" label-for="to-date">
+                  <b-form-input :state="toState && rangeState" ref="toField" @keydown.enter="onConfirmOverlay" tabindex="2" id="to-date" type="date" v-model="overlayTo"></b-form-input>
+                </b-form-group>
+              </b-form>
+              <div class="btn-row">
+                <b-button  tabindex="3" variant="primary" v-on:click="onCancelOverlay()" class="close-date-overlay">
+                  {{ $t('cancelDateOverlay') }}
+                </b-button>
+                <b-button :disabled="!fromState || !toState || !rangeState " tabindex="4" variant="primary" ref="confirmBtn" v-on:click="onConfirmOverlay()" class="confirm-date-overlay">
+                  {{ $t('confirmDateOverlay') }}
+                </b-button>
+              </div>
+              <div class="focusguard" ref="focusguardSecond" tabindex="5"></div>
+            </div>
           </div>
         </div>
         <div class="languages">
@@ -259,6 +282,62 @@
         padding: 0 0 16px 0;
         #slider-wrapper{
           margin-bottom:30px;
+          position: relative;
+
+          .date-overlay-bg {
+            background-color: #ffffff;
+            position: absolute;
+            top: 0;
+            left: -20px;
+            width: 338px;
+            height: calc(100% + 30px);
+            z-index: 100;
+          }
+
+          .date-overlay {
+            background-color: #e5e9f1;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% + 30px);
+            z-index: 101;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            padding: 6px;
+
+            .btn-row {
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              width: 100%;
+
+              .btn {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: calc(50% - 3px);
+              }
+            }
+
+            .form {
+              margin-bottom: 6px;
+
+              .form-group {
+                margin: 0;
+
+                label {
+                  margin-bottom: 0px;
+                  font-size: 14px;
+                }
+              }
+
+              #from-date-group {
+                margin-bottom: 6px;
+              }
+            }
+          }
         }
       }
     }
@@ -724,6 +803,13 @@
           border:0;
           width:0;
         }
+        .year-range {
+          #slider-wrapper{
+            .date-overlay-bg{
+              width: 100vw;
+            }
+          }
+        }
       }
       .results{
         width:100vw;
@@ -760,6 +846,7 @@ import LanguageFilter from '@/components/LanguageFilter.vue'
 import SortOrderSelector from '@/components/SortOrderSelector.vue'
 import { Route } from 'vue-router'
 import router from '@/router'
+import { BButton } from 'bootstrap-vue'
 
 @Component({
   name: 'SearchResult',
@@ -779,6 +866,9 @@ export default class SearchResults extends Vue {
   private sliderWidth = 1
   private allowUndoFilter = false
   private iframeUrl = ''
+  public overlayVisible = false
+  public overlayFrom = ''
+  public overlayTo = ''
 
   data () {
     return {
@@ -825,6 +915,34 @@ export default class SearchResults extends Vue {
 
   get locale () {
     return AppModule.locale
+  }
+
+  get fromState () {
+    const from = new Date(this.overlayFrom)
+    const fromNumber = from.getTime()
+    const to = new Date(this.overlayTo)
+    const toNumber = to.getTime()
+    return !isNaN(fromNumber)
+  }
+
+  get toState () {
+    const from = new Date(this.overlayFrom)
+    const fromNumber = from.getTime()
+    const to = new Date(this.overlayTo)
+    const toNumber = to.getTime()
+    return !isNaN(toNumber)
+  }
+
+  get rangeState () {
+    const from = new Date(this.overlayFrom)
+    const fromNumber = from.getTime()
+    const to = new Date(this.overlayTo)
+    const toNumber = to.getTime()
+    if (!isNaN(toNumber) && !isNaN(fromNumber)) {
+      return fromNumber - 1 < toNumber
+    } else {
+      return true
+    }
   }
 
   @Watch('locale')
@@ -892,6 +1010,9 @@ export default class SearchResults extends Vue {
         const newUrl = this.selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
         this.iframeUrl = newUrl
       }
+    }
+    if (from !== to && this.overlayVisible) {
+      this.onCancelOverlay()
     }
   }
 
@@ -1008,6 +1129,58 @@ export default class SearchResults extends Vue {
     return undefined
   }
 
+  public onCancelOverlay (): void {
+    this.overlayVisible = false
+    this.removeGuardListeners()
+  }
+
+  public onConfirmOverlay (): void {
+    if (this.fromState && this.toState && this.rangeState) {
+      const from = new Date(this.overlayFrom)
+      const fromNumber = from.getTime()
+      const to = new Date(this.overlayTo)
+      const toNumber = to.getTime();
+      (this.$refs.dateFilter as DateFilter).handleRangeChange(fromNumber, toNumber)
+      this.overlayVisible = false
+      this.removeGuardListeners()
+    }
+  }
+
+  public onShowOverlay (): void {
+    this.overlayVisible = true
+    this.initOverlayDates()
+    this.$nextTick(() => {
+      const focusGuard1 = this.$refs.focusguardFirst as HTMLElement
+      const focusGuard2 = this.$refs.focusguardSecond as HTMLElement
+      if (focusGuard1) {
+        focusGuard1.addEventListener('focus', this.focusOnLast)
+      }
+      if (focusGuard2) {
+        focusGuard2.addEventListener('focus', this.focusOnFirst)
+      }
+      (this.$refs.confirmBtn as BButton).focus()
+    })
+  }
+
+  public removeGuardListeners () {
+    const focusGuard1 = this.$refs.focusguardFirst as HTMLElement
+    const focusGuard2 = this.$refs.focusguardSecond as HTMLElement
+    if (focusGuard1) {
+      focusGuard1.removeEventListener('focus', this.focusOnLast)
+    }
+    if (focusGuard2) {
+      focusGuard2.removeEventListener('focus', this.focusOnFirst)
+    }
+  }
+
+  public focusOnLast () {
+    (this.$refs.confirmBtn as BButton).focus()
+  }
+
+  public focusOnFirst () {
+    (this.$refs.fromField as HTMLInputElement).focus()
+  }
+
   public onToggleFilter (): void {
     this.filterVisible = !this.filterVisible
   }
@@ -1062,6 +1235,41 @@ export default class SearchResults extends Vue {
       if (this.windowWidth > 534) {
         this.previewVisible = true
       }
+    }
+  }
+
+  public initOverlayDates (): void {
+    const minEdatum = Number(SearchModule.aggregations.min_edatum[0].key)
+    const maxEdatum = Number(SearchModule.aggregations.max_edatum[0].key)
+    if (!Object.prototype.hasOwnProperty.call(this.filter, 'edatum')) {
+      if (minEdatum) {
+        this.overlayFrom = this.dateToString(minEdatum)
+      }
+      if (maxEdatum) {
+        this.overlayTo = this.dateToString(maxEdatum)
+      }
+    } else {
+      const from = this.filter.edatum.payload.from
+      const to = this.filter.edatum.payload.to
+      if (from) {
+        this.overlayFrom = this.dateToString(from)
+      } else if (minEdatum) {
+        this.overlayFrom = this.dateToString(minEdatum)
+      }
+      if (to) {
+        this.overlayTo = this.dateToString(to)
+      } else if (maxEdatum) {
+        this.overlayTo = this.dateToString(maxEdatum)
+      }
+    }
+  }
+
+  public dateToString (date: Date | number): string {
+    if (date instanceof Date) {
+      return date.toISOString().split('T')[0]
+    } else {
+      const d = new Date(date)
+      return d.toISOString().split('T')[0]
     }
   }
 
