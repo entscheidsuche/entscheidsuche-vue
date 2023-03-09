@@ -478,6 +478,20 @@
             </div>
           </div>
         </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.mme.ch" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor35.svg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="MME Legal | Tax | Compliance">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              MME Legal | Tax | Compliance
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
 
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
