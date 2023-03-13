@@ -123,10 +123,13 @@ export default class DateFilterUI extends Vue {
   }
 
   public onValueChanged (value) {
-    if (!this.prevFrom) {
-      this.prevFrom = value.from_pretty
-    } if (!this.prevTo) {
-      this.prevTo = value.to_pretty
+    if (!this.prevFrom || !this.prevTo) {
+      if (!this.prevFrom) {
+        this.prevFrom = value.from_pretty
+      } if (!this.prevTo) {
+        this.prevTo = value.to_pretty
+      }
+      this.$emit('value-changed', value)
     }
     if (this.prevFrom !== value.from_pretty || this.prevTo !== value.to_pretty) {
       this.prevFrom = value.from_pretty
