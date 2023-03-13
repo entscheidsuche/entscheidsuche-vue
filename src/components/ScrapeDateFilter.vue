@@ -6,7 +6,7 @@
     :interval="dateInterval"
     :range="dateRange"
     :dates="dates"
-    outerRef="dateHistogram"
+    outerRef="scrapeDateHistogram"
     @value-changed="onDateRangeChanged"
     @show-date-overlay="onShowDateOverlay"/>
 </template>
@@ -54,7 +54,7 @@ import 'vue-histogram-slider/dist/histogram-slider.css'
     DateFilterUI
   }
 })
-export default class DateFilter extends Vue {
+export default class ScrapeDateFilter extends Vue {
   private showHistogram = false
   private dateInterval: { min: number; max: number } | undefined
   private dateRange: { from: number | undefined; to: number | undefined } | undefined
