@@ -4,6 +4,9 @@
       <div class="intro">
         <p>{{$t('intro')}}</p>
       </div>
+      <a href="https://jobfairzav.ch" target="_blank">
+        <img class="banner" src="~/../assets/sponsors/Banner.jpg" alt="Banner Job Fair ZAV" top v-b-tooltip.hover title="Job Fair ZAV"/>
+      </a>
       <h1>{{$t('support')}}</h1>
       <b-card-group id='bcards' deck>
         <b-card>
@@ -20,6 +23,7 @@
             </div>
           </div>
         </b-card>
+        <!--
         <b-card>
           <div class="card-img-wapper">
             <a href="https://www3.unifr.ch/ius/de/" target="_blank">
@@ -34,6 +38,7 @@
             </div>
           </div>
         </b-card>
+        -->
         <b-card>
           <div class="card-img-wapper">
             <a href="https://www.advo-schreiber.ch/advo/" target="_blank">
@@ -104,7 +109,6 @@
             </div>
           </div>
         </b-card>
-        <!--
         <b-card>
           <div class="card-img-wapper">
             <a href="https://www.zhaw.ch/de/hochschule/" target="_blank">
@@ -119,7 +123,6 @@
             </div>
           </div>
         </b-card>
-        -->
         <b-card>
           <div class="card-img-wapper">
             <a href="https://www.kellerhals-carrard.ch/de/home/index.php" target="_blank">
@@ -488,6 +491,76 @@
             <div class="card-text-wrapper">
               <b-card-text>
               MME Legal | Tax | Compliance
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.cms.law" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor36.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="CMS von Erlach Partners AG">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              CMS von Erlach Partners AG
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.altenburger.ch/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor37.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Altenburger Ltd legal + tax">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Altenburger Ltd legal + tax
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://obersonabels.com/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor38.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="OBERSON ABELS SA">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              OBERSON ABELS SA
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.unifr.ch/ius/baurecht/de/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor39.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Institut für Schweizerisches und Internationales Baurecht, Universität Freiburg">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Institut für Schweizerisches und Internationales Baurecht, Universität Freiburg
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.domenig.law/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor40.png" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Domenig & Partner Rechtsanwälte AG">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Domenig & Partner Rechtsanwälte AG
               </b-card-text>
             </div>
           </div>
