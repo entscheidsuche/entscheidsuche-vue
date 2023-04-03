@@ -9,7 +9,9 @@
         </div>
         <div class="total-hits">
           <div class="title-wrapper">
-            <p class="title">{{ $t('allHits') }}: {{ resultsTotal }}</p>
+            <p class="title">{{ $t('allHits') }}: {{ resultsTotal }}
+              <a v-bind:href="this.getDownloadUrl()" v-if="resultsTotal>0" target="_Blank">⬇</a>
+            </p>
           </div>
           <div class="undo-all" v-if="this.allowUndoFilter" v-on:click="undoFilter()">
             <div v-bind:class="['title-wrapper', this.allowUndoFilter ? 'active' : '']" v-on:click="undoFilter()">
@@ -1346,6 +1348,12 @@ export default class SearchResults extends Vue {
         button.style.transform = 'rotate(0deg)'
       }
     }
+  }
+
+  public getDownloadUrl () {
+    const url1 = 'http://v2202109132150164038.luckysrv.de/api/search?{%22collection%22:%22entscheidsuche%22,%20%22query%22:%22'
+    const url2 = '%22,%20%22getDocs%22:true,%22getZIP%22:true,%20%22getCSV%22:false,%20%22getHTML%22:true,%20%22getNiceHTML%22:false,%20%22getJSON%22:false,%20%22ui%22:true}'
+    return url1 + SearchModule.query + url2
   }
 }
 </script>
