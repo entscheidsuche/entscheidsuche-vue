@@ -98,7 +98,24 @@ export default class DateFilterUI extends Vue {
         singleHandle.addEventListener('mousedown', this.showDateOverlay)
         singleHandle.addEventListener('touchend', this.showDateOverlay)
       }
+      this.addHandleIcons()
     }, 20)
+  }
+
+  public addHandleIcons () {
+    const fromHandle = document.getElementsByClassName('irs-from')[0]
+    const toHandle = document.getElementsByClassName('irs-to')[0]
+    const singleHandle = document.getElementsByClassName('irs-single')[0]
+    const div = document.createElement('div')
+    const img = document.createElement('img')
+    div.classList.add('handle-img')
+    img.classList.add('bg-img')
+    div.appendChild(img)
+    if (fromHandle && toHandle && singleHandle) {
+      fromHandle.appendChild(div)
+      toHandle.appendChild(div.cloneNode(true))
+      singleHandle.appendChild(div.cloneNode(true))
+    }
   }
 
   public showDateOverlay () {
@@ -116,6 +133,7 @@ export default class DateFilterUI extends Vue {
       this.prevTo = value.to_pretty
       this.$emit('value-changed', value)
     }
+    this.addHandleIcons()
   }
 
   public handleRangeChange (fromUpdated: number, toUpdated: number) {
