@@ -1352,8 +1352,23 @@ export default class SearchResults extends Vue {
 
   public getDownloadUrl () {
     const url1 = 'http://v2202109132150164038.luckysrv.de/api/search?{%22collection%22:%22entscheidsuche%22,%20%22query%22:%22'
-    const url2 = '%22,%20%22getDocs%22:true,%22getZIP%22:true,%20%22getCSV%22:false,%20%22getHTML%22:true,%20%22getNiceHTML%22:false,%20%22getJSON%22:false,%20%22ui%22:true}'
-    return url1 + SearchModule.query + url2
+    const url2 = '%22,%20%22filter%22:%22'
+    const url3 = '%22,%20%22getDocs%22:true,%22getZIP%22:true,%20%22getCSV%22:false,%20%22getHTML%22:true,%20%22getNiceHTML%22:false,%20%22getJSON%22:false,%20%22ui%22:true}'
+    const filter = []
+    for (const k in SearchModule.filters) {
+      const e1 = {}
+      const e2 = {}
+      let kk = k
+      if (kk === 'language') {
+        kk = 'attachment.language'
+      }
+      e1[kk] = SearchModule.filters[k].payload
+      e2.terms = e1
+      filter.push(e2)
+    }
+    // "filter":[{"terms":{"attachment.language":["de"]}},{"terms":{"hierarchy":["AG"]}},{"range":{"date":{"lte":1509015759293}}}]}}
+    // "filters":"{"language":{"type":"language","payload":["de"]},"hierarchie":{"type":"hierarchie","payload":["CH"]}}"
+    return url1 + SearchModule.query + url2 + JSON.stringify(filter).replaceAll('"', '@') + url3
   }
 }
 </script>
