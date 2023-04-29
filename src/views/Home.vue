@@ -565,6 +565,34 @@
             </div>
           </div>
         </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://akbs.ch/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor41.jpg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Advokatenkammer Basel">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Advokatenkammer Basel
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.homburger.ch/de" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor42.svg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Homburger AG">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Homburger AG
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
 
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
