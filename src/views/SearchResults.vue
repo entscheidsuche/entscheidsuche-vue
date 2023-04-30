@@ -922,14 +922,14 @@ export default class SearchResults extends Vue {
   get fromState () {
     const from = new Date(this.overlayFrom)
     const fromNumber = from.getTime()
-    const to = new Date(this.overlayTo)
-    const toNumber = to.getTime()
+    // const to = new Date(this.overlayTo)
+    // const toNumber = to.getTime()
     return !isNaN(fromNumber)
   }
 
   get toState () {
-    const from = new Date(this.overlayFrom)
-    const fromNumber = from.getTime()
+    // const from = new Date(this.overlayFrom)
+    // const fromNumber = from.getTime()
     const to = new Date(this.overlayTo)
     const toNumber = to.getTime()
     return !isNaN(toNumber)
@@ -1068,7 +1068,7 @@ export default class SearchResults extends Vue {
     const selectedId = this.$route.query.selected
     const preview = this.$route.query.preview
     const fullScreen = this.$route.query.fullScreen
-    const name = this.$route.name
+    // const name = this.$route.name
     if (query && query !== this.query && ((fullScreen && this.windowWidth > 534) || (preview && this.windowWidth <= 534))) {
       this.fullScreen = true
       this.previewVisible = true
@@ -1354,16 +1354,31 @@ export default class SearchResults extends Vue {
     const url1 = 'http://v2202109132150164038.luckysrv.de/api/search?{%22collection%22:%22entscheidsuche%22,%20%22query%22:%22'
     const url2 = '%22,%20%22filter%22:%22'
     const url3 = '%22,%20%22getDocs%22:true,%22getZIP%22:true,%20%22getCSV%22:false,%20%22getHTML%22:true,%20%22getNiceHTML%22:false,%20%22getJSON%22:false,%20%22ui%22:true}'
-    const filter = []
+    const filter: any[] = []
     for (const k in SearchModule.filters) {
-      const e1 = {}
-      const e2 = {}
+      const e1: any = {}
+      const e2: any = {}
+      const f = SearchModule.filters[k].payload
       let kk = k
+      let term = 'terms'
       if (kk === 'language') {
         kk = 'attachment.language'
+      } else if (kk === 'hierarchie') {
+        kk = 'hierarchy'
+      } else if (kk === 'edatum') {
+        kk = 'date'
+        term = 'range'
+        if ('from' in f) {
+          f.gte = f.from
+          delete f.from
+        }
+        if ('to' in f) {
+          f.lte = f.to
+          delete f.to
+        }
       }
-      e1[kk] = SearchModule.filters[k].payload
-      e2.terms = e1
+      e1[kk] = f
+      e2[term] = e1
       filter.push(e2)
     }
     // "filter":[{"terms":{"attachment.language":["de"]}},{"terms":{"hierarchy":["AG"]}},{"range":{"date":{"lte":1509015759293}}}]}}
