@@ -593,6 +593,20 @@
             </div>
           </div>
         </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://www.cbwm.ch" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor43.svg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="CBWM &amp; Associés">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              CBWM &amp; Associés
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
 
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
