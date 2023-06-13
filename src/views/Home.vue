@@ -4,9 +4,11 @@
       <div class="intro">
         <p>{{$t('intro')}}</p>
       </div>
+<!--
       <a href="https://jobfairzav.ch" target="_blank">
         <img class="banner" src="~/../assets/sponsors/Banner.jpg" alt="Banner Job Fair ZAV" top v-b-tooltip.hover title="Job Fair ZAV"/>
       </a>
+-->
       <h1>{{$t('support')}}</h1>
       <b-card-group id='bcards' deck>
         <b-card>
@@ -603,6 +605,20 @@
             <div class="card-text-wrapper">
               <b-card-text>
               CBWM &amp; Associés
+              </b-card-text>
+            </div>
+          </div>
+        </b-card>
+        <b-card>
+          <div class="card-img-wapper">
+            <a href="https://odage.ch/" target="_blank">
+            <b-card-img src="~/../assets/sponsors/sponsor44.svg" alt="Image" top></b-card-img>
+            </a>
+          </div>
+          <div class="card-footer" v-b-tooltip.hover title="Ordre des avocats de Genève">
+            <div class="card-text-wrapper">
+              <b-card-text>
+              Ordre des avocats de Genève
               </b-card-text>
             </div>
           </div>
