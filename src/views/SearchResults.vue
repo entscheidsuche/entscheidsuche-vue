@@ -87,6 +87,12 @@
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
               <h4 class="result-title" v-html="result.title"/>
+              <b-button variant="primary" v-on:click="onOpenSource()" id="result-court-btn">
+                <b-icon id="result-court"></b-icon>
+              </b-button>
+              <b-button variant="primary" v-on:click="onPrint()" id="result-print-btn">
+                <b-icon id="result-print" icon="printer"></b-icon>
+              </b-button>
               <img v-if="result.pdf" src="../assets/pdf.png" class="link-logo">
               <img v-else src="../assets/html.png" class="link-logo">
             </div>
@@ -120,6 +126,12 @@
                 </div>
                 <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
                 <div class="controls-wrapper">
+                  <b-button variant="primary" v-on:click="onVisitCourt()" id="court-btn">
+                    <b-icon id="court"></b-icon>
+                  </b-button>
+                  <b-button variant="primary" v-on:click="onPrint()" id="print-btn">
+                    <b-icon id="print" icon="printer"></b-icon>
+                  </b-button>
                   <b-button variant="primary"  v-on:click="onFullScreen()" id="maximize-preview-btn">
                     <b-icon id="maximize-preview" icon="arrows-fullscreen"></b-icon>
                   </b-button>
@@ -430,18 +442,46 @@
             flex-direction: row;
             margin-bottom: 12px;
 
+            #result-court-btn{
+              height:30px;
+              width:30px;
+              position: relative;
+              margin-left: 5px;
+              #result-court{
+                background: url('../assets/court.svg') no-repeat center;
+                height:22px;
+                width:22px;
+                position:absolute;
+                top:3px;
+                left:3px;
+              }
+            }
+            #result-print-btn{
+              height:30px;
+              width:30px;
+              margin-left: 5px;
+              position: relative;
+              #result-print{
+                height:22px;
+                width:22px;
+                position:absolute;
+                top:3px;
+                left:3px;
+              }
+            }
+
             .canton-logo{
               max-height:36px;
               width: auto;
               height: auto;
-              margin-right:10px;
+              margin-right:5px;
               flex-shrink: 0;
             }
             .link-logo{
               max-height:36px;
               width:auto;
               height: auto;
-              margin-left:10px;
+              margin-left:5px;
             }
             .result-title{
               font-size: 16px;
@@ -563,7 +603,10 @@
                 flex-shrink: 0;
               }
               .controls-wrapper{
-                width:100px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                width:170px;
                 height:30px;
                 margin-left: 20px;
                 position:relative;
@@ -572,9 +615,7 @@
                 #close-preview-btn{
                   height:30px;
                   width:30px;
-                  position:absolute;
-                  top:0;
-                  right:0;
+                  position:relative;
                   #close-preview{
                     background: url('../assets/bootstrap-close-big-white.svg') no-repeat center;
                     height:28px;
@@ -584,35 +625,60 @@
                     left:0;
                   }
                 }
+                #court-btn{
+                  height:30px;
+                  width:30px;
+                  position: relative;
+                  #court{
+                    background: url('../assets/court.svg') no-repeat center;
+                    height:22px;
+                    width:22px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
+                  }
+                }
+                #print-btn{
+                  height:30px;
+                  width:30px;
+                  position: relative;
+                  #print{
+                    height:22px;
+                    width:22px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
+                  }
+                }
                 #maximize-preview-btn{
                   height:30px;
                   width:30px;
+                  position: relative;
                   #maximize-preview{
                     height:22px;
                     width:22px;
                     position:absolute;
-                    top:4px;
-                    left:4px;
+                    top:3px;
+                    left:3px;
                   }
                 }
                 #separate-preview-btn{
                   height:30px;
                   width:30px;
-                  margin-left: 5px;
+                  position: relative;
                   #separate-preview{
                     height:22px;
                     width:22px;
-                    position:relative;
-                    top:-1px;
-                    left:-8px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
                   }
                 }
                 #minimize-preview-btn{
                   height:30px;
                   width:30px;
                   display:none;
-                  position: absolute;
-                  right:0;
+                  position: relative;
                   #minimize-preview{
                     height:22px;
                     width:22px;
@@ -691,14 +757,11 @@
             .doc-header{
               .flex-row{
                 .controls-wrapper{
+                  width: 135px;
                   #minimize-preview-btn{
                     display:block;
-                    float:right;
                   }
                   #maximize-preview-btn{
-                    display:none;
-                  }
-                  #separate-preview-btn{
                     display:none;
                   }
                   #close-preview-btn{
@@ -1207,13 +1270,21 @@ export default class SearchResults extends Vue {
     }
   }
 
+  public onPrint (): void{
+    // TODO
+  }
+
+  public onOpenSource (): void{
+    // TODO
+  }
+
   public onNewTab (): void{
-    if (!this.fullScreen) {
-      if ('id' in SearchModule.selectedResult) {
-        window.open('/view/' + SearchModule.selectedResult.id, '_blank')
-        self.focus()
-      }
+    // if (!this.fullScreen) {
+    if ('id' in SearchModule.selectedResult) {
+      window.open('/view/' + SearchModule.selectedResult.id, '_blank')
+      self.focus()
     }
+    // }
   }
 
   public onOpenPreview (): void{
