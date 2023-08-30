@@ -86,7 +86,7 @@
         <div v-if="!pristine && results.length === 0" class="no-results">
           <h3 class="hint">Ihre Suche nach "{{ query }}" ergab leider keine Treffer</h3>
         </div>
-        <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
+        <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-bind:id="isSelected(result) ? 'selectedRes' : ''" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
@@ -1041,6 +1041,7 @@ export default class SearchResults extends Vue {
         iFrameParent.append(iFrame)
       }
     }
+    this.$nextTick(() => { this.scrollToSelectedRes() })
   }
 
   @Watch('filter')
@@ -1074,6 +1075,7 @@ export default class SearchResults extends Vue {
       this.previewVisible = false
       this.fullScreen = false
     }
+    this.setRandomSponsors()
   }
 
   created () {
@@ -1253,6 +1255,7 @@ export default class SearchResults extends Vue {
           SearchModule.SetFullScreen('')
         }
         this.fullScreen = false
+        this.$nextTick(() => { this.scrollToSelectedRes() })
       }
     } else if (this.fullScreen) {
       router.push({ name: 'Home' })
@@ -1288,6 +1291,7 @@ export default class SearchResults extends Vue {
         this.previewVisible = true
       }
     }
+    this.$nextTick(() => { this.scrollToSelectedRes() })
   }
 
   public initOverlayDates (): void {
@@ -1401,6 +1405,7 @@ export default class SearchResults extends Vue {
   }
 
   public setRandomSponsors () {
+    alert('new set Random Sponsors')
     let shuffledSponsors: {'sponsor': Sponsor; 'position': number}[] = []
     for (let i = 0; i < this.sponsors.length; i++) {
       shuffledSponsors[i] = { sponsor: this.sponsors[i], position: Math.random() }
@@ -1418,6 +1423,18 @@ export default class SearchResults extends Vue {
       newSponsors.push((shuffledSponsors[i]).sponsor)
     }
     this.randomSponsors = newSponsors
+  }
+
+  public scrollToSelectedRes () {
+    const selectedRes = document.getElementById('selectedRes')
+    if (selectedRes) {
+      if (selectedRes.getBoundingClientRect().bottom > window.innerHeight) {
+        selectedRes.scrollIntoView(false)
+      }
+      if (selectedRes.getBoundingClientRect().top < 0) {
+        selectedRes.scrollIntoView()
+      }
+    }
   }
 }
 </script>
