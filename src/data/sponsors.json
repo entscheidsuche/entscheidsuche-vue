@@ -1,0 +1,317 @@
+[
+    {
+        "logo": "sponsor1.png",
+        "link": "https://my-d.org/index.php/www-my-d-org",
+        "text": "MY-D Foundation, Geneva",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor2.png",
+        "link": "https://www3.unifr.ch/ius/de/",
+        "text": "Université de Fribourg Universität Freiburg",
+        "tooltip": "",
+        "active": false
+    },
+    {
+        "logo": "sponsor3.png",
+        "link": "https://www.advo-schreiber.ch/advo/",
+        "text": "Advokatur Schreiber",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor4.png",
+        "link": "https://www.unisg.ch/de/universitaet/schools/law",
+        "text": "Universität St.Gallen, Law School",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor5.png",
+        "link": "https://www.legalis.ch/de/",
+        "text": "legalis.ch",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor6.png",
+        "link": "https://www.bav-aab.ch/de/",
+        "text": "Bernischer Anwaltsverband Association des avocats bernois",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor7.jpg",
+        "link": "https://www.zav.ch/",
+        "text": "Zürcher Anwaltsverband",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor8.png",
+        "link": "https://www.zhaw.ch/de/hochschule/",
+        "text": "Zürcher Hochschule für Angewandte Wissenschaften",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor9.svg",
+        "link": "https://www.kellerhals-carrard.ch/de/home/index.php",
+        "text": "Kellerhals Carrard",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor11.jpg",
+        "link": "https://www3.unifr.ch/federalism/en/",
+        "text": "Institut für Föderalismus, Universität Freiburg Institut du Fédéralisme, Université de Fribourg",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor12.jpg",
+        "link": "https://www.oav.ch/",
+        "text": "Ordre des avocats vaudois",
+        "tooltip": "",
+        "active": false
+    },
+    {
+        "logo": "sponsor13.jpg",
+        "link": "https://www.schkg-vereinigung.ch/",
+        "text": "SchKG-Vereinigung Association LP",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor14.svg",
+        "link": "https://www.sgav.ch/",
+        "text": "St.Galler Anwaltsverband",
+        "tooltip": "",
+        "active": false
+    },
+    {
+        "logo": "sponsor15.png",
+        "link": "https://pansoft.de/",
+        "text": "Pansoft GmbH",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor16.png",
+        "link": "https://www.betreibung-konkurs.ch/",
+        "text": "Konferenz der Betreibungs- und Konkursbeamten der Schweiz",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor17.png",
+        "link": "https://www.oeffentlichkeitsgesetz.ch/deutsch",
+        "text": "Öffentlichkeitsgesetz",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor18.svg",
+        "link": "https://steigerlegal.ch",
+        "text": "Steiger Legal",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor19.jpg",
+        "link": "https://aslantas.ch",
+        "text": "Anwaltskanzlei Aslantas",
+        "tooltip": "",
+        "active": false
+    },
+    {
+        "logo": "sponsor20.jpg",
+        "link": "https://www.sedlex-avocats.ch/",
+        "text": "sedlex Rechtsanwälte Lausanne",
+        "tooltip": "",
+        "active": false
+    },
+    {
+        "logo": "sponsor21.png",
+        "link": "https://www.ub.unibe.ch/teilbibliotheken/rechtswissenschaft/juristische_bibliothek_jbb/index_ger.html",
+        "text": "Universitätsbibliothek Bern, Juristische Bibliothek",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor22.jpg",
+        "link": "https://fritschi.foundation/",
+        "text": "Fonds ÆQUITAS, Fritschi Foundation",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor23.jpg",
+        "link": "https://www.stulz-recht.ch/",
+        "text": "Anwaltskanzlei Stulz",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor24.svg",
+        "link": "https://www.lauxlawyers.ch/",
+        "text": "LAUX LAWYERS AG",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor25.jpg",
+        "link": "https://www.unilu.ch/fakultaeten/rf/",
+        "text": "Rechtswissenschaftliche Fakultät",
+        "tooltip": "UNIVERSITÄT LUZERN, Rechtswissenschaftliche Fakultät",
+        "active": true
+    },
+    {
+        "logo": "sponsor26.png",
+        "link": "https://www.cooprecht.ch/",
+        "text": "Coop Rechtsschutz AG",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor27.png",
+        "link": "https://www.lenzstaehelin.com",
+        "text": "Lenz & Staehelin",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor28.png",
+        "link": "https://www.5001.ch",
+        "text": "Schärer Rechtsanwälte",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor29.svg",
+        "link": "https://www.wartmann-merker.ch/",
+        "text": "Wartmann Merker AG",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor30.jpg",
+        "link": "https://www.hol-law.ch/",
+        "text": "HOLENSTEIN  BRUSA legal & tax",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor31.png",
+        "link": "https://unine.ch/droit",
+        "text": "Faculté de droit",
+        "tooltip": "Université de Neuchâtel, Faculté de droit",
+        "active": true
+    },
+    {
+        "logo": "sponsor32.jpg",
+        "link": "https://www.zurich.ch/",
+        "text": "Zürich Versicherungs-Gesellschaft AG",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor33.png",
+        "link": "https://www.arrestpraxis.ch/einfuehrung/",
+        "text": "VISCHER arrestpraxis.ch",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor34.png",
+        "link": "https://www.ylex.ch",
+        "text": "YLEX Rechtsberatung",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor35.svg",
+        "link": "https://www.mme.ch",
+        "text": "MME Legal | Tax | Compliance",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor36.png",
+        "link": "https://www.cms.law",
+        "text": "CMS von Erlach Partners AG",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor37.png",
+        "link": "https://www.altenburger.ch/",
+        "text": "Altenburger Ltd legal + tax",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor38.png",
+        "link": "https://obersonabels.com/",
+        "text": "OBERSON ABELS SA",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor39.png",
+        "link": "https://www.unifr.ch/ius/baurecht/de/",
+        "text": "Institut für Schweizerisches und Internationales Baurecht, Universität Freiburg",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor40.png",
+        "link": "https://www.domenig.law/",
+        "text": "Domenig & Partner Rechtsanwälte AG",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor41.jpg",
+        "link": "https://akbs.ch/",
+        "text": "Advokatenkammer Basel",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor42.svg",
+        "link": "https://www.homburger.ch/de",
+        "text": "Homburger AG",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor43.svg",
+        "link": "https://www.cbwm.ch",
+        "text": "CBWM &amp; Associés",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor44.svg",
+        "link": "https://odage.ch/",
+        "text": "Ordre des avocats de Genève",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor45.png",
+        "link": "https://basler-juristenverein.ch/",
+        "text": "Basler Juristenverein",
+        "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor46.svg",
+        "link": "https://good-zuerich.ch/",
+        "text": "Good Rechtsanwälte",
+        "tooltip": "",
+        "active": true
+    }
+]
