@@ -74,7 +74,7 @@
         </div>
       </div>
       <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']" @scroll="handleScroll" id="results">
-        <h1 class="card-group-title">{{$t('support')}}</h1>
+        <h1 class="card-group-title">{{$t('also support')}}</h1>
         <b-card-group id='bcardsResults' deck>
           <sponsor-card v-for="(sponsor, index) in this.randomSponsors" :key="index" :logo="sponsor.logo" :link="sponsor.link" :text="sponsor.text" :tooltip="sponsor.tooltip"/>
         </b-card-group>
