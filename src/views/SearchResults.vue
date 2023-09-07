@@ -1075,7 +1075,6 @@ export default class SearchResults extends Vue {
       this.previewVisible = false
       this.fullScreen = false
     }
-    this.setRandomSponsors()
   }
 
   created () {
@@ -1405,7 +1404,6 @@ export default class SearchResults extends Vue {
   }
 
   public setRandomSponsors () {
-    alert('new set Random Sponsors')
     let shuffledSponsors: {'sponsor': Sponsor; 'position': number}[] = []
     for (let i = 0; i < this.sponsors.length; i++) {
       shuffledSponsors[i] = { sponsor: this.sponsors[i], position: Math.random() }
