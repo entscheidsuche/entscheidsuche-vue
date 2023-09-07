@@ -74,10 +74,6 @@
         </div>
       </div>
       <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']" @scroll="handleScroll" id="results">
-        <h1 class="card-group-title">{{$t('also support')}}</h1>
-        <b-card-group id='bcardsResults' deck>
-          <sponsor-card v-for="(sponsor, index) in this.randomSponsors" :key="index" :logo="sponsor.logo" :link="sponsor.link" :text="sponsor.text" :tooltip="sponsor.tooltip"/>
-        </b-card-group>
         <div v-bind:class="['button-wrapper', this.showMessage ? 'messageOffset' : '']">
           <div v-on:click="onToggleFilter()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible', this.fullScreen ? 'fullScreen' : '']">
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
@@ -86,7 +82,7 @@
         <div v-if="!pristine && results.length === 0" class="no-results">
           <h3 class="hint">Ihre Suche nach "{{ query }}" ergab leider keine Treffer</h3>
         </div>
-        <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
+        <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-bind:id="isSelected(result) ? 'selectedRes' : ''" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
@@ -362,37 +358,6 @@
         padding: 8px 0 8px 0;
         border:0;
         overflow:none;
-      }
-      .card-group-title {
-        margin: 0;
-        padding-bottom: 15px;
-      }
-      .card-deck{
-        width:100%;
-        display:flex;
-        flex-flow:row wrap;
-        justify-content:space-between;
-        margin:0px;
-
-        .card {
-          background-color: #fff;
-          border: none;
-          box-shadow: 0 2px 30px rgba(0, 0, 0, .15);
-          border-radius: 0 0 20px 0;
-          margin: 5px 0 5px 0;
-          width: 260px;
-          max-width: calc((100% - 40px) / 4);
-          flex-basis: 260px;
-          flex-grow: 1;
-          justify-content: space-between;
-        }
-        .card:hover {
-          .card-img-wapper {
-            .card-img-top {
-              transform: matrix(1, 0, 0, 1, 0, 0);
-            }
-          }
-        }
       }
       .button-wrapper{
         position:absolute;
@@ -781,9 +746,6 @@
         }
       }
       .results{
-        .card {
-          max-width: calc((100% - 20px) / 3);
-        }
         .button-wrapper{
           top: calc(((100vh - 38px) / 2) - 120px );
 
@@ -856,13 +818,6 @@
         border:0;
         padding-left: 20px;
         padding-right: 20px;
-        .card-deck{
-          .card{
-            min-width:100px;
-            //max-width:160px;
-            max-width:calc((100% - 20px) / 2);
-          }
-        }
         .show-filter{
           &.visible{
           top: calc((100vh - 38px) / 2);
@@ -883,7 +838,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
-import { AppModule, MessageState, Sponsor } from '@/store/modules/app'
+import { AppModule, MessageState } from '@/store/modules/app'
 import { Filters, FilterType, SearchModule, SearchResult } from '@/store/modules/search'
 import DateFilter from '@/components/DateFilter.vue'
 import HierarchieFilter from '@/components/HierarchieFilter.vue'
@@ -892,8 +847,6 @@ import SortOrderSelector from '@/components/SortOrderSelector.vue'
 import { Route } from 'vue-router'
 import router from '@/router'
 import { BButton } from 'bootstrap-vue'
-import SponsorCard from '@/components/SponsorCard.vue'
-import data from '../data/sponsors.json'
 
 @Component({
   name: 'SearchResult',
@@ -901,8 +854,7 @@ import data from '../data/sponsors.json'
     SortOrderSelector,
     DateFilter,
     LanguageFilter,
-    HierarchieFilter,
-    SponsorCard
+    HierarchieFilter
   }
 })
 
@@ -917,8 +869,6 @@ export default class SearchResults extends Vue {
   public overlayVisible = false
   public overlayFrom = ''
   public overlayTo = ''
-  public sponsors = data.filter(s => s.active)
-  public randomSponsors = data.filter(s => s.active)
 
   data () {
     return {
@@ -1041,6 +991,7 @@ export default class SearchResults extends Vue {
         iFrameParent.append(iFrame)
       }
     }
+    this.$nextTick(() => { this.scrollToSelectedRes() })
   }
 
   @Watch('filter')
@@ -1089,7 +1040,6 @@ export default class SearchResults extends Vue {
 
   mounted () {
     this.allowUndoFilter = Object.keys(this.filter).length > 0
-    this.handleResize()
   }
 
   destroyed () {
@@ -1101,7 +1051,6 @@ export default class SearchResults extends Vue {
     this.getFilterInnerWidth()
     this.windowWidth = window.innerWidth
     this.filterVisible = this.windowWidth > 1024
-    this.setRandomSponsors()
   }
 
   handleScroll () {
@@ -1253,6 +1202,7 @@ export default class SearchResults extends Vue {
           SearchModule.SetFullScreen('')
         }
         this.fullScreen = false
+        this.$nextTick(() => { this.scrollToSelectedRes() })
       }
     } else if (this.fullScreen) {
       router.push({ name: 'Home' })
@@ -1288,6 +1238,7 @@ export default class SearchResults extends Vue {
         this.previewVisible = true
       }
     }
+    this.$nextTick(() => { this.scrollToSelectedRes() })
   }
 
   public initOverlayDates (): void {
@@ -1400,24 +1351,16 @@ export default class SearchResults extends Vue {
     }
   }
 
-  public setRandomSponsors () {
-    let shuffledSponsors: {'sponsor': Sponsor; 'position': number}[] = []
-    for (let i = 0; i < this.sponsors.length; i++) {
-      shuffledSponsors[i] = { sponsor: this.sponsors[i], position: Math.random() }
+  public scrollToSelectedRes () {
+    const selectedRes = document.getElementById('selectedRes')
+    if (selectedRes) {
+      if (selectedRes.getBoundingClientRect().bottom > window.innerHeight) {
+        selectedRes.scrollIntoView(false)
+      }
+      if (selectedRes.getBoundingClientRect().top < 0) {
+        selectedRes.scrollIntoView()
+      }
     }
-    shuffledSponsors.sort((a, b) => { return Math.sign(a.position - b.position) })
-    if (this.windowWidth <= 534 && this.randomSponsors.length !== 2) {
-      shuffledSponsors = shuffledSponsors.slice(0, 2)
-    } else if (this.windowWidth > 534 && this.randomSponsors.length !== 4) {
-      shuffledSponsors = shuffledSponsors.slice(0, 4)
-    } else {
-      return
-    }
-    const newSponsors: Sponsor[] = []
-    for (let i = 0; i < shuffledSponsors.length; i++) {
-      newSponsors.push((shuffledSponsors[i]).sponsor)
-    }
-    this.randomSponsors = newSponsors
   }
 }
 </script>
