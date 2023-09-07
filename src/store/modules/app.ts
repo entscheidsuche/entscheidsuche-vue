@@ -30,6 +30,14 @@ export interface AppState {
   showMessage: MessageState;
 }
 
+export interface Sponsor {
+  logo: string;
+  link: string;
+  text: string;
+  tooltip: string;
+  active: boolean;
+}
+
 @Module({ dynamic: true, store, name: 'app' })
 export class App extends VuexModule implements AppState {
   private lang = i18n.locale
