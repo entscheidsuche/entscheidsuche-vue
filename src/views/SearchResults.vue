@@ -1065,6 +1065,7 @@ export default class SearchResults extends Vue {
     if (from !== to && this.overlayVisible) {
       this.onCancelOverlay()
     }
+    this.setRandomSponsors()
   }
 
   @Watch('query')
@@ -1404,20 +1405,21 @@ export default class SearchResults extends Vue {
   }
 
   public setRandomSponsors () {
-    let shuffledSponsors: {'sponsor': Sponsor; 'position': number}[] = []
+    const shuffledSponsors: {'sponsor': Sponsor; 'position': number}[] = []
     for (let i = 0; i < this.sponsors.length; i++) {
       shuffledSponsors[i] = { sponsor: this.sponsors[i], position: Math.random() }
     }
     shuffledSponsors.sort((a, b) => { return Math.sign(a.position - b.position) })
-    if (this.windowWidth <= 534 && this.randomSponsors.length !== 2) {
-      shuffledSponsors = shuffledSponsors.slice(0, 2)
-    } else if (this.windowWidth > 534 && this.randomSponsors.length !== 4) {
-      shuffledSponsors = shuffledSponsors.slice(0, 4)
+    let visibleSponsors = 0
+    if (this.windowWidth <= 534) {
+      visibleSponsors = 2
+    } else if (this.windowWidth > 534) {
+      visibleSponsors = 4
     } else {
-      return
+      visibleSponsors = 0
     }
     const newSponsors: Sponsor[] = []
-    for (let i = 0; i < shuffledSponsors.length; i++) {
+    for (let i = 0; i < visibleSponsors; i++) {
       newSponsors.push((shuffledSponsors[i]).sponsor)
     }
     this.randomSponsors = newSponsors
