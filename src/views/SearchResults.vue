@@ -90,9 +90,11 @@
               <b-button variant="primary" v-on:click="onOpenSource()" id="result-court-btn">
                 <b-icon id="result-court"></b-icon>
               </b-button>
-              <b-button variant="primary" v-on:click="onPrint()" id="result-print-btn">
-                <b-icon id="result-print" icon="printer"></b-icon>
-              </b-button>
+              <a :href="result.url" target="_blank">
+                <b-button variant="primary" id="result-print-btn">
+                  <b-icon id="result-print" icon="printer"></b-icon>
+                </b-button>
+              </a>
               <img v-if="result.pdf" src="../assets/pdf.png" class="link-logo">
               <img v-else src="../assets/html.png" class="link-logo">
             </div>
@@ -129,9 +131,11 @@
                   <b-button variant="primary" v-on:click="onVisitCourt()" id="court-btn">
                     <b-icon id="court"></b-icon>
                   </b-button>
-                  <b-button variant="primary" v-on:click="onPrint()" id="print-btn">
-                    <b-icon id="print" icon="printer"></b-icon>
-                  </b-button>
+                  <a :href="selectedResult.url" target="_blank">
+                    <b-button variant="primary" id="print-btn">
+                      <b-icon id="print" icon="printer"></b-icon>
+                    </b-button>
+                  </a>
                   <b-button variant="primary"  v-on:click="onFullScreen()" id="maximize-preview-btn">
                     <b-icon id="maximize-preview" icon="arrows-fullscreen"></b-icon>
                   </b-button>
@@ -1268,10 +1272,6 @@ export default class SearchResults extends Vue {
     } else if (this.fullScreen) {
       router.push({ name: 'Home' })
     }
-  }
-
-  public onPrint (): void{
-    // TODO
   }
 
   public onOpenSource (): void{
