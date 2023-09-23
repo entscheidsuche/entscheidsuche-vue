@@ -1041,7 +1041,9 @@ export default class SearchResults extends Vue {
         iFrameParent.append(iFrame)
       }
     }
-    this.$nextTick(() => { this.scrollToSelectedRes() })
+    setTimeout(() => {
+      this.scrollToSelectedRes()
+    }, 100)
   }
 
   @Watch('filter')
@@ -1255,7 +1257,9 @@ export default class SearchResults extends Vue {
           SearchModule.SetFullScreen('')
         }
         this.fullScreen = false
-        this.$nextTick(() => { this.scrollToSelectedRes() })
+        setTimeout(() => {
+          this.scrollToSelectedRes()
+        }, 100)
       }
     } else if (this.fullScreen) {
       router.push({ name: 'Home' })
@@ -1291,7 +1295,9 @@ export default class SearchResults extends Vue {
         this.previewVisible = true
       }
     }
-    this.$nextTick(() => { this.scrollToSelectedRes() })
+    setTimeout(() => {
+      this.scrollToSelectedRes()
+    }, 100)
   }
 
   public initOverlayDates (): void {
@@ -1429,10 +1435,10 @@ export default class SearchResults extends Vue {
     const selectedRes = document.getElementById('selectedRes')
     if (selectedRes) {
       if (selectedRes.getBoundingClientRect().bottom > window.innerHeight) {
-        selectedRes.scrollIntoView(false)
+        selectedRes.scrollIntoView({ block: 'center' })
       }
       if (selectedRes.getBoundingClientRect().top < 0) {
-        selectedRes.scrollIntoView()
+        selectedRes.scrollIntoView({ block: 'center' })
       }
     }
   }
