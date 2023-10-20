@@ -1275,8 +1275,13 @@ export default class SearchResults extends Vue {
   }
 
   public onOpenSource (): void{
-    // TODO
+
   }
+
+  public onVisitCourt (): void{
+
+  }
+
 
   public onNewTab (): void{
     // if (!this.fullScreen) {
