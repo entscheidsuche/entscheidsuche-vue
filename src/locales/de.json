@@ -41,5 +41,8 @@
   "from": "Von",
   "to": "Bis",
   "confirmDateOverlay": "Übernehmen",
-  "cancelDateOverlay": "Abbrechen"
+  "cancelDateOverlay": "Abbrechen",
+  "postitMessage": "Strafbefehle gesucht",
+  "postitHover": "Nutzen Sie die Uploadfunktion, um fehlende Strafbefehle hochzuladen",
+  "postitUrl": "https://entscheidsuche.ch/upload"
 }

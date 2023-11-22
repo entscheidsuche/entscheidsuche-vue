@@ -40,5 +40,8 @@
   "from": "du",
   "to": "au",
   "confirmDateOverlay": "accepter",
-  "cancelDateOverlay": "annuler"
+  "cancelDateOverlay": "annuler",
+  "postitMessage": "",
+  "postitHover": "",
+  "postitUrl": ""
 }

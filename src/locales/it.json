@@ -40,5 +40,8 @@
   "from": "tra",
   "to": "e",
   "confirmDateOverlay": "applica",
-  "cancelDateOverlay": "cancellare"
+  "cancelDateOverlay": "cancellare",
+  "postitMessage": "",
+  "postitHover": "",
+  "postitUrl": ""
 }
