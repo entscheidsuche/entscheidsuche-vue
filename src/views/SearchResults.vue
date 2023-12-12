@@ -970,14 +970,10 @@ export default class SearchResults extends Vue {
   get fromState () {
     const from = new Date(this.overlayFrom)
     const fromNumber = from.getTime()
-    const to = new Date(this.overlayTo)
-    const toNumber = to.getTime()
     return !isNaN(fromNumber)
   }
 
   get toState () {
-    const from = new Date(this.overlayFrom)
-    const fromNumber = from.getTime()
     const to = new Date(this.overlayTo)
     const toNumber = to.getTime()
     return !isNaN(toNumber)
@@ -1122,7 +1118,6 @@ export default class SearchResults extends Vue {
     const selectedId = this.$route.query.selected
     const preview = this.$route.query.preview
     const fullScreen = this.$route.query.fullScreen
-    const name = this.$route.name
     if (query && query !== this.query && ((fullScreen && this.windowWidth > 534) || (preview && this.windowWidth <= 534))) {
       this.fullScreen = true
       this.previewVisible = true
@@ -1241,7 +1236,7 @@ export default class SearchResults extends Vue {
     this.filterVisible = !this.filterVisible
   }
 
-  public onFullScreen (): void{
+  public onFullScreen (): void {
     const name = this.$route.name
     if (name !== 'View') {
       if (!this.fullScreen) {
@@ -1266,7 +1261,7 @@ export default class SearchResults extends Vue {
     }
   }
 
-  public onNewTab (): void{
+  public onNewTab (): void {
     if (!this.fullScreen) {
       if ('id' in SearchModule.selectedResult) {
         window.open('/view/' + SearchModule.selectedResult.id, '_blank')
@@ -1275,7 +1270,7 @@ export default class SearchResults extends Vue {
     }
   }
 
-  public onOpenPreview (): void{
+  public onOpenPreview (): void {
     this.previewVisible = true
     if (this.windowWidth <= 534) {
       this.fullScreen = true
@@ -1286,7 +1281,7 @@ export default class SearchResults extends Vue {
     return AppModule.showMessage === MessageState.VISIBLE
   }
 
-  public onClosePreview (): void{
+  public onClosePreview (): void {
     this.previewVisible = false
     SearchModule.SetPreview(false)
     if (this.fullScreen) {

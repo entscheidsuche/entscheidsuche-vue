@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueI18n, { LocaleMessages } from 'vue-i18n'
 import getBrowserLocale from '@/util/i18n/get-browser-locale'
-import router from '@/router'
 
 Vue.use(VueI18n)
 

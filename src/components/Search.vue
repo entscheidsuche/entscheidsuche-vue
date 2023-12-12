@@ -126,8 +126,6 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SearchModule } from '@/store/modules/search'
-import router from '@/router'
-import { Route } from 'vue-router'
 
 @Component
 export default class Search extends Vue {
