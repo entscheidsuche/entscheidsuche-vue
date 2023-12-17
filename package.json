@@ -12,7 +12,7 @@
   "dependencies": {
     "@riophae/vue-treeselect": "^0.4.0",
     "@syncfusion/ej2-vue-navigations": "^18.4.31",
-    "@types/lodash": "^4.14.166",
+    "@types/lodash": "^4.14.74",
     "axios": "^0.21.0",
     "bootstrap-vue": "^2.19.0",
     "core-js": "^3.6.5",
