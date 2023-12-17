@@ -221,7 +221,7 @@ import Message from '@/components/Message.vue'
   }
 })
 export default class Header extends Vue {
-  private showOptionalBar = true;
+  private showOptionalBar = true
 
   public get locale () {
     return AppModule.locale

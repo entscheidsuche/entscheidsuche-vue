@@ -13,7 +13,7 @@
       :disableFuzzyMatching="true"
       :searchable="this.getSearchable()">
       @input="onHierarchieChanged"
-      <label slot="option-label" slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName}" v-bind:class="[labelClassName, node.raw.count === 0 ? 'empty' : '']">
+      <label slot="option-label" slot-scope="{ node, labelClassName, countClassName}" v-bind:class="[labelClassName, node.raw.count === 0 ? 'empty' : '']">
         <div class="text-wrapper">
           <span>{{ node.label }}</span>
         </div>
