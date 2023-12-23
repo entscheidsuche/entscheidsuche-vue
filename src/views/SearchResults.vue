@@ -91,16 +91,19 @@
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
               <h4 class="result-title" v-html="result.title"/>
-              <b-button variant="primary" v-on:click="onOpenSource()" id="result-court-btn">
-                <b-icon id="result-court"></b-icon>
-              </b-button>
-              <a :href="result.url" target="_blank">
-                <b-button variant="primary" id="result-print-btn">
+
+              <a v-if="directLink(result)" :href="result.url" target="_blank" @click.prevent.stop="onSource(result.url)">
+                <b-button variant="primary" id="result-court-btn" :title="$t('courtHover')">
+                  <b-icon id="result-court"></b-icon>
+                </b-button>
+              </a>
+              <a :href="result.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(result.url.replace('/docs/','/dok/'))">
+                <b-button variant="primary" id="result-print-btn" :title="$t('printHover')">
                   <b-icon id="result-print" icon="printer"></b-icon>
                 </b-button>
               </a>
-              <img v-if="result.pdf" src="../assets/pdf.png" class="link-logo">
-              <img v-else src="../assets/html.png" class="link-logo">
+              <img v-if="result.pdf" src="../assets/pdf.png" class="link-logo" :title="$t('pdfHover')">
+              <img v-else src="../assets/html.png" class="link-logo" :title="$t('htmlHover')">
             </div>
             <div class="abstract" v-if="result.abstract.length > 0">
               <div class="first-row">
@@ -132,11 +135,13 @@
                 </div>
                 <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
                 <div class="controls-wrapper">
-                  <b-button variant="primary" v-on:click="onVisitCourt()" id="court-btn">
-                    <b-icon id="court"></b-icon>
-                  </b-button>
-                  <a :href="selectedResult.url" target="_blank">
-                    <b-button variant="primary" id="print-btn">
+                  <a v-if="directLink(selectedResult)" :href="selectedResult.url" target="_blank" @click.prevent.stop="onSource(selectedResult.url)">
+                    <b-button variant="primary" id="court-btn" :title="$t('courtHover')">
+                      <b-icon id="court"></b-icon>
+                    </b-button>
+                  </a>
+                  <a :href="selectedResult.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(selectedResult.url.replace('/docs/','/dok/'))">
+                    <b-button variant="primary" id="print-btn" :title="$t('printHover')">
                       <b-icon id="print" icon="printer"></b-icon>
                     </b-button>
                   </a>
@@ -158,7 +163,7 @@
             </div>
             <div class="abstract" v-if="selectedResult.abstract !== undefined && selectedResult.abstract.length > 0">
               <div class="first-row">
-                <div v-on:click.stop="onToggleAbstract((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
+                <div v-on:click.stop="onToggle((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
                   <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
                 </div>
                 <p class="card-text" v-html="selectedResult.abstract" v-bind:id="(selectedResult.id + '-preview')"/>
@@ -981,6 +986,7 @@ export default class SearchResults extends Vue {
   private sliderWidth = 1
   private allowUndoFilter = false
   private iframeUrl = ''
+  private jsonData: any = null
   public overlayVisible = false
   public overlayFrom = ''
   public overlayTo = ''
@@ -1303,6 +1309,78 @@ export default class SearchResults extends Vue {
     this.filterVisible = !this.filterVisible
   }
 
+  public directLink (result) {
+    const pathSegments = result.url.split('/').filter(Boolean)
+    return (/^[A-Z]{2}_/.test(pathSegments[3]) && !(/^(CH_EDOEB|XX_Upload|BE_ZivilStraf|BE_Anwaltsaufsicht|BE_Verwaltungsgericht|BE_Steuerrekurs|BS_Omni|GL_Omni|GR_Gerichte|JU_Gerichte|TG_OG|VS_Gerichte)$/.test(pathSegments[3])))
+  }
+
+  public onSource (docurl): void {
+    // const protocol = 'https:'
+    // const host = 'entscheidsuche.ch'
+    // const protocol = window.location.protocol
+    // const host = window.location.host
+    const url = docurl.replace(/\.([a-zA-Z0-9]+)$/, '.json')
+
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok.')
+        }
+        return response.json()
+      })
+      .then(data => {
+        // Here 'data' is the JSON object you've fetched
+        console.log(data)
+        // You can now set this data to a component's data property or work with it as needed
+        this.processJsonData(data) // Process your data with another method
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error)
+      })
+  }
+
+  processJsonData (data) {
+    // Handle your JSON data here
+    // For example, you might want to set it to a Vue data property
+    let url = null
+    if ('PDF' in data) {
+      url = data.PDF.URL
+    } else if ('HTML' in data) {
+      url = data.HTML.URL
+    }
+    if (url) {
+      this.openPrint(url)
+    } else {
+      alert('no deeplink available')
+    }
+  }
+
+  public openPrint (url): void {
+    // Calculate width and height as 80% of the current window's dimensions
+    const width = window.innerWidth * 0.8
+    const height = window.innerHeight * 0.8
+
+    // Round down the numbers to avoid decimals
+    const roundedWidth = Math.floor(width)
+    const roundedHeight = Math.floor(height)
+
+    // Calculate the position of the new window to be centered
+    const left = (window.innerWidth / 2) - (roundedWidth / 2)
+    const top = (window.innerHeight / 2) - (roundedHeight / 2)
+
+    // Open a new window with the specified dimensions and position it in the center
+    const newWindow = window.open(url, 'newwindow', `width=${roundedWidth},height=${roundedHeight},top=${top},left=${left}`)
+
+    // Check if the new window was successfully opened
+    if (newWindow) {
+      // Focus the new window if it's opened in the background
+      newWindow.focus()
+    } else {
+      // If the new window was blocked by the browser's popup blocker, inform the user
+      alert('A popup blocker may be preventing the new window from opening.')
+    }
+  }
+
   public onFullScreen (): void {
     const name = this.$route.name
     if (name !== 'View') {
@@ -1328,15 +1406,7 @@ export default class SearchResults extends Vue {
     }
   }
 
-  public onOpenSource (): void{
-
-  }
-
-  public onVisitCourt (): void{
-
-  }
-
-  public onNewTab (): void{
+  public onNewTab (): void {
     // if (!this.fullScreen) {
     if ('id' in SearchModule.selectedResult) {
       window.open('/view/' + SearchModule.selectedResult.id, '_blank')

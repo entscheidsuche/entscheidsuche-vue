@@ -44,5 +44,9 @@
   "cancelDateOverlay": "Abbrechen",
   "postitMessage": "Strafbefehle gesucht",
   "postitHover": "Gesucht: Stossendster Strafbefehl des Jahres",
-  "postitUrl": "https://www.beobachter.ch/gesetze-recht/justiz/gesucht-stossendster-strafbefehl-des-jahres-659798?utm_source=linkedin&utm_medium=social&utm_campaign=article_traffic"
+  "postitUrl": "https://www.beobachter.ch/gesetze-recht/justiz/gesucht-stossendster-strafbefehl-des-jahres-659798?utm_source=linkedin&utm_medium=social&utm_campaign=article_traffic",
+  "printHover": "Druckansicht",
+  "courtHover": "Deeplink zur Gerichtswebsite",
+  "pdfHover": "Entscheid aufrufen (PDF)",
+  "htmlHover": "Entscheid aufrufen (HTML)"  
 }

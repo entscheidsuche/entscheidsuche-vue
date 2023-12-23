@@ -43,5 +43,9 @@
   "cancelDateOverlay": "cancellare",
   "postitMessage": "",
   "postitHover": "",
-  "postitUrl": ""
+  "postitUrl": "",
+  "printHover": "Vista stampa",
+  "courtHover": "Link al sito web del tribunale",
+  "pdfHover": "Visualizza la decisione del tribunale (PDF)",
+  "htmlHover": "Visualizza la decisione del tribunale (HTML)"  
 }
