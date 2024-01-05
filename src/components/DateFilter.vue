@@ -23,8 +23,32 @@
   }
   .irs-from,.irs-to,.irs-single{
     top:56px;
+
+    .handle-img {
+      position: absolute;
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      top: 0px;
+      border-radius: 0 4px 4px 0;
+      background-color: #6183ec;
+
+      .bg-img {
+        width: 13px;
+        height: 13px;
+        position: relative;
+        top: 2px;
+        left: 3px;
+        content: url('../assets/pencil-white.svg');
+      }
+    }
+
     @media (hover: none) and (pointer: coarse) {
       font-size: 16px;
+
+      .handle-img {
+        height: 22px;
+      }
     }
   }
   .irs-from::before,.irs-to::before,.irs-single::before{

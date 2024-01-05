@@ -37,9 +37,17 @@
   "Update am": "Update am",
   "intro": "Das frei zugängliche Portal entscheidsuche.ch bietet eine Suche in allen publizierten Gerichtsurteilen von Schweizer Gerichten aller Instanzen.",
   "support": "Wer uns unterstützt:",
+  "also support": "Wir werden u.a. unterstützt von:",
   "betatest": "Betatest",
   "from": "Von",
   "to": "Bis",
   "confirmDateOverlay": "Übernehmen",
-  "cancelDateOverlay": "Abbrechen"
+  "cancelDateOverlay": "Abbrechen",
+  "postitMessage": "Strafbefehle gesucht",
+  "postitHover": "Gesucht: Stossendster Strafbefehl des Jahres",
+  "postitUrl": "https://www.beobachter.ch/gesetze-recht/justiz/gesucht-stossendster-strafbefehl-des-jahres-659798?utm_source=linkedin&utm_medium=social&utm_campaign=article_traffic",
+  "printHover": "Druckansicht",
+  "courtHover": "Deeplink zur Gerichtswebsite",
+  "pdfHover": "Entscheid aufrufen (PDF)",
+  "htmlHover": "Entscheid aufrufen (HTML)"  
 }

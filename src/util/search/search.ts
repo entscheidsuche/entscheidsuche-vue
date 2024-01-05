@@ -26,15 +26,12 @@ export class SearchUtil {
       _source: {
         excludes: ['attachment.content']
       },
-      // eslint-disable-next-line @typescript-eslint/camelcase
       track_total_hits: true,
       query: {
         bool: {
           must: {
-            // eslint-disable-next-line @typescript-eslint/camelcase
             query_string: {
               query: query,
-              // eslint-disable-next-line @typescript-eslint/camelcase
               default_operator: 'AND',
               type: 'cross_fields',
               fields: [
@@ -55,11 +52,9 @@ export class SearchUtil {
       highlight: {
         fields: {
           [`title.${lang}`]: {
-            // eslint-disable-next-line @typescript-eslint/camelcase
             number_of_fragments: 0
           },
           [`abstract.${lang}`]: {
-            // eslint-disable-next-line @typescript-eslint/camelcase
             number_of_fragments: 0
           },
           'attachment.content': {}
@@ -70,7 +65,6 @@ export class SearchUtil {
       search.query.bool.filter = SearchUtil.buildFilters(filters)
     }
     if (searchAfter !== undefined) {
-      // eslint-disable-next-line @typescript-eslint/camelcase
       search.search_after = searchAfter
     } else {
       if (filters.hierarchie === undefined) {
@@ -100,20 +94,16 @@ export class SearchUtil {
           search.aggs = {}
         }
         search.aggs.edatum = {
-          // eslint-disable-next-line @typescript-eslint/camelcase
           date_histogram: {
-            // eslint-disable-next-line @typescript-eslint/camelcase
             calendar_interval: SearchUtil.getCalendarInterval(filters),
             field: 'date'
           }
         }
-        // eslint-disable-next-line @typescript-eslint/camelcase
         search.aggs.min_edatum = {
           min: {
             field: 'date'
           }
         }
-        // eslint-disable-next-line @typescript-eslint/camelcase
         search.aggs.max_edatum = {
           max: {
             field: 'date'
@@ -155,10 +145,8 @@ export class SearchUtil {
       query: {
         bool: {
           must: {
-            // eslint-disable-next-line @typescript-eslint/camelcase
             query_string: {
               query: query,
-              // eslint-disable-next-line @typescript-eslint/camelcase
               default_operator: 'AND',
               type: 'cross_fields',
               fields: [
@@ -193,20 +181,16 @@ export class SearchUtil {
       }
     } else if (filter.type === 'edatum') {
       search.aggs.edatum = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
         date_histogram: {
-          // eslint-disable-next-line @typescript-eslint/camelcase
           calendar_interval: SearchUtil.getCalendarInterval(filters),
           field: 'date'
         }
       }
-      // eslint-disable-next-line @typescript-eslint/camelcase
       search.aggs.min_edatum = {
         min: {
           field: 'date'
         }
       }
-      // eslint-disable-next-line @typescript-eslint/camelcase
       search.aggs.max_edatum = {
         max: {
           field: 'date'

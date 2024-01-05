@@ -108,6 +108,10 @@
         </div>
       </div>
       <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']" @scroll="handleScroll" id="results">
+        <h1 class="card-group-title">{{$t('also support')}}</h1>
+        <b-card-group id='bcardsResults' deck>
+          <sponsor-card v-for="(sponsor, index) in this.randomSponsors" :key="index" :logo="sponsor.logo" :link="sponsor.link" :text="sponsor.text" :tooltip="sponsor.tooltip"/>
+        </b-card-group>
         <div v-bind:class="['button-wrapper', this.showMessage ? 'messageOffset' : '']">
           <div v-on:click="onToggleFilter()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible', this.fullScreen ? 'fullScreen' : '']">
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
@@ -116,13 +120,24 @@
         <div v-if="!pristine && results.length === 0" class="no-results">
           <h3 class="hint">Ihre Suche nach "{{ query }}" ergab leider keine Treffer</h3>
         </div>
-        <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
+        <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-bind:id="isSelected(result) ? 'selectedRes' : ''" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
               <h4 class="result-title" v-html="result.title"/>
-              <img v-if="result.pdf" src="../assets/pdf.png" class="link-logo">
-              <img v-else src="../assets/html.png" class="link-logo">
+
+              <a v-if="directLink(result)" :href="result.url" target="_blank" @click.prevent.stop="onSource(result.url)">
+                <b-button variant="primary" id="result-court-btn" :title="$t('courtHover')">
+                  <b-icon id="result-court"></b-icon>
+                </b-button>
+              </a>
+              <a :href="result.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(result.url.replace('/docs/','/dok/'))">
+                <b-button variant="primary" id="result-print-btn" :title="$t('printHover')">
+                  <b-icon id="result-print" icon="printer"></b-icon>
+                </b-button>
+              </a>
+              <img v-if="result.pdf" src="../assets/pdf.png" class="link-logo" :title="$t('pdfHover')">
+              <img v-else src="../assets/html.png" class="link-logo" :title="$t('htmlHover')">
             </div>
             <div class="abstract" v-if="result.abstract.length > 0">
               <div class="first-row">
@@ -154,6 +169,16 @@
                 </div>
                 <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
                 <div class="controls-wrapper">
+                  <a v-if="directLink(selectedResult)" :href="selectedResult.url" target="_blank" @click.prevent.stop="onSource(selectedResult.url)">
+                    <b-button variant="primary" id="court-btn" :title="$t('courtHover')">
+                      <b-icon id="court"></b-icon>
+                    </b-button>
+                  </a>
+                  <a :href="selectedResult.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(selectedResult.url.replace('/docs/','/dok/'))">
+                    <b-button variant="primary" id="print-btn" :title="$t('printHover')">
+                      <b-icon id="print" icon="printer"></b-icon>
+                    </b-button>
+                  </a>
                   <b-button variant="primary"  v-on:click="onFullScreen()" id="maximize-preview-btn">
                     <b-icon id="maximize-preview" icon="arrows-fullscreen"></b-icon>
                   </b-button>
@@ -172,7 +197,7 @@
             </div>
             <div class="abstract" v-if="selectedResult.abstract !== undefined && selectedResult.abstract.length > 0">
               <div class="first-row">
-                <div v-on:click.stop="onToggleAbstract((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
+                <div v-on:click.stop="onToggle((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
                   <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
                 </div>
                 <p class="card-text" v-html="selectedResult.abstract" v-bind:id="(selectedResult.id + '-preview')"/>
@@ -397,6 +422,37 @@
         border:0;
         overflow:none;
       }
+      .card-group-title {
+        margin: 0;
+        padding-bottom: 15px;
+      }
+      .card-deck{
+        width:100%;
+        display:flex;
+        flex-flow:row wrap;
+        justify-content:space-between;
+        margin:0px;
+
+        .card {
+          background-color: #fff;
+          border: none;
+          box-shadow: 0 2px 30px rgba(0, 0, 0, .15);
+          border-radius: 0 0 20px 0;
+          margin: 5px 0 5px 0;
+          width: 260px;
+          max-width: calc((100% - 40px) / 4);
+          flex-basis: 260px;
+          flex-grow: 1;
+          justify-content: space-between;
+        }
+        .card:hover {
+          .card-img-wapper {
+            .card-img-top {
+              transform: matrix(1, 0, 0, 1, 0, 0);
+            }
+          }
+        }
+      }
       .button-wrapper{
         position:absolute;
         width:20px;
@@ -468,18 +524,46 @@
             flex-direction: row;
             margin-bottom: 12px;
 
+            #result-court-btn{
+              height:30px;
+              width:30px;
+              position: relative;
+              margin-left: 5px;
+              #result-court{
+                background: url('../assets/court.svg') no-repeat center;
+                height:22px;
+                width:22px;
+                position:absolute;
+                top:3px;
+                left:3px;
+              }
+            }
+            #result-print-btn{
+              height:30px;
+              width:30px;
+              margin-left: 5px;
+              position: relative;
+              #result-print{
+                height:22px;
+                width:22px;
+                position:absolute;
+                top:3px;
+                left:3px;
+              }
+            }
+
             .canton-logo{
               max-height:36px;
               width: auto;
               height: auto;
-              margin-right:10px;
+              margin-right:5px;
               flex-shrink: 0;
             }
             .link-logo{
               max-height:36px;
               width:auto;
               height: auto;
-              margin-left:10px;
+              margin-left:5px;
             }
             .result-title{
               font-size: 16px;
@@ -601,7 +685,10 @@
                 flex-shrink: 0;
               }
               .controls-wrapper{
-                width:100px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                width:170px;
                 height:30px;
                 margin-left: 20px;
                 position:relative;
@@ -610,9 +697,7 @@
                 #close-preview-btn{
                   height:30px;
                   width:30px;
-                  position:absolute;
-                  top:0;
-                  right:0;
+                  position:relative;
                   #close-preview{
                     background: url('../assets/bootstrap-close-big-white.svg') no-repeat center;
                     height:28px;
@@ -622,35 +707,60 @@
                     left:0;
                   }
                 }
+                #court-btn{
+                  height:30px;
+                  width:30px;
+                  position: relative;
+                  #court{
+                    background: url('../assets/court.svg') no-repeat center;
+                    height:22px;
+                    width:22px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
+                  }
+                }
+                #print-btn{
+                  height:30px;
+                  width:30px;
+                  position: relative;
+                  #print{
+                    height:22px;
+                    width:22px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
+                  }
+                }
                 #maximize-preview-btn{
                   height:30px;
                   width:30px;
+                  position: relative;
                   #maximize-preview{
                     height:22px;
                     width:22px;
                     position:absolute;
-                    top:4px;
-                    left:4px;
+                    top:3px;
+                    left:3px;
                   }
                 }
                 #separate-preview-btn{
                   height:30px;
                   width:30px;
-                  margin-left: 5px;
+                  position: relative;
                   #separate-preview{
                     height:22px;
                     width:22px;
-                    position:relative;
-                    top:-1px;
-                    left:-8px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
                   }
                 }
                 #minimize-preview-btn{
                   height:30px;
                   width:30px;
                   display:none;
-                  position: absolute;
-                  right:0;
+                  position: relative;
                   #minimize-preview{
                     height:22px;
                     width:22px;
@@ -729,14 +839,11 @@
             .doc-header{
               .flex-row{
                 .controls-wrapper{
+                  width: 135px;
                   #minimize-preview-btn{
                     display:block;
-                    float:right;
                   }
                   #maximize-preview-btn{
-                    display:none;
-                  }
-                  #separate-preview-btn{
                     display:none;
                   }
                   #close-preview-btn{
@@ -784,6 +891,9 @@
         }
       }
       .results{
+        .card {
+          max-width: calc((100% - 20px) / 3);
+        }
         .button-wrapper{
           top: calc(((100vh - 38px) / 2) - 120px );
 
@@ -856,6 +966,13 @@
         border:0;
         padding-left: 20px;
         padding-right: 20px;
+        .card-deck{
+          .card{
+            min-width:100px;
+            //max-width:160px;
+            max-width:calc((100% - 20px) / 2);
+          }
+        }
         .show-filter{
           &.visible{
           top: calc((100vh - 38px) / 2);
@@ -876,7 +993,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
-import { AppModule, MessageState } from '@/store/modules/app'
+import { AppModule, MessageState, Sponsor } from '@/store/modules/app'
 import { Filters, FilterType, SearchModule, SearchResult } from '@/store/modules/search'
 import DateFilter from '@/components/DateFilter.vue'
 import ScrapeDateFilter from '@/components/ScrapeDateFilter.vue'
@@ -887,6 +1004,8 @@ import { Route } from 'vue-router'
 import router from '@/router'
 import { BButton } from 'bootstrap-vue'
 import i18n from '@/i18n'
+import SponsorCard from '@/components/SponsorCard.vue'
+import data from '../data/sponsors.json'
 
 @Component({
   name: 'SearchResult',
@@ -895,7 +1014,8 @@ import i18n from '@/i18n'
     DateFilter,
     LanguageFilter,
     HierarchieFilter,
-    ScrapeDateFilter
+    ScrapeDateFilter,
+    SponsorCard
   }
 })
 
@@ -918,6 +1038,12 @@ export default class SearchResults extends Vue {
     { value: 'date', text: i18n.t('date').toString() },
     { value: 'scrapeDate', text: i18n.t('scrapeDate').toString() }
   ]
+  private jsonData: any = null
+  public overlayVisible = false
+  public overlayFrom = ''
+  public overlayTo = ''
+  public sponsors = data.filter(s => s.active)
+  public randomSponsors = data.filter(s => s.active)
 
   data () {
     return {
@@ -969,14 +1095,10 @@ export default class SearchResults extends Vue {
   get dateFromState () {
     const from = new Date(this.dateOverlayFrom)
     const fromNumber = from.getTime()
-    const to = new Date(this.dateOverlayTo)
-    const toNumber = to.getTime()
     return !isNaN(fromNumber)
   }
 
   get dateToState () {
-    const from = new Date(this.dateOverlayFrom)
-    const fromNumber = from.getTime()
     const to = new Date(this.dateOverlayTo)
     const toNumber = to.getTime()
     return !isNaN(toNumber)
@@ -997,14 +1119,10 @@ export default class SearchResults extends Vue {
   get scrapeDateFromState () {
     const from = new Date(this.scrapeDateOverlayFrom)
     const fromNumber = from.getTime()
-    const to = new Date(this.scrapeDateOverlayTo)
-    const toNumber = to.getTime()
     return !isNaN(fromNumber)
   }
 
   get scrapeDateToState () {
-    const from = new Date(this.scrapeDateOverlayFrom)
-    const fromNumber = from.getTime()
     const to = new Date(this.scrapeDateOverlayTo)
     const toNumber = to.getTime()
     return !isNaN(toNumber)
@@ -1072,6 +1190,9 @@ export default class SearchResults extends Vue {
         iFrameParent.append(iFrame)
       }
     }
+    setTimeout(() => {
+      this.scrollToSelectedRes()
+    }, 100)
   }
 
   @Watch('filter')
@@ -1098,6 +1219,7 @@ export default class SearchResults extends Vue {
     if (from !== to && this.scrapeDateOverlayVisible) {
       this.onCancelScrapeDateOverlay()
     }
+    this.setRandomSponsors()
   }
 
   @Watch('query')
@@ -1123,6 +1245,7 @@ export default class SearchResults extends Vue {
 
   mounted () {
     this.allowUndoFilter = Object.keys(this.filter).length > 0
+    this.handleResize()
   }
 
   destroyed () {
@@ -1134,6 +1257,7 @@ export default class SearchResults extends Vue {
     this.getFilterInnerWidth()
     this.windowWidth = window.innerWidth
     this.filterVisible = this.windowWidth > 1024
+    this.setRandomSponsors()
   }
 
   handleScroll () {
@@ -1150,7 +1274,6 @@ export default class SearchResults extends Vue {
     const selectedId = this.$route.query.selected
     const preview = this.$route.query.preview
     const fullScreen = this.$route.query.fullScreen
-    const name = this.$route.name
     if (query && query !== this.query && ((fullScreen && this.windowWidth > 534) || (preview && this.windowWidth <= 534))) {
       this.fullScreen = true
       this.previewVisible = true
@@ -1321,7 +1444,79 @@ export default class SearchResults extends Vue {
     this.filterVisible = !this.filterVisible
   }
 
-  public onFullScreen (): void{
+  public directLink (result) {
+    const pathSegments = result.url.split('/').filter(Boolean)
+    return (/^[A-Z]{2}_/.test(pathSegments[3]) && !(/^(CH_EDOEB|XX_Upload|BE_ZivilStraf|BE_Anwaltsaufsicht|BE_Verwaltungsgericht|BE_Steuerrekurs|BS_Omni|GL_Omni|GR_Gerichte|JU_Gerichte|TG_OG|VS_Gerichte)$/.test(pathSegments[3])))
+  }
+
+  public onSource (docurl): void {
+    // const protocol = 'https:'
+    // const host = 'entscheidsuche.ch'
+    // const protocol = window.location.protocol
+    // const host = window.location.host
+    const url = docurl.replace(/\.([a-zA-Z0-9]+)$/, '.json')
+
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok.')
+        }
+        return response.json()
+      })
+      .then(data => {
+        // Here 'data' is the JSON object you've fetched
+        console.log(data)
+        // You can now set this data to a component's data property or work with it as needed
+        this.processJsonData(data) // Process your data with another method
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error)
+      })
+  }
+
+  processJsonData (data) {
+    // Handle your JSON data here
+    // For example, you might want to set it to a Vue data property
+    let url = null
+    if ('PDF' in data) {
+      url = data.PDF.URL
+    } else if ('HTML' in data) {
+      url = data.HTML.URL
+    }
+    if (url) {
+      this.openPrint(url)
+    } else {
+      alert('no deeplink available')
+    }
+  }
+
+  public openPrint (url): void {
+    // Calculate width and height as 80% of the current window's dimensions
+    const width = window.innerWidth * 0.8
+    const height = window.innerHeight * 0.8
+
+    // Round down the numbers to avoid decimals
+    const roundedWidth = Math.floor(width)
+    const roundedHeight = Math.floor(height)
+
+    // Calculate the position of the new window to be centered
+    const left = (window.innerWidth / 2) - (roundedWidth / 2)
+    const top = (window.innerHeight / 2) - (roundedHeight / 2)
+
+    // Open a new window with the specified dimensions and position it in the center
+    const newWindow = window.open(url, 'newwindow', `width=${roundedWidth},height=${roundedHeight},top=${top},left=${left}`)
+
+    // Check if the new window was successfully opened
+    if (newWindow) {
+      // Focus the new window if it's opened in the background
+      newWindow.focus()
+    } else {
+      // If the new window was blocked by the browser's popup blocker, inform the user
+      alert('A popup blocker may be preventing the new window from opening.')
+    }
+  }
+
+  public onFullScreen (): void {
     const name = this.$route.name
     if (name !== 'View') {
       if (!this.fullScreen) {
@@ -1337,22 +1532,25 @@ export default class SearchResults extends Vue {
           SearchModule.SetFullScreen('')
         }
         this.fullScreen = false
+        setTimeout(() => {
+          this.scrollToSelectedRes()
+        }, 100)
       }
     } else if (this.fullScreen) {
       router.push({ name: 'Home' })
     }
   }
 
-  public onNewTab (): void{
-    if (!this.fullScreen) {
-      if ('id' in SearchModule.selectedResult) {
-        window.open('/view/' + SearchModule.selectedResult.id, '_blank')
-        self.focus()
-      }
+  public onNewTab (): void {
+    // if (!this.fullScreen) {
+    if ('id' in SearchModule.selectedResult) {
+      window.open('/view/' + SearchModule.selectedResult.id, '_blank')
+      self.focus()
     }
+    // }
   }
 
-  public onOpenPreview (): void{
+  public onOpenPreview (): void {
     this.previewVisible = true
     if (this.windowWidth <= 534) {
       this.fullScreen = true
@@ -1363,7 +1561,7 @@ export default class SearchResults extends Vue {
     return AppModule.showMessage === MessageState.VISIBLE
   }
 
-  public onClosePreview (): void{
+  public onClosePreview (): void {
     this.previewVisible = false
     SearchModule.SetPreview(false)
     if (this.fullScreen) {
@@ -1372,6 +1570,9 @@ export default class SearchResults extends Vue {
         this.previewVisible = true
       }
     }
+    setTimeout(() => {
+      this.scrollToSelectedRes()
+    }, 100)
   }
 
   public initOverlayDates (): void {
@@ -1514,6 +1715,39 @@ export default class SearchResults extends Vue {
         button.style.transform = 'rotate(90deg)'
       } else {
         button.style.transform = 'rotate(0deg)'
+      }
+    }
+  }
+
+  public setRandomSponsors () {
+    const shuffledSponsors: {'sponsor': Sponsor; 'position': number}[] = []
+    for (let i = 0; i < this.sponsors.length; i++) {
+      shuffledSponsors[i] = { sponsor: this.sponsors[i], position: Math.random() }
+    }
+    shuffledSponsors.sort((a, b) => { return Math.sign(a.position - b.position) })
+    let visibleSponsors = 0
+    if (this.windowWidth <= 534) {
+      visibleSponsors = 2
+    } else if (this.windowWidth > 534) {
+      visibleSponsors = 4
+    } else {
+      visibleSponsors = 0
+    }
+    const newSponsors: Sponsor[] = []
+    for (let i = 0; i < visibleSponsors; i++) {
+      newSponsors.push((shuffledSponsors[i]).sponsor)
+    }
+    this.randomSponsors = newSponsors
+  }
+
+  public scrollToSelectedRes () {
+    const selectedRes = document.getElementById('selectedRes')
+    if (selectedRes) {
+      if (selectedRes.getBoundingClientRect().bottom > window.innerHeight) {
+        selectedRes.scrollIntoView({ block: 'center' })
+      }
+      if (selectedRes.getBoundingClientRect().top < 0) {
+        selectedRes.scrollIntoView({ block: 'center' })
       }
     }
   }
