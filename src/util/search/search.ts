@@ -115,20 +115,16 @@ export class SearchUtil {
           search.aggs = {}
         }
         search.aggs.scrapedate = {
-          // eslint-disable-next-line @typescript-eslint/camelcase
           date_histogram: {
-            // eslint-disable-next-line @typescript-eslint/camelcase
             calendar_interval: SearchUtil.getCalendarInterval(filters),
             field: 'scrapedate'
           }
         }
-        // eslint-disable-next-line @typescript-eslint/camelcase
         search.aggs.min_scrapedate = {
           min: {
             field: 'scrapedate'
           }
         }
-        // eslint-disable-next-line @typescript-eslint/camelcase
         search.aggs.max_scrapedate = {
           max: {
             field: 'scrapedate'
@@ -198,20 +194,16 @@ export class SearchUtil {
       }
     } else if (filter.type === 'scrapedate') {
       search.aggs.scrapedate = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
         date_histogram: {
-          // eslint-disable-next-line @typescript-eslint/camelcase
           calendar_interval: SearchUtil.getCalendarInterval(filters),
           field: 'scrapedate'
         }
       }
-      // eslint-disable-next-line @typescript-eslint/camelcase
       search.aggs.min_scrapedate = {
         min: {
           field: 'scrapedate'
         }
       }
-      // eslint-disable-next-line @typescript-eslint/camelcase
       search.aggs.max_scrapedate = {
         max: {
           field: 'scrapedate'

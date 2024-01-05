@@ -1034,10 +1034,7 @@ export default class SearchResults extends Vue {
   public scrapeDateOverlayFrom = ''
   public scrapeDateOverlayTo = ''
   public selectedSlider = 'date'
-  public sliderOptions = [
-    { value: 'date', text: i18n.t('date').toString() },
-    { value: 'scrapeDate', text: i18n.t('scrapeDate').toString() }
-  ]
+  public sliderOptions = [{ value: 'date', text: i18n.t('date').toString() }, { value: 'scrapeDate', text: i18n.t('scrapeDate').toString() }]
   private jsonData: any = null
   public overlayVisible = false
   public overlayFrom = ''
