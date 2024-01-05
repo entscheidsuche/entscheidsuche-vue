@@ -1241,7 +1241,7 @@ export default class SearchResults extends Vue {
       const fromNumber = from.getTime()
       const to = new Date(this.scrapeDateOverlayTo)
       const toNumber = to.getTime();
-      (this.$refs.scrapeDateFilter as DateFilter).handleRangeChange(fromNumber, toNumber)
+      (this.$refs.scrapeDateFilter as ScrapeDateFilter).handleRangeChange(fromNumber, toNumber)
       this.scrapeDateOverlayVisible = false
       this.removeScrapeGuardListeners()
     }
@@ -1401,10 +1401,9 @@ export default class SearchResults extends Vue {
   }
 
   initScrapeOverlayDates (): void {
-    // TODO
-    const minEdatum = Number(SearchModule.aggregations.min_edatum[0].key)
-    const maxEdatum = Number(SearchModule.aggregations.max_edatum[0].key)
-    if (!Object.prototype.hasOwnProperty.call(this.filter, 'edatum')) {
+    const minEdatum = Number(SearchModule.aggregations.min_scrapedate[0].key)
+    const maxEdatum = Number(SearchModule.aggregations.max_scrapedate[0].key)
+    if (!Object.prototype.hasOwnProperty.call(this.filter, 'scrapedate')) {
       if (minEdatum) {
         this.scrapeDateOverlayFrom = this.dateToString(minEdatum)
       }
@@ -1412,8 +1411,8 @@ export default class SearchResults extends Vue {
         this.scrapeDateOverlayTo = this.dateToString(maxEdatum)
       }
     } else {
-      const from = this.filter.edatum.payload.from
-      const to = this.filter.edatum.payload.to
+      const from = this.filter.scrapedate.payload.from
+      const to = this.filter.scrapedate.payload.to
       if (from) {
         this.scrapeDateOverlayFrom = this.dateToString(from)
       } else if (minEdatum) {
@@ -1475,7 +1474,7 @@ export default class SearchResults extends Vue {
   }
 
   public undoScrapeDateFilter () {
-    // TODO
+    SearchModule.RemoveFilter(FilterType.SCRAPEDATE)
   }
 
   public undoLanguageFilter () {
@@ -1491,8 +1490,7 @@ export default class SearchResults extends Vue {
   }
 
   public scrapeDateFilterEmpty () {
-    // TODO
-    return true
+    return !(Object.keys(this.filter).includes('scrapedate'))
   }
 
   public languageFilterEmpty () {
