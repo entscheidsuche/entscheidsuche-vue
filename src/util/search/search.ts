@@ -116,7 +116,7 @@ export class SearchUtil {
         }
         search.aggs.scrapedate = {
           date_histogram: {
-            calendar_interval: SearchUtil.getCalendarInterval(filters),
+            calendar_interval: SearchUtil.getScrapeCalendarInterval(filters),
             field: 'scrapedate'
           }
         }
@@ -195,7 +195,7 @@ export class SearchUtil {
     } else if (filter.type === 'scrapedate') {
       search.aggs.scrapedate = {
         date_histogram: {
-          calendar_interval: SearchUtil.getCalendarInterval(filters),
+          calendar_interval: SearchUtil.getScrapeCalendarInterval(filters),
           field: 'scrapedate'
         }
       }
@@ -275,7 +275,24 @@ export class SearchUtil {
   private static getCalendarInterval (filters: Filters): string {
     const filter = filters.edatum
     if (filter !== undefined) {
-      if (filter.type === 'edatum' || filter.type === 'scrapedate') {
+      if (filter.type === 'edatum') {
+        const range = (filter.payload.to - filter.payload.from) / 1000 / 3600 / 24
+        if (range < 40) {
+          return 'day'
+        } else if (range < 280) {
+          return 'week'
+        } else if (range < 1200) {
+          return 'month'
+        }
+      }
+    }
+    return 'quarter'
+  }
+
+  private static getScrapeCalendarInterval (filters: Filters): string {
+    const filter = filters.scrapedate
+    if (filter !== undefined) {
+      if (filter.type === 'scrapedate') {
         const range = (filter.payload.to - filter.payload.from) / 1000 / 3600 / 24
         if (range < 40) {
           return 'day'
