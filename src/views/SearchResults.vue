@@ -97,7 +97,7 @@
                   <b-icon id="result-court"></b-icon>
                 </b-button>
               </a>
-              <a :href="result.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(result.url.replace('/docs/','/dok/'))">
+              <a v-if="directLink(result)" :href="result.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(result.url.replace('/docs/','/dok/'))">
                 <b-button variant="primary" id="result-print-btn" :title="$t('printHover')">
                   <b-icon id="result-print" icon="printer"></b-icon>
                 </b-button>
@@ -140,7 +140,7 @@
                       <b-icon id="court"></b-icon>
                     </b-button>
                   </a>
-                  <a :href="selectedResult.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(selectedResult.url.replace('/docs/','/dok/'))">
+                  <a v-if="directLink(selectedResult)" :href="selectedResult.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(selectedResult.url.replace('/docs/','/dok/'))">
                     <b-button variant="primary" id="print-btn" :title="$t('printHover')">
                       <b-icon id="print" icon="printer"></b-icon>
                     </b-button>
@@ -1310,8 +1310,11 @@ export default class SearchResults extends Vue {
   }
 
   public directLink (result) {
-    const pathSegments = result.url.split('/').filter(Boolean)
-    return (/^[A-Z]{2}_/.test(pathSegments[3]) && !(/^(CH_EDOEB|XX_Upload|BE_ZivilStraf|BE_Anwaltsaufsicht|BE_Verwaltungsgericht|BE_Steuerrekurs|BS_Omni|GL_Omni|GR_Gerichte|JU_Gerichte|TG_OG|VS_Gerichte)$/.test(pathSegments[3])))
+    if (result && result.url) {
+      const pathSegments = result.url.split('/').filter(Boolean)
+      return (/^[A-Z]{2}_/.test(pathSegments[3]) && !(/^(CH_EDOEB|XX_Upload|BE_ZivilStraf|BE_Anwaltsaufsicht|BE_Verwaltungsgericht|BE_Steuerrekurs|BS_Omni|GL_Omni|GR_Gerichte|JU_Gerichte|TG_OG|VS_Gerichte)$/.test(pathSegments[3])))
+    }
+    return false
   }
 
   public onSource (docurl): void {
