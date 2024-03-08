@@ -10,7 +10,7 @@
         <div class="total-hits">
           <div class="title-wrapper">
             <p class="title">{{ $t('allHits') }}: {{ resultsTotal }}
-              <a :href="this.getDownloadUrl()" target="_blank" @click.prevent.stop="this.getDownloadUrl()">
+              <a :href="this.getDownloadUrl()" target="_blank">
                 <b-button variant="primary" id="result-download-btn" :title="$t('downloadHover')">
                   <b-icon id="result-print" icon="download"></b-icon>
                 </b-button>
