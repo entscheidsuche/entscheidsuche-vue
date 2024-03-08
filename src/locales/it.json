@@ -47,5 +47,6 @@
   "printHover": "Vista stampa",
   "courtHover": "Link al sito web del tribunale",
   "pdfHover": "Visualizza la decisione del tribunale (PDF)",
-  "htmlHover": "Visualizza la decisione del tribunale (HTML)"  
+  "htmlHover": "Visualizza la decisione del tribunale (HTML)",
+  "downloadHover": "Scarica tutte le decisioni trovate (versione di prova)"
 }

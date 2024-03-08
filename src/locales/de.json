@@ -48,5 +48,6 @@
   "printHover": "Druckansicht",
   "courtHover": "Deeplink zur Gerichtswebsite",
   "pdfHover": "Entscheid aufrufen (PDF)",
-  "htmlHover": "Entscheid aufrufen (HTML)"  
+  "htmlHover": "Entscheid aufrufen (HTML)",
+  "downloadHover": "Alle gefundenen Entscheide herunterladen (Testversion)"
 }
