@@ -93,6 +93,11 @@ const routes: Array<RouteConfig> = [
     path: '/datenschutz',
     name: 'Datenschutz',
     component: () => import('../views/Datenschutz.vue')
+  },
+  {
+    path: '/altsystem',
+    name: 'Altsystem',
+    component: () => import('../views/Altsystem.vue')
   }
 ]
 

@@ -35,9 +35,17 @@
   "Update am": "aggiornamento da",
   "intro": "Il portale Internet entscheidsuche.ch, accessibile gratuitamente, permette di cercare tutte le decisioni giudiziarie svizzere pubblicate da tutte le istanze.",
   "support": "Chi ci sostiene:",
+  "also support": "Siamo sostenuti, tra gli altri, da :",
   "betatest": "beta test",
   "from": "tra",
   "to": "e",
   "confirmDateOverlay": "applica",
-  "cancelDateOverlay": "cancellare"
+  "cancelDateOverlay": "cancellare",
+  "postitMessage": "",
+  "postitHover": "",
+  "postitUrl": "",
+  "printHover": "Vista stampa",
+  "courtHover": "Link al sito web del tribunale",
+  "pdfHover": "Visualizza la decisione del tribunale (PDF)",
+  "htmlHover": "Visualizza la decisione del tribunale (HTML)"  
 }
