@@ -218,7 +218,7 @@
     },
     {
         "logo": "sponsor33.png",
-        "link": "https://www.arrestpraxis.ch/einfuehrung/",
+        "link": "https://www.arrestpraxis.ch/",
         "text": "VISCHER arrestpraxis.ch",
         "tooltip": "",
         "active": true
@@ -319,6 +319,13 @@
         "link": "https://bhlaw.ch/",
         "text": "Baur Hürlimann AG",
         "tooltip": "",
+        "active": true
+    },
+    {
+        "logo": "sponsor48.svg",
+        "link": "https://www.bfh.ch/ipst",
+        "text": "Institut Public Sector Transformation",
+        "tooltip": "Institut Public Sector Transformation, Berner Fachhochschule",
         "active": true
     }
 ]
