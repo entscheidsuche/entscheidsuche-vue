@@ -1,8 +1,8 @@
 import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult, SortOrder } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
 
-// const searchUrl = 'https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search'
-const searchUrl = 'https://entscheidsuche.ch/_search.php'
+// const searchUrl = 'https://entscheidsuche.pansoft.de:9200/entscheidsuche.v2-*/_search'
+const searchUrl = 'https://entscheidsuche.ch/_searchV2.php'
 
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
