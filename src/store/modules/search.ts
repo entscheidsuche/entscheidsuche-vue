@@ -10,11 +10,11 @@ const FILTER_DELIMITER = '@'
 export type Facets = Array<Facet>
 
 export enum FilterType {
-  HIERARCHY = 'hierarchie', DATE = 'edatum', LANGUAGE = 'language'
+  HIERARCHY = 'hierarchie', DATE = 'edatum', SCRAPEDATE = 'scrapedate', LANGUAGE = 'language'
 }
 
 export enum SortOrder {
-  RELEVANCE = 'relevance', DATE = 'date'
+  RELEVANCE = 'relevance', DATE = 'date', SCRAPEDATE = 'scrapedate'
 }
 
 function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrder, selectedId?: string, preview?: string, fullScreen?: string): void {
@@ -24,8 +24,8 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
   const existingFilters = query.filter !== undefined ? Array.isArray(query.filter) ? query.filter : [query.filter] : undefined
   const newFilters: Array<string> | undefined = Object.keys(filters).length > 0 ? [] : undefined
   const newQueryString = queryString !== '' ? queryString : undefined
-  const existingSort = query.sort !== undefined && query.sort === SortOrder.DATE ? SortOrder.DATE : undefined
-  const newSort = sortOrder === SortOrder.DATE ? SortOrder.DATE : undefined
+  const existingSort = query.sort !== undefined && query.sort === SortOrder.DATE ? SortOrder.DATE : query.sort === SortOrder.SCRAPEDATE ? SortOrder.SCRAPEDATE : undefined
+  const newSort = sortOrder === SortOrder.DATE ? SortOrder.DATE : sortOrder === SortOrder.SCRAPEDATE ? SortOrder.SCRAPEDATE : undefined
   const existingSelectedId = query.selectedId
   const newSelectedId = selectedId !== '' ? selectedId : undefined
   const existingPreview = query.preview
@@ -41,6 +41,8 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
           newFilters.push(`h${FILTER_DELIMITER}${filter.payload.join()}`)
         } else if (filter.type === FilterType.DATE) {
           newFilters.push(`e${FILTER_DELIMITER}${filter.payload.from ? filter.payload.from : ''},${filter.payload.to !== undefined ? filter.payload.to : ''}`)
+        } else if (filter.type === FilterType.SCRAPEDATE) {
+          newFilters.push(`s${FILTER_DELIMITER}${filter.payload.from ? filter.payload.from : ''},${filter.payload.to !== undefined ? filter.payload.to : ''}`)
         } else if (filter.type === FilterType.LANGUAGE) {
           newFilters.push(`l${FILTER_DELIMITER}${filter.payload.join()}`)
         }
@@ -135,6 +137,7 @@ export interface SearchResult {
   abstract: string;
   text: string;
   date: string;
+  scrapedate?: string;
   canton: string;
   pdf: boolean;
   url: string;
@@ -325,6 +328,17 @@ export class Search extends VuexModule implements SearchState {
           newFilters.edatum =
           {
             type: FilterType.DATE,
+            payload:
+            {
+              from: numbers[0].length > 0 ? parseInt(numbers[0]) : undefined,
+              to: numbers[1].length > 0 ? parseInt(numbers[1]) : undefined
+            }
+          }
+        } else if (filter.startsWith('s' + FILTER_DELIMITER)) {
+          const numbers = filter.substring(1 + FILTER_DELIMITER.length).split(',')
+          newFilters.scrapedate =
+          {
+            type: FilterType.SCRAPEDATE,
             payload:
             {
               from: numbers[0].length > 0 ? parseInt(numbers[0]) : undefined,
