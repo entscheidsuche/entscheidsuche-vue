@@ -32,33 +32,67 @@
         </div>
         <div class="year-range">
           <div id="slider-wrapper">
-            <div v-bind:class="['title-wrapper', this.dateFilterEmpty() ? '' : 'active']" v-on:click="undoDateFilter()">
-              <p class="title">{{ $t('year') }}</p>
+            <p class="title title-wrapper" v-if="dateFilterEmpty() && scrapeDateFilterEmpty()">{{ $t('year') }}</p>
+            <div v-bind:class="['title-wrapper', !dateFilterEmpty() ? 'active' : '']" v-on:click="undoDateFilter()">
+              <p v-if="!dateFilterEmpty()" class="title">{{ $t('date') }}</p>
               <b-icon class="undo-filter" icon="x"></b-icon>
             </div>
-            <DateFilter ref="dateFilter"
-              :sliderWidth="sliderWidth"
-              @show-date-overlay="onShowOverlay"/>
-            <div class="date-overlay-bg" v-if="overlayVisible"></div>
-            <div class="date-overlay" v-if="overlayVisible">
-              <div class="focusguard" ref="focusguardFirst" tabindex="0"></div>
-              <b-form class="form">
-                <b-form-group id="from-date-group" class="mt-16" :label="$t('from')" label-for="form-date">
-                  <b-form-input :state="fromState && rangeState" ref="fromField" @keydown.enter="onConfirmOverlay" tabindex="1" lang="fr" id="from-date" type="date" v-model="overlayFrom"></b-form-input>
-                </b-form-group>
-                <b-form-group id="to-date-group" class="mt-16" :label="$t('to')" label-for="to-date">
-                  <b-form-input :state="toState && rangeState" ref="toField" @keydown.enter="onConfirmOverlay" tabindex="2" id="to-date" type="date" v-model="overlayTo"></b-form-input>
-                </b-form-group>
-              </b-form>
-              <div class="btn-row">
-                <b-button  tabindex="3" variant="primary" v-on:click="onCancelOverlay()" class="close-date-overlay">
-                  {{ $t('cancelDateOverlay') }}
-                </b-button>
-                <b-button :disabled="!fromState || !toState || !rangeState " tabindex="4" variant="primary" ref="confirmBtn" v-on:click="onConfirmOverlay()" class="confirm-date-overlay">
-                  {{ $t('confirmDateOverlay') }}
-                </b-button>
+            <div v-bind:class="['title-wrapper', !scrapeDateFilterEmpty() ? 'active' : '']" v-on:click="undoScrapeDateFilter()">
+              <p v-if="!scrapeDateFilterEmpty()" class="title">{{ $t('scrapeDate') }}</p>
+              <b-icon class="undo-filter" icon="x"></b-icon>
+            </div>
+            <b-form-select id="select-slider" v-model="selectedSlider" :options="sliderOptions"></b-form-select>
+            <div class="date-filter" v-if="showDateFilter">
+              <DateFilter ref="dateFilter"
+                :sliderWidth="sliderWidth"
+                @show-date-overlay="onShowOverlay"/>
+              <div class="date-overlay-bg" v-if="dateOverlayVisible"></div>
+              <div class="date-overlay" v-if="dateOverlayVisible">
+                <div class="focusguard" ref="focusguardFirst" tabindex="0"></div>
+                <b-form class="form">
+                  <b-form-group id="from-date-group" class="mt-16" :label="$t('from')" label-for="form-date">
+                    <b-form-input :state="dateFromState && dateRangeState" ref="fromField" @keydown.enter="onConfirmDateOverlay" tabindex="1" lang="fr" id="from-date" type="date" v-model="dateOverlayFrom"></b-form-input>
+                  </b-form-group>
+                  <b-form-group id="to-date-group" class="mt-16" :label="$t('to')" label-for="to-date">
+                    <b-form-input :state="dateToState && dateRangeState" @keydown.enter="onConfirmDateOverlay" tabindex="2" id="to-date" type="date" v-model="dateOverlayTo"></b-form-input>
+                  </b-form-group>
+                </b-form>
+                <div class="btn-row">
+                  <b-button  tabindex="3" variant="primary" v-on:click="onCancelDateOverlay()" class="close-date-overlay">
+                    {{ $t('cancelDateOverlay') }}
+                  </b-button>
+                  <b-button :disabled="!dateFromState || !dateToState || !dateRangeState " tabindex="4" variant="primary" ref="confirmBtn" v-on:click="onConfirmDateOverlay()" class="confirm-date-overlay">
+                    {{ $t('confirmDateOverlay') }}
+                  </b-button>
+                </div>
+                <div class="focusguard" ref="focusguardSecond" tabindex="5"></div>
               </div>
-              <div class="focusguard" ref="focusguardSecond" tabindex="5"></div>
+            </div>
+            <div v-else>
+              <ScrapeDateFilter ref="scrapeDateFilter"
+                :sliderWidth="sliderWidth"
+                @show-date-overlay="onShowScrapeOverlay"/>
+              <div class="date-overlay-bg" v-if="scrapeDateOverlayVisible"></div>
+              <div class="date-overlay" v-if="scrapeDateOverlayVisible">
+                <div class="focusguard" ref="scrapeFocusGuardFirst" tabindex="0"></div>
+                <b-form class="form">
+                  <b-form-group id="from-date-group" class="mt-16" :label="$t('from')" label-for="form-date">
+                    <b-form-input :state="scrapeDateFromState && scrapeDateRangeState" ref="fromFieldScrape" @keydown.enter="onConfirmScrapeDateOverlay" tabindex="1" lang="fr" id="from-date" type="date" v-model="scrapeDateOverlayFrom"></b-form-input>
+                  </b-form-group>
+                  <b-form-group id="to-date-group" class="mt-16" :label="$t('to')" label-for="to-date">
+                    <b-form-input :state="scrapeDateToState && scrapeDateRangeState" @keydown.enter="onConfirmScrapeDateOverlay" tabindex="2" id="to-date" type="date" v-model="scrapeDateOverlayTo"></b-form-input>
+                  </b-form-group>
+                </b-form>
+                <div class="btn-row">
+                  <b-button  tabindex="3" variant="primary" v-on:click="onCancelScrapeDateOverlay()" class="close-date-overlay">
+                    {{ $t('cancelDateOverlay') }}
+                  </b-button>
+                  <b-button :disabled="!scrapeDateFromState || !scrapeDateToState || !scrapeDateRangeState " tabindex="4" variant="primary" ref="confirmBtnScrape" v-on:click="onConfirmScrapeDateOverlay()" class="confirm-date-overlay">
+                    {{ $t('confirmDateOverlay') }}
+                  </b-button>
+                </div>
+                <div class="focusguard" ref="scrapeFocusguardSecond" tabindex="5"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -103,7 +137,7 @@
                   <b-icon id="result-court"></b-icon>
                 </b-button>
               </a>
-              <a v-if="directLink(result)" :href="result.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(result.url.replace('/docs/','/dok/'))">
+              <a :href="result.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(result.url.replace('/docs/','/dok/'))">
                 <b-button variant="primary" id="result-print-btn" :title="$t('printHover')">
                   <b-icon id="result-print" icon="printer"></b-icon>
                 </b-button>
@@ -146,7 +180,7 @@
                       <b-icon id="court"></b-icon>
                     </b-button>
                   </a>
-                  <a v-if="directLink(selectedResult)" :href="selectedResult.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(selectedResult.url.replace('/docs/','/dok/'))">
+                  <a :href="selectedResult.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(selectedResult.url.replace('/docs/','/dok/'))">
                     <b-button variant="primary" id="print-btn" :title="$t('printHover')">
                       <b-icon id="print" icon="printer"></b-icon>
                     </b-button>
@@ -315,23 +349,27 @@
           margin-bottom:30px;
           position: relative;
 
+          #select-slider {
+            margin-bottom: 22px;
+          }
+
           .date-overlay-bg {
             background-color: #ffffff;
             position: absolute;
-            top: 0;
+            top: 74px;
             left: -20px;
             width: 338px;
-            height: calc(100% + 30px);
+            height: 180px;
             z-index: 100;
           }
 
           .date-overlay {
             background-color: #e5e9f1;
             position: absolute;
-            top: 0;
+            top: 74px;
             left: 0;
             width: 100%;
-            height: calc(100% + 30px);
+            height: 180px;
             z-index: 101;
             border-radius: 4px;
             display: flex;
@@ -964,12 +1002,14 @@ import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState, Sponsor } from '@/store/modules/app'
 import { Filters, FilterType, SearchModule, SearchResult } from '@/store/modules/search'
 import DateFilter from '@/components/DateFilter.vue'
+import ScrapeDateFilter from '@/components/ScrapeDateFilter.vue'
 import HierarchieFilter from '@/components/HierarchieFilter.vue'
 import LanguageFilter from '@/components/LanguageFilter.vue'
 import SortOrderSelector from '@/components/SortOrderSelector.vue'
 import { Route } from 'vue-router'
 import router from '@/router'
 import { BButton } from 'bootstrap-vue'
+import i18n from '@/i18n'
 import SponsorCard from '@/components/SponsorCard.vue'
 import data from '../data/sponsors.json'
 
@@ -980,6 +1020,7 @@ import data from '../data/sponsors.json'
     DateFilter,
     LanguageFilter,
     HierarchieFilter,
+    ScrapeDateFilter,
     SponsorCard
   }
 })
@@ -992,6 +1033,14 @@ export default class SearchResults extends Vue {
   private sliderWidth = 1
   private allowUndoFilter = false
   private iframeUrl = ''
+  public dateOverlayVisible = false
+  public scrapeDateOverlayVisible = false
+  public dateOverlayFrom = ''
+  public dateOverlayTo = ''
+  public scrapeDateOverlayFrom = ''
+  public scrapeDateOverlayTo = ''
+  public selectedSlider = 'date'
+  public sliderOptions = [{ value: 'date', text: i18n.t('date').toString() }, { value: 'scrapeDate', text: i18n.t('scrapeDate').toString() }]
   private jsonData: any = null
   public overlayVisible = false
   public overlayFrom = ''
@@ -1046,28 +1095,56 @@ export default class SearchResults extends Vue {
     return AppModule.locale
   }
 
-  get fromState () {
-    const from = new Date(this.overlayFrom)
+  get dateFromState () {
+    const from = new Date(this.dateOverlayFrom)
     const fromNumber = from.getTime()
     return !isNaN(fromNumber)
   }
 
-  get toState () {
-    const to = new Date(this.overlayTo)
+  get dateToState () {
+    const to = new Date(this.dateOverlayTo)
     const toNumber = to.getTime()
     return !isNaN(toNumber)
   }
 
-  get rangeState () {
-    const from = new Date(this.overlayFrom)
+  get dateRangeState () {
+    const from = new Date(this.dateOverlayFrom)
     const fromNumber = from.getTime()
-    const to = new Date(this.overlayTo)
+    const to = new Date(this.dateOverlayTo)
     const toNumber = to.getTime()
     if (!isNaN(toNumber) && !isNaN(fromNumber)) {
       return fromNumber - 1 < toNumber
     } else {
       return true
     }
+  }
+
+  get scrapeDateFromState () {
+    const from = new Date(this.scrapeDateOverlayFrom)
+    const fromNumber = from.getTime()
+    return !isNaN(fromNumber)
+  }
+
+  get scrapeDateToState () {
+    const to = new Date(this.scrapeDateOverlayTo)
+    const toNumber = to.getTime()
+    return !isNaN(toNumber)
+  }
+
+  get scrapeDateRangeState () {
+    const from = new Date(this.scrapeDateOverlayFrom)
+    const fromNumber = from.getTime()
+    const to = new Date(this.scrapeDateOverlayTo)
+    const toNumber = to.getTime()
+    if (!isNaN(toNumber) && !isNaN(fromNumber)) {
+      return fromNumber - 1 < toNumber
+    } else {
+      return true
+    }
+  }
+
+  get showDateFilter () {
+    return this.selectedSlider === 'date'
   }
 
   @Watch('locale')
@@ -1139,8 +1216,11 @@ export default class SearchResults extends Vue {
         this.iframeUrl = newUrl
       }
     }
-    if (from !== to && this.overlayVisible) {
-      this.onCancelOverlay()
+    if (from !== to && this.dateOverlayVisible) {
+      this.onCancelDateOverlay()
+    }
+    if (from !== to && this.scrapeDateOverlayVisible) {
+      this.onCancelScrapeDateOverlay()
     }
     this.setRandomSponsors()
   }
@@ -1259,25 +1339,42 @@ export default class SearchResults extends Vue {
     return undefined
   }
 
-  public onCancelOverlay (): void {
-    this.overlayVisible = false
+  public onCancelDateOverlay (): void {
+    this.dateOverlayVisible = false
     this.removeGuardListeners()
   }
 
-  public onConfirmOverlay (): void {
-    if (this.fromState && this.toState && this.rangeState) {
-      const from = new Date(this.overlayFrom)
+  public onCancelScrapeDateOverlay (): void {
+    this.scrapeDateOverlayVisible = false
+    this.removeScrapeGuardListeners()
+  }
+
+  public onConfirmDateOverlay (): void {
+    if (this.dateFromState && this.dateToState && this.dateRangeState) {
+      const from = new Date(this.dateOverlayFrom)
       const fromNumber = from.getTime()
-      const to = new Date(this.overlayTo)
+      const to = new Date(this.dateOverlayTo)
       const toNumber = to.getTime();
       (this.$refs.dateFilter as DateFilter).handleRangeChange(fromNumber, toNumber)
-      this.overlayVisible = false
+      this.dateOverlayVisible = false
       this.removeGuardListeners()
     }
   }
 
+  public onConfirmScrapeDateOverlay (): void {
+    if (this.scrapeDateFromState && this.scrapeDateToState && this.scrapeDateRangeState) {
+      const from = new Date(this.scrapeDateOverlayFrom)
+      const fromNumber = from.getTime()
+      const to = new Date(this.scrapeDateOverlayTo)
+      const toNumber = to.getTime();
+      (this.$refs.scrapeDateFilter as ScrapeDateFilter).handleRangeChange(fromNumber, toNumber)
+      this.scrapeDateOverlayVisible = false
+      this.removeScrapeGuardListeners()
+    }
+  }
+
   public onShowOverlay (): void {
-    this.overlayVisible = true
+    this.dateOverlayVisible = true
     this.initOverlayDates()
     this.$nextTick(() => {
       const focusGuard1 = this.$refs.focusguardFirst as HTMLElement
@@ -1292,6 +1389,22 @@ export default class SearchResults extends Vue {
     })
   }
 
+  public onShowScrapeOverlay (): void {
+    this.scrapeDateOverlayVisible = true
+    this.initScrapeOverlayDates()
+    this.$nextTick(() => {
+      const focusGuard1 = this.$refs.scrapeFocusGuardFirst as HTMLElement
+      const focusGuard2 = this.$refs.scrapeFocusguardSecond as HTMLElement
+      if (focusGuard1) {
+        focusGuard1.addEventListener('focus', this.focusOnLastScrape)
+      }
+      if (focusGuard2) {
+        focusGuard2.addEventListener('focus', this.focusOnFirstScrape)
+      }
+      (this.$refs.confirmBtnScrape as BButton).focus()
+    })
+  }
+
   public removeGuardListeners () {
     const focusGuard1 = this.$refs.focusguardFirst as HTMLElement
     const focusGuard2 = this.$refs.focusguardSecond as HTMLElement
@@ -1303,6 +1416,17 @@ export default class SearchResults extends Vue {
     }
   }
 
+  public removeScrapeGuardListeners () {
+    const focusGuard1 = this.$refs.focusguardFirstScrape as HTMLElement
+    const focusGuard2 = this.$refs.focusguardSecondScrape as HTMLElement
+    if (focusGuard1) {
+      focusGuard1.removeEventListener('focus', this.focusOnLastScrape)
+    }
+    if (focusGuard2) {
+      focusGuard2.removeEventListener('focus', this.focusOnFirstScrape)
+    }
+  }
+
   public focusOnLast () {
     (this.$refs.confirmBtn as BButton).focus()
   }
@@ -1311,16 +1435,21 @@ export default class SearchResults extends Vue {
     (this.$refs.fromField as HTMLInputElement).focus()
   }
 
+  public focusOnLastScrape () {
+    (this.$refs.confirmBtnScrape as BButton).focus()
+  }
+
+  public focusOnFirstScrape () {
+    (this.$refs.fromFieldScrape as HTMLInputElement).focus()
+  }
+
   public onToggleFilter (): void {
     this.filterVisible = !this.filterVisible
   }
 
   public directLink (result) {
-    if (result && result.url) {
-      const pathSegments = result.url.split('/').filter(Boolean)
-      return (/^[A-Z]{2}_/.test(pathSegments[3]) && !(/^(CH_EDOEB|XX_Upload|BE_ZivilStraf|BE_Anwaltsaufsicht|BE_Verwaltungsgericht|BE_Steuerrekurs|BS_Omni|GL_Omni|GR_Gerichte|JU_Gerichte|TG_OG|VS_Gerichte)$/.test(pathSegments[3])))
-    }
-    return false
+    const pathSegments = result.url.split('/').filter(Boolean)
+    return (/^[A-Z]{2}_/.test(pathSegments[3]) && !(/^(CH_EDOEB|XX_Upload|BE_ZivilStraf|BE_Anwaltsaufsicht|BE_Verwaltungsgericht|BE_Steuerrekurs|BS_Omni|GL_Omni|GR_Gerichte|JU_Gerichte|TG_OG|VS_Gerichte)$/.test(pathSegments[3])))
   }
 
   public onSource (docurl): void {
@@ -1454,23 +1583,49 @@ export default class SearchResults extends Vue {
     const maxEdatum = Number(SearchModule.aggregations.max_edatum[0].key)
     if (!Object.prototype.hasOwnProperty.call(this.filter, 'edatum')) {
       if (minEdatum) {
-        this.overlayFrom = this.dateToString(minEdatum)
+        this.dateOverlayFrom = this.dateToString(minEdatum)
       }
       if (maxEdatum) {
-        this.overlayTo = this.dateToString(maxEdatum)
+        this.dateOverlayTo = this.dateToString(maxEdatum)
       }
     } else {
       const from = this.filter.edatum.payload.from
       const to = this.filter.edatum.payload.to
       if (from) {
-        this.overlayFrom = this.dateToString(from)
+        this.dateOverlayFrom = this.dateToString(from)
       } else if (minEdatum) {
-        this.overlayFrom = this.dateToString(minEdatum)
+        this.dateOverlayFrom = this.dateToString(minEdatum)
       }
       if (to) {
-        this.overlayTo = this.dateToString(to)
+        this.dateOverlayTo = this.dateToString(to)
       } else if (maxEdatum) {
-        this.overlayTo = this.dateToString(maxEdatum)
+        this.dateOverlayTo = this.dateToString(maxEdatum)
+      }
+    }
+  }
+
+  initScrapeOverlayDates (): void {
+    const minEdatum = Number(SearchModule.aggregations.min_scrapedate[0].key)
+    const maxEdatum = Number(SearchModule.aggregations.max_scrapedate[0].key)
+    if (!Object.prototype.hasOwnProperty.call(this.filter, 'scrapedate')) {
+      if (minEdatum) {
+        this.scrapeDateOverlayFrom = this.dateToString(minEdatum)
+      }
+      if (maxEdatum) {
+        this.scrapeDateOverlayTo = this.dateToString(maxEdatum)
+      }
+    } else {
+      const from = this.filter.scrapedate.payload.from
+      const to = this.filter.scrapedate.payload.to
+      if (from) {
+        this.scrapeDateOverlayFrom = this.dateToString(from)
+      } else if (minEdatum) {
+        this.scrapeDateOverlayFrom = this.dateToString(minEdatum)
+      }
+      if (to) {
+        this.scrapeDateOverlayTo = this.dateToString(to)
+      } else if (maxEdatum) {
+        this.scrapeDateOverlayTo = this.dateToString(maxEdatum)
       }
     }
   }
@@ -1522,6 +1677,10 @@ export default class SearchResults extends Vue {
     SearchModule.RemoveFilter(FilterType.DATE)
   }
 
+  public undoScrapeDateFilter () {
+    SearchModule.RemoveFilter(FilterType.SCRAPEDATE)
+  }
+
   public undoLanguageFilter () {
     SearchModule.RemoveFilter(FilterType.LANGUAGE)
   }
@@ -1532,6 +1691,10 @@ export default class SearchResults extends Vue {
 
   public dateFilterEmpty () {
     return !(Object.keys(this.filter).includes('edatum'))
+  }
+
+  public scrapeDateFilterEmpty () {
+    return !(Object.keys(this.filter).includes('scrapedate'))
   }
 
   public languageFilterEmpty () {
@@ -1557,42 +1720,6 @@ export default class SearchResults extends Vue {
         button.style.transform = 'rotate(0deg)'
       }
     }
-  }
-
-  public getDownloadUrl () {
-    const url1 = 'http://v2202109132150164038.luckysrv.de/api/search?{%22collection%22:%22entscheidsuche%22,%20%22query%22:%22'
-    const url2 = '%22,%20%22filter%22:%22'
-    const url3 = '%22,%20%22getDocs%22:true,%22getZIP%22:true,%20%22getCSV%22:false,%20%22getHTML%22:true,%20%22getNiceHTML%22:false,%20%22getJSON%22:false,%20%22ui%22:true}'
-    const filter: any[] = []
-    for (const k in SearchModule.filters) {
-      const e1: any = {}
-      const e2: any = {}
-      const f = SearchModule.filters[k].payload
-      let kk = k
-      let term = 'terms'
-      if (kk === 'language') {
-        kk = 'attachment.language'
-      } else if (kk === 'hierarchie') {
-        kk = 'hierarchy'
-      } else if (kk === 'edatum') {
-        kk = 'date'
-        term = 'range'
-        if ('from' in f) {
-          f.gte = f.from
-          delete f.from
-        }
-        if ('to' in f) {
-          f.lte = f.to
-          delete f.to
-        }
-      }
-      e1[kk] = f
-      e2[term] = e1
-      filter.push(e2)
-    }
-    // "filter":[{"terms":{"attachment.language":["de"]}},{"terms":{"hierarchy":["AG"]}},{"range":{"date":{"lte":1509015759293}}}]}}
-    // "filters":"{"language":{"type":"language","payload":["de"]},"hierarchie":{"type":"hierarchie","payload":["CH"]}}"
-    return url1 + SearchModule.query + url2 + JSON.stringify(filter).replaceAll('"', '@') + url3
   }
 
   public setRandomSponsors () {
