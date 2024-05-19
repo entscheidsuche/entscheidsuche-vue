@@ -1,8 +1,9 @@
 <template>
   <b-form-group v-slot="{ ariaDescribedby }">
-    <b-form-radio v-model="sortOrder" :aria-describedby="ariaDescribedby" value="relevance">{{ $t('relevance') }}</b-form-radio>
-    <b-form-radio v-model="sortOrder" :aria-describedby="ariaDescribedby" value="date">{{ $t('date') }}</b-form-radio>
-    <b-form-radio v-model="sortOrder" :aria-describedby="ariaDescribedby" value="scrapedate">{{ $t('scrapeDate') }}</b-form-radio>
+    <b-form-radio-group v-model="sortOrder">
+      <b-form-radio :aria-describedby="ariaDescribedby" value="relevance">{{ $t('relevance') }}</b-form-radio>
+      <b-form-radio :aria-describedby="ariaDescribedby" value="date">{{ $t('date') }}</b-form-radio>
+    </b-form-radio-group>
   </b-form-group>
 </template>
 
@@ -32,9 +33,9 @@ export default class SortOrderSelector extends Vue {
   private handlePopState () {
     const sort = this.$route.query.sort
     const stateSort = SearchModule.sortOrder
-    if ((sort === undefined && stateSort !== 'relevance') || (sort !== undefined && stateSort !== sort)) {
+    if ((sort === undefined && stateSort === 'date') || (sort === 'date' && stateSort === 'relevance')) {
       if (sort) {
-        this.sortOrder = sort as SortOrder
+        this.sortOrder = SortOrder.DATE
       } else {
         this.sortOrder = SortOrder.RELEVANCE
       }

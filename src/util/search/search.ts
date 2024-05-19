@@ -1,8 +1,8 @@
 import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult, SortOrder } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
 
-// const searchUrl = 'https://entscheidsuche.pansoft.de:9200/entscheidsuche.v2-*/_search'
-const searchUrl = 'https://entscheidsuche.ch/_searchV2.php'
+// const searchUrl = 'https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search'
+const searchUrl = 'https://entscheidsuche.ch/_search.php'
 
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
@@ -46,7 +46,7 @@ export class SearchUtil {
         }
       },
       sort: [
-        { [sortOrder === SortOrder.RELEVANCE ? '_score' : sortOrder === SortOrder.DATE ? 'date' : 'scrapedate']: 'desc' },
+        { [sortOrder === SortOrder.RELEVANCE ? '_score' : 'date']: 'desc' },
         { id: 'desc' }
       ],
       highlight: {
@@ -110,27 +110,6 @@ export class SearchUtil {
           }
         }
       }
-      if (filters.scrapedate === undefined) {
-        if (search.aggs === undefined) {
-          search.aggs = {}
-        }
-        search.aggs.scrapedate = {
-          date_histogram: {
-            calendar_interval: SearchUtil.getScrapeCalendarInterval(filters),
-            field: 'scrapedate'
-          }
-        }
-        search.aggs.min_scrapedate = {
-          min: {
-            field: 'scrapedate'
-          }
-        }
-        search.aggs.max_scrapedate = {
-          max: {
-            field: 'scrapedate'
-          }
-        }
-      }
     }
     return search
   }
@@ -190,23 +169,6 @@ export class SearchUtil {
       search.aggs.max_edatum = {
         max: {
           field: 'date'
-        }
-      }
-    } else if (filter.type === 'scrapedate') {
-      search.aggs.scrapedate = {
-        date_histogram: {
-          calendar_interval: SearchUtil.getScrapeCalendarInterval(filters),
-          field: 'scrapedate'
-        }
-      }
-      search.aggs.min_scrapedate = {
-        min: {
-          field: 'scrapedate'
-        }
-      }
-      search.aggs.max_scrapedate = {
-        max: {
-          field: 'scrapedate'
         }
       }
     }
@@ -289,23 +251,6 @@ export class SearchUtil {
     return 'quarter'
   }
 
-  private static getScrapeCalendarInterval (filters: Filters): string {
-    const filter = filters.scrapedate
-    if (filter !== undefined) {
-      if (filter.type === 'scrapedate') {
-        const range = (filter.payload.to - filter.payload.from) / 1000 / 3600 / 24
-        if (range < 40) {
-          return 'day'
-        } else if (range < 280) {
-          return 'week'
-        } else if (range < 1200) {
-          return 'month'
-        }
-      }
-    }
-    return 'quarter'
-  }
-
   private static buildFilters (filters: Filters): any {
     const filterArray: Array<any> = []
     for (const type in filters) {
@@ -325,34 +270,6 @@ export class SearchUtil {
 
   private static buildFilter (filter: Filter): any {
     if (filter.type === 'edatum') {
-      if (filter.payload.from !== undefined && filter.payload.to !== undefined) {
-        return {
-          range: {
-            date: {
-              gte: SearchUtil.transformDate(filter.payload.from),
-              lte: SearchUtil.transformDate(filter.payload.to)
-            }
-          }
-        }
-      } else if (filter.payload.from !== undefined) {
-        return {
-          range: {
-            date: {
-              gte: SearchUtil.transformDate(filter.payload.from)
-            }
-          }
-        }
-      } else if (filter.payload.to !== undefined) {
-        return {
-          range: {
-            date: {
-              lte: SearchUtil.transformDate(filter.payload.to)
-            }
-          }
-        }
-      }
-    }
-    if (filter.type === 'scrapedate') {
       if (filter.payload.from !== undefined && filter.payload.to !== undefined) {
         return {
           range: {
@@ -420,12 +337,6 @@ export class SearchUtil {
         if (hit._source.date !== undefined && hit._source.date.length === 10) {
           date = SearchUtil.formatDate(hit._source.date)
         }
-        let scrapedate: string | undefined
-        if (hit._source.scrapedate !== undefined && hit._source.scrapedate.length === 10) {
-          scrapedate = SearchUtil.formatDate(hit._source.scrapedate)
-        } else {
-          scrapedate = undefined
-        }
         const pdf = SearchUtil.getDocType(hit._source.attachment.content_type)
         results.push({
           id: hit._id,
@@ -436,8 +347,7 @@ export class SearchUtil {
           canton: hit._source.canton.toUpperCase(),
           pdf,
           url: hit._source.attachment.content_url,
-          sort: hit.sort,
-          scrapedate: scrapedate
+          sort: hit.sort
         })
       }
       aggregations = SearchUtil.extractAggregations(resp)

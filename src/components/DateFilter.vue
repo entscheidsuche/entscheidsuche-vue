@@ -6,7 +6,6 @@
     :interval="dateInterval"
     :range="dateRange"
     :dates="dates"
-    outerRef="dateHistogram"
     @value-changed="onDateRangeChanged"
     @show-date-overlay="onShowDateOverlay"/>
 </template>

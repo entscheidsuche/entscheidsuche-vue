@@ -29,7 +29,7 @@ const routes: Array<RouteConfig> = [
         SearchModule.SetFilters([])
       }
       if (to.query.sort !== undefined && typeof to.query.sort === 'string') {
-        SearchModule.SetSortOrder(to.query.sort === SortOrder.DATE ? SortOrder.DATE : to.query.sort === SortOrder.SCRAPEDATE ? SortOrder.SCRAPEDATE : SortOrder.RELEVANCE)
+        SearchModule.SetSortOrder(to.query.sort === SortOrder.DATE ? SortOrder.DATE : SortOrder.RELEVANCE)
       } else {
         SearchModule.SetSortOrder(SortOrder.RELEVANCE)
       }

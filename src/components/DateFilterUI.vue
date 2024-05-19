@@ -1,7 +1,6 @@
 <template>
   <HistogramSlider
-    :ref="outerRef"
-    :id="outerRef"
+    ref="histogram"
     :width="sliderWidth"
     :bar-height="100"
     :transitionDuration="10"
@@ -38,7 +37,6 @@ export default class DateFilterUI extends Vue {
   @Prop() dates
   @Prop() interval: { min: number; max: number } | undefined
   @Prop() range: { from: number | undefined; to: number | undefined } | undefined
-  @Prop() outerRef
   public prevFrom = ''
   public prevTo = ''
 
@@ -47,7 +45,7 @@ export default class DateFilterUI extends Vue {
       setTimeout(() => {
         if (this.range !== undefined && this.interval !== undefined) {
           if (this.range.from !== undefined || this.range.to !== undefined) {
-            (this.$refs[this.outerRef] as HistogramSlider).update(
+            (this.$refs.histogram as HistogramSlider).update(
               {
                 from: this.range.from !== undefined ? this.range.from : this.interval.min,
                 to: this.range.to !== undefined ? this.range.to : this.interval.max
@@ -60,54 +58,48 @@ export default class DateFilterUI extends Vue {
   }
 
   destroyed () {
-    const histogram = document.getElementById(this.outerRef)
-    if (histogram) {
-      const fromHandle = histogram.getElementsByClassName('irs-from')[0]
-      const toHandle = histogram.getElementsByClassName('irs-to')[0]
-      const singleHandle = histogram.getElementsByClassName('irs-single')[0]
-      if (fromHandle) {
-        fromHandle.removeEventListener('mousedown', this.showDateOverlay)
-        fromHandle.removeEventListener('touchend', this.showDateOverlay)
-      }
-      if (toHandle) {
-        toHandle.removeEventListener('mousedown', this.showDateOverlay)
-        toHandle.removeEventListener('touchend', this.showDateOverlay)
-      }
-      if (singleHandle) {
-        singleHandle.removeEventListener('mousedown', this.showDateOverlay)
-        singleHandle.removeEventListener('touchend', this.showDateOverlay)
-      }
+    const fromHandle = document.getElementsByClassName('irs-from')[0]
+    const toHandle = document.getElementsByClassName('irs-to')[0]
+    const singleHandle = document.getElementsByClassName('irs-single')[0]
+    if (fromHandle) {
+      fromHandle.removeEventListener('mousedown', this.showDateOverlay)
+      fromHandle.removeEventListener('touchend', this.showDateOverlay)
+    }
+    if (toHandle) {
+      toHandle.removeEventListener('mousedown', this.showDateOverlay)
+      toHandle.removeEventListener('touchend', this.showDateOverlay)
+    }
+    if (singleHandle) {
+      singleHandle.removeEventListener('mousedown', this.showDateOverlay)
+      singleHandle.removeEventListener('touchend', this.showDateOverlay)
     }
   }
 
   public addHandleListeners () {
-    const histogram = document.getElementById(this.outerRef)
-    if (histogram) {
-      setTimeout(() => {
-        const fromHandle = histogram.getElementsByClassName('irs-from')[0]
-        const toHandle = histogram.getElementsByClassName('irs-to')[0]
-        const singleHandle = histogram.getElementsByClassName('irs-single')[0]
-        if (fromHandle) {
-          fromHandle.removeEventListener('mousedown', this.showDateOverlay)
-          fromHandle.removeEventListener('touchend', this.showDateOverlay)
-          fromHandle.addEventListener('mousedown', this.showDateOverlay)
-          fromHandle.addEventListener('touchend', this.showDateOverlay)
-        }
-        if (toHandle) {
-          toHandle.removeEventListener('mousedown', this.showDateOverlay)
-          toHandle.removeEventListener('touchend', this.showDateOverlay)
-          toHandle.addEventListener('mousedown', this.showDateOverlay)
-          toHandle.addEventListener('touchend', this.showDateOverlay)
-        }
-        if (singleHandle) {
-          singleHandle.removeEventListener('mousedown', this.showDateOverlay)
-          singleHandle.removeEventListener('touchend', this.showDateOverlay)
-          singleHandle.addEventListener('mousedown', this.showDateOverlay)
-          singleHandle.addEventListener('touchend', this.showDateOverlay)
-        }
-        this.addHandleIcons()
-      }, 20)
-    }
+    setTimeout(() => {
+      const fromHandle = document.getElementsByClassName('irs-from')[0]
+      const toHandle = document.getElementsByClassName('irs-to')[0]
+      const singleHandle = document.getElementsByClassName('irs-single')[0]
+      if (fromHandle) {
+        fromHandle.removeEventListener('mousedown', this.showDateOverlay)
+        fromHandle.removeEventListener('touchend', this.showDateOverlay)
+        fromHandle.addEventListener('mousedown', this.showDateOverlay)
+        fromHandle.addEventListener('touchend', this.showDateOverlay)
+      }
+      if (toHandle) {
+        toHandle.removeEventListener('mousedown', this.showDateOverlay)
+        toHandle.removeEventListener('touchend', this.showDateOverlay)
+        toHandle.addEventListener('mousedown', this.showDateOverlay)
+        toHandle.addEventListener('touchend', this.showDateOverlay)
+      }
+      if (singleHandle) {
+        singleHandle.removeEventListener('mousedown', this.showDateOverlay)
+        singleHandle.removeEventListener('touchend', this.showDateOverlay)
+        singleHandle.addEventListener('mousedown', this.showDateOverlay)
+        singleHandle.addEventListener('touchend', this.showDateOverlay)
+      }
+      this.addHandleIcons()
+    }, 20)
   }
 
   public addHandleIcons () {
@@ -148,7 +140,7 @@ export default class DateFilterUI extends Vue {
   }
 
   public handleRangeChange (fromUpdated: number, toUpdated: number) {
-    (this.$refs[this.outerRef] as HistogramSlider).update(
+    (this.$refs.histogram as HistogramSlider).update(
       {
         from: fromUpdated,
         to: toUpdated
