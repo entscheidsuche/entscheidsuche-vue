@@ -9,13 +9,7 @@
         </div>
         <div class="total-hits">
           <div class="title-wrapper">
-            <p class="title">{{ $t('allHits') }}: {{ resultsTotal }}
-              <a :href="this.getDownloadUrl()" target="_blank">
-                <b-button variant="primary" id="result-download-btn" :title="$t('downloadHover')">
-                  <b-icon id="result-print" icon="download"></b-icon>
-                </b-button>
-              </a>
-            </p>
+            <p class="title">{{ $t('allHits') }}: {{ resultsTotal }}</p>
           </div>
           <div class="undo-all" v-if="this.allowUndoFilter" v-on:click="undoFilter()">
             <div v-bind:class="['title-wrapper', this.allowUndoFilter ? 'active' : '']" v-on:click="undoFilter()">
