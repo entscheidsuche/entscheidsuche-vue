@@ -356,7 +356,7 @@ export class SearchUtil {
       if (filter.payload.from !== undefined && filter.payload.to !== undefined) {
         return {
           range: {
-            date: {
+            scrapedate: {
               gte: SearchUtil.transformDate(filter.payload.from),
               lte: SearchUtil.transformDate(filter.payload.to)
             }
@@ -365,7 +365,7 @@ export class SearchUtil {
       } else if (filter.payload.from !== undefined) {
         return {
           range: {
-            date: {
+            scrapedate: {
               gte: SearchUtil.transformDate(filter.payload.from)
             }
           }
@@ -373,7 +373,7 @@ export class SearchUtil {
       } else if (filter.payload.to !== undefined) {
         return {
           range: {
-            date: {
+            scrapedate: {
               lte: SearchUtil.transformDate(filter.payload.to)
             }
           }
