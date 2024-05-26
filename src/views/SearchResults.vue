@@ -1355,6 +1355,7 @@ export default class SearchResults extends Vue {
     }
   }
 
+
   public onConfirmScrapeDateOverlay (): void {
     if (this.scrapeDateFromState && this.scrapeDateToState && this.scrapeDateRangeState) {
       const from = new Date(this.scrapeDateOverlayFrom)
@@ -1442,8 +1443,11 @@ export default class SearchResults extends Vue {
   }
 
   public directLink (result) {
-    const pathSegments = result.url.split('/').filter(Boolean)
-    return (/^[A-Z]{2}_/.test(pathSegments[3]) && !(/^(CH_EDOEB|XX_Upload|BE_ZivilStraf|BE_Anwaltsaufsicht|BE_Verwaltungsgericht|BE_Steuerrekurs|BS_Omni|GL_Omni|GR_Gerichte|JU_Gerichte|TG_OG|VS_Gerichte)$/.test(pathSegments[3])))
+    if (result && result.url) {
+      const pathSegments = result.url.split('/').filter(Boolean)
+      return (/^[A-Z]{2}_/.test(pathSegments[3]) && !(/^(CH_EDOEB|XX_Upload|BE_ZivilStraf|BE_Anwaltsaufsicht|BE_Verwaltungsgericht|BE_Steuerrekurs|BS_Omni|GL_Omni|GR_Gerichte|JU_Gerichte|TG_OG|VS_Gerichte)$/.test(pathSegments[3])))
+    }
+    return false
   }
 
   public onSource (docurl): void {
