@@ -9,7 +9,16 @@
         </div>
         <div class="total-hits">
           <div class="title-wrapper">
-            <p class="title">{{ $t('allHits') }}: {{ resultsTotal }}</p>
+            <p class="title">
+              <span style="">
+                <a :href="this.getDownloadUrl()" target="_blank">
+                  <b-button variant="primary" id="result-download-btn" :title="$t('downloadHover')">
+                    <b-icon id="download" icon="cloud-download" scale="5" font-scale=".2" height="20"></b-icon>
+                  </b-button>
+                </a>
+              </span>
+              {{ $t('allHits') }}: {{ resultsTotal }}
+            </p>
           </div>
           <div class="undo-all" v-if="this.allowUndoFilter" v-on:click="undoFilter()">
             <div v-bind:class="['title-wrapper', this.allowUndoFilter ? 'active' : '']" v-on:click="undoFilter()">
@@ -1341,6 +1350,53 @@ export default class SearchResults extends Vue {
   public onCancelScrapeDateOverlay (): void {
     this.scrapeDateOverlayVisible = false
     this.removeScrapeGuardListeners()
+  }
+
+  public getDownloadUrl () {
+    const url1 = 'http://v2202109132150164038.luckysrv.de/api/search?{%22collection%22:%22entscheidsuche%22,%20%22query%22:%22'
+    const url2 = '%22,%20%22filter%22:%22'
+    const url3 = '%22,%20%22getDocs%22:true,%22getZIP%22:true,%20%22getCSV%22:false,%20%22getHTML%22:true,%20%22getNiceHTML%22:false,%20%22getJSON%22:false,%20%22ui%22:true}'
+    const filter: any[] = []
+    for (const k in SearchModule.filters) {
+      const e1: any = {}
+      const e2: any = {}
+      const f = SearchModule.filters[k].payload
+      let kk = k
+      let term = 'terms'
+      if (kk === 'language') {
+        kk = 'attachment.language'
+      } else if (kk === 'hierarchie') {
+        kk = 'hierarchy'
+      } else if (kk === 'edatum') {
+        kk = 'date'
+        term = 'range'
+        if ('from' in f) {
+          f.gte = f.from
+          delete f.from
+        }
+        if ('to' in f) {
+          f.lte = f.to
+          delete f.to
+        }
+      } else if (kk === 'scrapedate') {
+        kk = 'scrapedate'
+        term = 'range'
+        if ('from' in f) {
+          f.gte = f.from
+          delete f.from
+        }
+        if ('to' in f) {
+          f.lte = f.to
+          delete f.to
+        }
+      }
+      e1[kk] = f
+      e2[term] = e1
+      filter.push(e2)
+    }
+    // "filter":[{"terms":{"attachment.language":["de"]}},{"terms":{"hierarchy":["AG"]}},{"range":{"date":{"lte":1509015759293}}}]}}
+    // "filters":"{"language":{"type":"language","payload":["de"]},"hierarchie":{"type":"hierarchie","payload":["CH"]}}"
+    return url1 + SearchModule.query + url2 + JSON.stringify(filter).replaceAll('"', '@') + url3
   }
 
   public onConfirmDateOverlay (): void {

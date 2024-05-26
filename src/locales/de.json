@@ -49,5 +49,6 @@
   "printHover": "Druckansicht",
   "courtHover": "Deeplink zur Gerichtswebsite",
   "pdfHover": "Entscheid aufrufen (PDF)",
-  "htmlHover": "Entscheid aufrufen (HTML)"  
+  "htmlHover": "Entscheid aufrufen (HTML)",
+  "downloadHover": "Download aller Treffer (via scigate)"  
 }
