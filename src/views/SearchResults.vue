@@ -1355,7 +1355,6 @@ export default class SearchResults extends Vue {
     }
   }
 
-
   public onConfirmScrapeDateOverlay (): void {
     if (this.scrapeDateFromState && this.scrapeDateToState && this.scrapeDateRangeState) {
       const from = new Date(this.scrapeDateOverlayFrom)
