@@ -182,13 +182,6 @@
         "active": true
     },
     {
-        "logo": "sponsor28.png",
-        "link": "https://www.5001.ch",
-        "text": "Schärer Rechtsanwälte",
-        "tooltip": "",
-        "active": true
-    },
-    {
         "logo": "sponsor29.svg",
         "link": "https://www.wartmann-merker.ch/",
         "text": "Wartmann Merker AG",
@@ -280,9 +273,9 @@
         "active": true
     },
     {
-        "logo": "sponsor43.svg",
+        "logo": "sponsor43.jpg",
         "link": "https://www.cbwm.ch",
-        "text": "CBWM &amp; Associés",
+        "text": "CBWM Avocats",
         "tooltip": "",
         "active": true
     },
