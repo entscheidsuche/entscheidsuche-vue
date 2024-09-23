@@ -53,7 +53,7 @@
               <div class="date-overlay" v-if="dateOverlayVisible">
                 <div class="focusguard" ref="focusguardFirst" tabindex="0"></div>
                 <b-form class="form">
-                  <b-form-group id="from-date-group" class="mt-16" :label="$t('from')" label-for="form-date">
+                  <b-form-group id="from-date-group" class="mt-16" :label="$t('from')" label-for="from-date">
                     <b-form-input :state="dateFromState && dateRangeState" ref="fromField" @keydown.enter="onConfirmDateOverlay" tabindex="1" lang="fr" id="from-date" type="date" v-model="dateOverlayFrom"></b-form-input>
                   </b-form-group>
                   <b-form-group id="to-date-group" class="mt-16" :label="$t('to')" label-for="to-date">
@@ -79,7 +79,7 @@
               <div class="date-overlay" v-if="scrapeDateOverlayVisible">
                 <div class="focusguard" ref="scrapeFocusGuardFirst" tabindex="0"></div>
                 <b-form class="form">
-                  <b-form-group id="from-date-group" class="mt-16" :label="$t('from')" label-for="form-date">
+                  <b-form-group id="from-date-group" class="mt-16" :label="$t('from')" label-for="from-date">
                     <b-form-input :state="scrapeDateFromState && scrapeDateRangeState" ref="fromFieldScrape" @keydown.enter="onConfirmScrapeDateOverlay" tabindex="1" lang="fr" id="from-date" type="date" v-model="scrapeDateOverlayFrom"></b-form-input>
                   </b-form-group>
                   <b-form-group id="to-date-group" class="mt-16" :label="$t('to')" label-for="to-date">
@@ -1360,7 +1360,7 @@ export default class SearchResults extends Vue {
     for (const k in SearchModule.filters) {
       const e1: any = {}
       const e2: any = {}
-      const f = SearchModule.filters[k].payload
+      const f = { ...SearchModule.filters[k].payload }
       let kk = k
       let term = 'terms'
       if (kk === 'language') {

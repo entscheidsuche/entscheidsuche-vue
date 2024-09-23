@@ -81,6 +81,9 @@ export default class ScrapeDateFilter extends Vue {
   }
 
   public mounted () {
+    if (Object.prototype.hasOwnProperty.call(this.filters, 'scrapedate')) {
+      this.dateRange = { from: this.filters.scrapedate.payload.from, to: this.filters.scrapedate.payload.to }
+    }
     if (Object.prototype.hasOwnProperty.call(this.aggregations, 'scrapedate')) {
       this.update()
     }

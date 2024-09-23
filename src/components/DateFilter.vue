@@ -105,6 +105,10 @@ export default class DateFilter extends Vue {
   }
 
   public mounted () {
+    console.log(this.filters)
+    if (Object.prototype.hasOwnProperty.call(this.filters, 'edatum')) {
+      this.dateRange = { from: this.filters.edatum.payload.from, to: this.filters.edatum.payload.to }
+    }
     if (Object.prototype.hasOwnProperty.call(this.aggregations, 'edatum')) {
       this.update()
     }

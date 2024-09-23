@@ -25,7 +25,7 @@
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import HistogramSlider from 'vue-histogram-slider'
 
 @Component({
@@ -45,18 +45,24 @@ export default class DateFilterUI extends Vue {
   public mounted () {
     if (this.range !== undefined && (this.range.from !== undefined || this.range.to !== undefined)) {
       setTimeout(() => {
-        if (this.range !== undefined && this.interval !== undefined) {
-          if (this.range.from !== undefined || this.range.to !== undefined) {
-            (this.$refs[this.outerRef] as HistogramSlider).update(
-              {
-                from: this.range.from !== undefined ? this.range.from : this.interval.min,
-                to: this.range.to !== undefined ? this.range.to : this.interval.max
-              })
-          }
-        }
+        this.onRangeChange()
       }, 20)
     }
     this.addHandleListeners()
+  }
+
+  @Watch('range')
+  public onRangeChange () {
+    console.log('range', this.range)
+    if (this.range !== undefined && this.interval !== undefined) {
+      if (this.range.from !== undefined || this.range.to !== undefined) {
+        (this.$refs[this.outerRef] as HistogramSlider).update(
+          {
+            from: this.range.from !== undefined ? this.range.from : this.interval.min,
+            to: this.range.to !== undefined ? this.range.to : this.interval.max
+          })
+      }
+    }
   }
 
   destroyed () {
