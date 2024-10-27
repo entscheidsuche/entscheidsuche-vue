@@ -1,6 +1,7 @@
 <template>
   <HistogramSlider
-    ref="histogram"
+    :ref="outerRef"
+    :id="outerRef"
     :width="sliderWidth"
     :bar-height="100"
     :transitionDuration="10"
@@ -16,6 +17,7 @@
     :prettify="prettifyDate"
     :grid="false"
     @finish="onValueChanged"
+    @update="onValueChanged"
   />
 </template>
 
@@ -23,7 +25,7 @@
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import HistogramSlider from 'vue-histogram-slider'
 
 @Component({
@@ -36,25 +38,129 @@ export default class DateFilterUI extends Vue {
   @Prop() dates
   @Prop() interval: { min: number; max: number } | undefined
   @Prop() range: { from: number | undefined; to: number | undefined } | undefined
+  @Prop() outerRef
+  public prevFrom = ''
+  public prevTo = ''
 
   public mounted () {
     if (this.range !== undefined && (this.range.from !== undefined || this.range.to !== undefined)) {
       setTimeout(() => {
-        if (this.range !== undefined && this.interval !== undefined) {
-          if (this.range.from !== undefined || this.range.to !== undefined) {
-            (this.$refs.histogram as HistogramSlider).update(
-              {
-                from: this.range.from !== undefined ? this.range.from : this.interval.min,
-                to: this.range.to !== undefined ? this.range.to : this.interval.max
-              })
-          }
+        this.onRangeChange()
+      }, 20)
+    }
+    this.addHandleListeners()
+  }
+
+  @Watch('range')
+  public onRangeChange () {
+    console.log('range', this.range)
+    if (this.range !== undefined && this.interval !== undefined) {
+      if (this.range.from !== undefined || this.range.to !== undefined) {
+        (this.$refs[this.outerRef] as HistogramSlider).update(
+          {
+            from: this.range.from !== undefined ? this.range.from : this.interval.min,
+            to: this.range.to !== undefined ? this.range.to : this.interval.max
+          })
+      }
+    }
+  }
+
+  destroyed () {
+    const histogram = document.getElementById(this.outerRef)
+    if (histogram) {
+      const fromHandle = histogram.getElementsByClassName('irs-from')[0]
+      const toHandle = histogram.getElementsByClassName('irs-to')[0]
+      const singleHandle = histogram.getElementsByClassName('irs-single')[0]
+      if (fromHandle) {
+        fromHandle.removeEventListener('mousedown', this.showDateOverlay)
+        fromHandle.removeEventListener('touchend', this.showDateOverlay)
+      }
+      if (toHandle) {
+        toHandle.removeEventListener('mousedown', this.showDateOverlay)
+        toHandle.removeEventListener('touchend', this.showDateOverlay)
+      }
+      if (singleHandle) {
+        singleHandle.removeEventListener('mousedown', this.showDateOverlay)
+        singleHandle.removeEventListener('touchend', this.showDateOverlay)
+      }
+    }
+  }
+
+  public addHandleListeners () {
+    const histogram = document.getElementById(this.outerRef)
+    if (histogram) {
+      setTimeout(() => {
+        const fromHandle = histogram.getElementsByClassName('irs-from')[0]
+        const toHandle = histogram.getElementsByClassName('irs-to')[0]
+        const singleHandle = histogram.getElementsByClassName('irs-single')[0]
+        if (fromHandle) {
+          fromHandle.removeEventListener('mousedown', this.showDateOverlay)
+          fromHandle.removeEventListener('touchend', this.showDateOverlay)
+          fromHandle.addEventListener('mousedown', this.showDateOverlay)
+          fromHandle.addEventListener('touchend', this.showDateOverlay)
         }
+        if (toHandle) {
+          toHandle.removeEventListener('mousedown', this.showDateOverlay)
+          toHandle.removeEventListener('touchend', this.showDateOverlay)
+          toHandle.addEventListener('mousedown', this.showDateOverlay)
+          toHandle.addEventListener('touchend', this.showDateOverlay)
+        }
+        if (singleHandle) {
+          singleHandle.removeEventListener('mousedown', this.showDateOverlay)
+          singleHandle.removeEventListener('touchend', this.showDateOverlay)
+          singleHandle.addEventListener('mousedown', this.showDateOverlay)
+          singleHandle.addEventListener('touchend', this.showDateOverlay)
+        }
+        this.addHandleIcons()
       }, 20)
     }
   }
 
+  public addHandleIcons () {
+    const fromHandle = document.getElementsByClassName('irs-from')[0]
+    const toHandle = document.getElementsByClassName('irs-to')[0]
+    const singleHandle = document.getElementsByClassName('irs-single')[0]
+    const div = document.createElement('div')
+    const img = document.createElement('img')
+    div.classList.add('handle-img')
+    img.classList.add('bg-img')
+    div.appendChild(img)
+    if (fromHandle && toHandle && singleHandle) {
+      fromHandle.appendChild(div)
+      toHandle.appendChild(div.cloneNode(true))
+      singleHandle.appendChild(div.cloneNode(true))
+    }
+  }
+
+  public showDateOverlay () {
+    this.$emit('show-date-overlay')
+  }
+
   public onValueChanged (value) {
-    this.$emit('value-changed', value)
+    if (!this.prevFrom || !this.prevTo) {
+      if (!this.prevFrom) {
+        this.prevFrom = value.from_pretty
+      } if (!this.prevTo) {
+        this.prevTo = value.to_pretty
+      }
+      this.$emit('value-changed', value)
+    }
+    if (this.prevFrom !== value.from_pretty || this.prevTo !== value.to_pretty) {
+      this.prevFrom = value.from_pretty
+      this.prevTo = value.to_pretty
+      this.$emit('value-changed', value)
+    }
+    this.addHandleIcons()
+  }
+
+  public handleRangeChange (fromUpdated: number, toUpdated: number) {
+    (this.$refs[this.outerRef] as HistogramSlider).update(
+      {
+        from: fromUpdated,
+        to: toUpdated
+      }
+    )
+    this.addHandleListeners()
   }
 
   public prettifyDate (date: Date | number): string {

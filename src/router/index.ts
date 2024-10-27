@@ -29,7 +29,7 @@ const routes: Array<RouteConfig> = [
         SearchModule.SetFilters([])
       }
       if (to.query.sort !== undefined && typeof to.query.sort === 'string') {
-        SearchModule.SetSortOrder(to.query.sort === SortOrder.DATE ? SortOrder.DATE : SortOrder.RELEVANCE)
+        SearchModule.SetSortOrder(to.query.sort === SortOrder.DATE ? SortOrder.DATE : to.query.sort === SortOrder.SCRAPEDATE ? SortOrder.SCRAPEDATE : SortOrder.RELEVANCE)
       } else {
         SearchModule.SetSortOrder(SortOrder.RELEVANCE)
       }
@@ -108,6 +108,11 @@ const routes: Array<RouteConfig> = [
     path: '/datenschutz',
     name: 'Datenschutz',
     component: () => import('../views/Datenschutz.vue')
+  },
+  {
+    path: '/altsystem',
+    name: 'Altsystem',
+    component: () => import('../views/Altsystem.vue')
   }
 ]
 

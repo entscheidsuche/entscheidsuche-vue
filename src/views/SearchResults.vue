@@ -9,7 +9,16 @@
         </div>
         <div class="total-hits">
           <div class="title-wrapper">
-            <p class="title">{{ $t('allHits') }}: {{ resultsTotal }}</p>
+            <p class="title">
+              <span style="">
+                <a :href="this.getDownloadUrl()" target="_blank">
+                  <b-button variant="primary" id="result-download-btn" :title="$t('downloadHover')">
+                    <b-icon id="download" icon="cloud-download" scale="5" font-scale=".2" height="20"></b-icon>
+                  </b-button>
+                </a>
+              </span>
+              {{ $t('allHits') }}: {{ resultsTotal }}
+            </p>
           </div>
           <div class="undo-all" v-if="this.allowUndoFilter" v-on:click="undoFilter()">
             <div v-bind:class="['title-wrapper', this.allowUndoFilter ? 'active' : '']" v-on:click="undoFilter()">
@@ -26,11 +35,68 @@
         </div>
         <div class="year-range">
           <div id="slider-wrapper">
-            <div v-bind:class="['title-wrapper', this.dateFilterEmpty() ? '' : 'active']" v-on:click="undoDateFilter()">
-              <p class="title">{{ $t('year') }}</p>
+            <p class="title title-wrapper" v-if="dateFilterEmpty() && scrapeDateFilterEmpty()">{{ $t('year') }}</p>
+            <div v-bind:class="['title-wrapper', !dateFilterEmpty() ? 'active' : '']" v-on:click="undoDateFilter()">
+              <p v-if="!dateFilterEmpty()" class="title">{{ $t('date') }}</p>
               <b-icon class="undo-filter" icon="x"></b-icon>
             </div>
-            <DateFilter :sliderWidth="sliderWidth"/>
+            <div v-bind:class="['title-wrapper', !scrapeDateFilterEmpty() ? 'active' : '']" v-on:click="undoScrapeDateFilter()">
+              <p v-if="!scrapeDateFilterEmpty()" class="title">{{ $t('scrapeDate') }}</p>
+              <b-icon class="undo-filter" icon="x"></b-icon>
+            </div>
+            <b-form-select id="select-slider" v-model="selectedSlider" :options="sliderOptions"></b-form-select>
+            <div class="date-filter" v-if="showDateFilter">
+              <DateFilter ref="dateFilter"
+                :sliderWidth="sliderWidth"
+                @show-date-overlay="onShowOverlay"/>
+              <div class="date-overlay-bg" v-if="dateOverlayVisible"></div>
+              <div class="date-overlay" v-if="dateOverlayVisible">
+                <div class="focusguard" ref="focusguardFirst" tabindex="0"></div>
+                <b-form class="form">
+                  <b-form-group id="from-date-group" class="mt-16" :label="$t('from')" label-for="from-date">
+                    <b-form-input :state="dateFromState && dateRangeState" ref="fromField" @keydown.enter="onConfirmDateOverlay" tabindex="1" lang="fr" id="from-date" type="date" v-model="dateOverlayFrom"></b-form-input>
+                  </b-form-group>
+                  <b-form-group id="to-date-group" class="mt-16" :label="$t('to')" label-for="to-date">
+                    <b-form-input :state="dateToState && dateRangeState" @keydown.enter="onConfirmDateOverlay" tabindex="2" id="to-date" type="date" v-model="dateOverlayTo"></b-form-input>
+                  </b-form-group>
+                </b-form>
+                <div class="btn-row">
+                  <b-button  tabindex="3" variant="primary" v-on:click="onCancelDateOverlay()" class="close-date-overlay">
+                    {{ $t('cancelDateOverlay') }}
+                  </b-button>
+                  <b-button :disabled="!dateFromState || !dateToState || !dateRangeState " tabindex="4" variant="primary" ref="confirmBtn" v-on:click="onConfirmDateOverlay()" class="confirm-date-overlay">
+                    {{ $t('confirmDateOverlay') }}
+                  </b-button>
+                </div>
+                <div class="focusguard" ref="focusguardSecond" tabindex="5"></div>
+              </div>
+            </div>
+            <div v-else>
+              <ScrapeDateFilter ref="scrapeDateFilter"
+                :sliderWidth="sliderWidth"
+                @show-date-overlay="onShowScrapeOverlay"/>
+              <div class="date-overlay-bg" v-if="scrapeDateOverlayVisible"></div>
+              <div class="date-overlay" v-if="scrapeDateOverlayVisible">
+                <div class="focusguard" ref="scrapeFocusGuardFirst" tabindex="0"></div>
+                <b-form class="form">
+                  <b-form-group id="from-date-group" class="mt-16" :label="$t('from')" label-for="from-date">
+                    <b-form-input :state="scrapeDateFromState && scrapeDateRangeState" ref="fromFieldScrape" @keydown.enter="onConfirmScrapeDateOverlay" tabindex="1" lang="fr" id="from-date" type="date" v-model="scrapeDateOverlayFrom"></b-form-input>
+                  </b-form-group>
+                  <b-form-group id="to-date-group" class="mt-16" :label="$t('to')" label-for="to-date">
+                    <b-form-input :state="scrapeDateToState && scrapeDateRangeState" @keydown.enter="onConfirmScrapeDateOverlay" tabindex="2" id="to-date" type="date" v-model="scrapeDateOverlayTo"></b-form-input>
+                  </b-form-group>
+                </b-form>
+                <div class="btn-row">
+                  <b-button  tabindex="3" variant="primary" v-on:click="onCancelScrapeDateOverlay()" class="close-date-overlay">
+                    {{ $t('cancelDateOverlay') }}
+                  </b-button>
+                  <b-button :disabled="!scrapeDateFromState || !scrapeDateToState || !scrapeDateRangeState " tabindex="4" variant="primary" ref="confirmBtnScrape" v-on:click="onConfirmScrapeDateOverlay()" class="confirm-date-overlay">
+                    {{ $t('confirmDateOverlay') }}
+                  </b-button>
+                </div>
+                <div class="focusguard" ref="scrapeFocusguardSecond" tabindex="5"></div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="languages">
@@ -51,6 +117,10 @@
         </div>
       </div>
       <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']" @scroll="handleScroll" id="results">
+        <h1 class="card-group-title">{{$t('also support')}}</h1>
+        <b-card-group id='bcardsResults' deck>
+          <sponsor-card v-for="(sponsor, index) in this.randomSponsors" :key="index" :logo="sponsor.logo" :link="sponsor.link" :text="sponsor.text" :tooltip="sponsor.tooltip"/>
+        </b-card-group>
         <div v-bind:class="['button-wrapper', this.showMessage ? 'messageOffset' : '']">
           <div v-on:click="onToggleFilter()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible', this.fullScreen ? 'fullScreen' : '']">
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
@@ -59,13 +129,24 @@
         <div v-if="!pristine && results.length === 0" class="no-results">
           <h3 class="hint">Ihre Suche nach "{{ query }}" ergab leider keine Treffer</h3>
         </div>
-        <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-on:click="[onOpenPreview(), onSelectResult(result)]">
+        <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-bind:id="isSelected(result) ? 'selectedRes' : ''" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
               <h4 class="result-title" v-html="result.title"/>
-              <img v-if="result.pdf" src="../assets/pdf.png" class="link-logo">
-              <img v-else src="../assets/html.png" class="link-logo">
+
+              <a v-if="directLink(result)" :href="result.url" target="_blank" @click.prevent.stop="onSource(result.url)">
+                <b-button variant="primary" id="result-court-btn" :title="$t('courtHover')">
+                  <b-icon id="result-court"></b-icon>
+                </b-button>
+              </a>
+              <a v-if="directLink(result)" :href="result.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(result.url.replace('/docs/','/dok/'))">
+                <b-button variant="primary" id="result-print-btn" :title="$t('printHover')">
+                  <b-icon id="result-print" icon="printer"></b-icon>
+                </b-button>
+              </a>
+              <img v-if="result.pdf" src="../assets/pdf.png" class="link-logo" :title="$t('pdfHover')">
+              <img v-else src="../assets/html.png" class="link-logo" :title="$t('htmlHover')">
             </div>
             <div class="abstract" v-if="result.abstract.length > 0">
               <div class="first-row">
@@ -97,6 +178,16 @@
                 </div>
                 <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
                 <div class="controls-wrapper">
+                  <a v-if="directLink(selectedResult)" :href="selectedResult.url" target="_blank" @click.prevent.stop="onSource(selectedResult.url)">
+                    <b-button variant="primary" id="court-btn" :title="$t('courtHover')">
+                      <b-icon id="court"></b-icon>
+                    </b-button>
+                  </a>
+                  <a v-if="directLink(selectedResult)" :href="selectedResult.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(selectedResult.url.replace('/docs/','/dok/'))">
+                    <b-button variant="primary" id="print-btn" :title="$t('printHover')">
+                      <b-icon id="print" icon="printer"></b-icon>
+                    </b-button>
+                  </a>
                   <b-button variant="primary"  v-on:click="onFullScreen()" id="maximize-preview-btn">
                     <b-icon id="maximize-preview" icon="arrows-fullscreen"></b-icon>
                   </b-button>
@@ -115,7 +206,7 @@
             </div>
             <div class="abstract" v-if="selectedResult.abstract !== undefined && selectedResult.abstract.length > 0">
               <div class="first-row">
-                <div v-on:click.stop="onToggleAbstract((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
+                <div v-on:click.stop="onToggle((selectedResult.id + '-preview'))" v-bind:class="['show-more']" v-bind:id="('button-' + selectedResult.id + '-preview')" style="border:none;outline:none;box-shadow:none;">
                   <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
                 </div>
                 <p class="card-text" v-html="selectedResult.abstract" v-bind:id="(selectedResult.id + '-preview')"/>
@@ -259,6 +350,66 @@
         padding: 0 0 16px 0;
         #slider-wrapper{
           margin-bottom:30px;
+          position: relative;
+
+          #select-slider {
+            margin-bottom: 22px;
+          }
+
+          .date-overlay-bg {
+            background-color: #ffffff;
+            position: absolute;
+            top: 74px;
+            left: -20px;
+            width: 338px;
+            height: 180px;
+            z-index: 100;
+          }
+
+          .date-overlay {
+            background-color: #e5e9f1;
+            position: absolute;
+            top: 74px;
+            left: 0;
+            width: 100%;
+            height: 180px;
+            z-index: 101;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            padding: 6px;
+
+            .btn-row {
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              width: 100%;
+
+              .btn {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: calc(50% - 3px);
+              }
+            }
+
+            .form {
+              margin-bottom: 6px;
+
+              .form-group {
+                margin: 0;
+
+                label {
+                  margin-bottom: 0px;
+                  font-size: 14px;
+                }
+              }
+
+              #from-date-group {
+                margin-bottom: 6px;
+              }
+            }
+          }
         }
       }
     }
@@ -279,6 +430,37 @@
         padding: 8px 0 8px 0;
         border:0;
         overflow:none;
+      }
+      .card-group-title {
+        margin: 0;
+        padding-bottom: 15px;
+      }
+      .card-deck{
+        width:100%;
+        display:flex;
+        flex-flow:row wrap;
+        justify-content:space-between;
+        margin:0px;
+
+        .card {
+          background-color: #fff;
+          border: none;
+          box-shadow: 0 2px 30px rgba(0, 0, 0, .15);
+          border-radius: 0 0 20px 0;
+          margin: 5px 0 5px 0;
+          width: 260px;
+          max-width: calc((100% - 40px) / 4);
+          flex-basis: 260px;
+          flex-grow: 1;
+          justify-content: space-between;
+        }
+        .card:hover {
+          .card-img-wapper {
+            .card-img-top {
+              transform: matrix(1, 0, 0, 1, 0, 0);
+            }
+          }
+        }
       }
       .button-wrapper{
         position:absolute;
@@ -351,18 +533,46 @@
             flex-direction: row;
             margin-bottom: 12px;
 
+            #result-court-btn{
+              height:30px;
+              width:30px;
+              position: relative;
+              margin-left: 5px;
+              #result-court{
+                background: url('../assets/court.svg') no-repeat center;
+                height:22px;
+                width:22px;
+                position:absolute;
+                top:3px;
+                left:3px;
+              }
+            }
+            #result-print-btn{
+              height:30px;
+              width:30px;
+              margin-left: 5px;
+              position: relative;
+              #result-print{
+                height:22px;
+                width:22px;
+                position:absolute;
+                top:3px;
+                left:3px;
+              }
+            }
+
             .canton-logo{
               max-height:36px;
               width: auto;
               height: auto;
-              margin-right:10px;
+              margin-right:5px;
               flex-shrink: 0;
             }
             .link-logo{
               max-height:36px;
               width:auto;
               height: auto;
-              margin-left:10px;
+              margin-left:5px;
             }
             .result-title{
               font-size: 16px;
@@ -455,21 +665,20 @@
       .preview-content{
         height:100%;
         width:auto;
+        display: flex;
+        flex-direction: column;
         .doc-info{
           width:100%;
           padding:15px 11px 15px 11px;
           border: 1px solid rgba(0, 0, 0, 0.125);
           border-radius: 4px;
           margin-bottom: 0.5em;
-          position:relative;
+          display: flex;
+          flex-direction: column;
 
           .doc-header{
             width:100%;
             height:100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-
             .flex-row{
               width:100%;
               display: flex;
@@ -485,7 +694,10 @@
                 flex-shrink: 0;
               }
               .controls-wrapper{
-                width:100px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                width:170px;
                 height:30px;
                 margin-left: 20px;
                 position:relative;
@@ -494,9 +706,7 @@
                 #close-preview-btn{
                   height:30px;
                   width:30px;
-                  position:absolute;
-                  top:0;
-                  right:0;
+                  position:relative;
                   #close-preview{
                     background: url('../assets/bootstrap-close-big-white.svg') no-repeat center;
                     height:28px;
@@ -506,35 +716,60 @@
                     left:0;
                   }
                 }
+                #court-btn{
+                  height:30px;
+                  width:30px;
+                  position: relative;
+                  #court{
+                    background: url('../assets/court.svg') no-repeat center;
+                    height:22px;
+                    width:22px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
+                  }
+                }
+                #print-btn{
+                  height:30px;
+                  width:30px;
+                  position: relative;
+                  #print{
+                    height:22px;
+                    width:22px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
+                  }
+                }
                 #maximize-preview-btn{
                   height:30px;
                   width:30px;
+                  position: relative;
                   #maximize-preview{
                     height:22px;
                     width:22px;
                     position:absolute;
-                    top:4px;
-                    left:4px;
+                    top:3px;
+                    left:3px;
                   }
                 }
                 #separate-preview-btn{
                   height:30px;
                   width:30px;
-                  margin-left: 5px;
+                  position: relative;
                   #separate-preview{
                     height:22px;
                     width:22px;
-                    position:relative;
-                    top:-1px;
-                    left:-8px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
                   }
                 }
                 #minimize-preview-btn{
                   height:30px;
                   width:30px;
                   display:none;
-                  position: absolute;
-                  right:0;
+                  position: relative;
                   #minimize-preview{
                     height:22px;
                     width:22px;
@@ -613,14 +848,11 @@
             .doc-header{
               .flex-row{
                 .controls-wrapper{
+                  width: 135px;
                   #minimize-preview-btn{
                     display:block;
-                    float:right;
                   }
                   #maximize-preview-btn{
-                    display:none;
-                  }
-                  #separate-preview-btn{
                     display:none;
                   }
                   #close-preview-btn{
@@ -668,6 +900,9 @@
         }
       }
       .results{
+        .card {
+          max-width: calc((100% - 20px) / 3);
+        }
         .button-wrapper{
           top: calc(((100vh - 38px) / 2) - 120px );
 
@@ -725,6 +960,13 @@
           border:0;
           width:0;
         }
+        .year-range {
+          #slider-wrapper{
+            .date-overlay-bg{
+              width: 100vw;
+            }
+          }
+        }
       }
       .results{
         width:100vw;
@@ -733,6 +975,13 @@
         border:0;
         padding-left: 20px;
         padding-right: 20px;
+        .card-deck{
+          .card{
+            min-width:100px;
+            //max-width:160px;
+            max-width:calc((100% - 20px) / 2);
+          }
+        }
         .show-filter{
           &.visible{
           top: calc((100vh - 38px) / 2);
@@ -753,14 +1002,19 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
-import { AppModule, MessageState } from '@/store/modules/app'
+import { AppModule, MessageState, Sponsor } from '@/store/modules/app'
 import { Filters, FilterType, SearchModule, SearchResult } from '@/store/modules/search'
 import DateFilter from '@/components/DateFilter.vue'
+import ScrapeDateFilter from '@/components/ScrapeDateFilter.vue'
 import HierarchieFilter from '@/components/HierarchieFilter.vue'
 import LanguageFilter from '@/components/LanguageFilter.vue'
 import SortOrderSelector from '@/components/SortOrderSelector.vue'
 import { Route } from 'vue-router'
 import router from '@/router'
+import { BButton } from 'bootstrap-vue'
+import i18n from '@/i18n'
+import SponsorCard from '@/components/SponsorCard.vue'
+import data from '../data/sponsors.json'
 
 @Component({
   name: 'SearchResult',
@@ -768,7 +1022,9 @@ import router from '@/router'
     SortOrderSelector,
     DateFilter,
     LanguageFilter,
-    HierarchieFilter
+    HierarchieFilter,
+    ScrapeDateFilter,
+    SponsorCard
   }
 })
 
@@ -780,6 +1036,20 @@ export default class SearchResults extends Vue {
   private sliderWidth = 1
   private allowUndoFilter = false
   private iframeUrl = ''
+  public dateOverlayVisible = false
+  public scrapeDateOverlayVisible = false
+  public dateOverlayFrom = ''
+  public dateOverlayTo = ''
+  public scrapeDateOverlayFrom = ''
+  public scrapeDateOverlayTo = ''
+  public selectedSlider = 'date'
+  public sliderOptions = [{ value: 'date', text: i18n.t('date').toString() }, { value: 'scrapeDate', text: i18n.t('scrapeDate').toString() }]
+  private jsonData: any = null
+  public overlayVisible = false
+  public overlayFrom = ''
+  public overlayTo = ''
+  public sponsors = data.filter(s => s.active)
+  public randomSponsors = data.filter(s => s.active)
 
   data () {
     return {
@@ -828,6 +1098,58 @@ export default class SearchResults extends Vue {
     return AppModule.locale
   }
 
+  get dateFromState () {
+    const from = new Date(this.dateOverlayFrom)
+    const fromNumber = from.getTime()
+    return !isNaN(fromNumber)
+  }
+
+  get dateToState () {
+    const to = new Date(this.dateOverlayTo)
+    const toNumber = to.getTime()
+    return !isNaN(toNumber)
+  }
+
+  get dateRangeState () {
+    const from = new Date(this.dateOverlayFrom)
+    const fromNumber = from.getTime()
+    const to = new Date(this.dateOverlayTo)
+    const toNumber = to.getTime()
+    if (!isNaN(toNumber) && !isNaN(fromNumber)) {
+      return fromNumber - 1 < toNumber
+    } else {
+      return true
+    }
+  }
+
+  get scrapeDateFromState () {
+    const from = new Date(this.scrapeDateOverlayFrom)
+    const fromNumber = from.getTime()
+    return !isNaN(fromNumber)
+  }
+
+  get scrapeDateToState () {
+    const to = new Date(this.scrapeDateOverlayTo)
+    const toNumber = to.getTime()
+    return !isNaN(toNumber)
+  }
+
+  get scrapeDateRangeState () {
+    const from = new Date(this.scrapeDateOverlayFrom)
+    const fromNumber = from.getTime()
+    const to = new Date(this.scrapeDateOverlayTo)
+    const toNumber = to.getTime()
+    if (!isNaN(toNumber) && !isNaN(fromNumber)) {
+      return fromNumber - 1 < toNumber
+    } else {
+      return true
+    }
+  }
+
+  get showDateFilter () {
+    return this.selectedSlider === 'date'
+  }
+
   @Watch('locale')
   public onLocaleChanged () {
     if (SearchModule.document !== '') {
@@ -874,6 +1196,9 @@ export default class SearchResults extends Vue {
         iFrameParent.append(iFrame)
       }
     }
+    setTimeout(() => {
+      this.scrollToSelectedRes()
+    }, 100)
   }
 
   @Watch('filter')
@@ -894,6 +1219,13 @@ export default class SearchResults extends Vue {
         this.iframeUrl = newUrl
       }
     }
+    if (from !== to && this.dateOverlayVisible) {
+      this.onCancelDateOverlay()
+    }
+    if (from !== to && this.scrapeDateOverlayVisible) {
+      this.onCancelScrapeDateOverlay()
+    }
+    this.setRandomSponsors()
   }
 
   @Watch('query')
@@ -919,6 +1251,7 @@ export default class SearchResults extends Vue {
 
   mounted () {
     this.allowUndoFilter = Object.keys(this.filter).length > 0
+    this.handleResize()
   }
 
   destroyed () {
@@ -930,6 +1263,7 @@ export default class SearchResults extends Vue {
     this.getFilterInnerWidth()
     this.windowWidth = window.innerWidth
     this.filterVisible = this.windowWidth > 1024
+    this.setRandomSponsors()
   }
 
   handleScroll () {
@@ -946,7 +1280,6 @@ export default class SearchResults extends Vue {
     const selectedId = this.$route.query.selected
     const preview = this.$route.query.preview
     const fullScreen = this.$route.query.fullScreen
-    const name = this.$route.name
     if (query && query !== this.query && ((fullScreen && this.windowWidth > 534) || (preview && this.windowWidth <= 534))) {
       this.fullScreen = true
       this.previewVisible = true
@@ -1009,11 +1342,237 @@ export default class SearchResults extends Vue {
     return undefined
   }
 
+  public onCancelDateOverlay (): void {
+    this.dateOverlayVisible = false
+    this.removeGuardListeners()
+  }
+
+  public onCancelScrapeDateOverlay (): void {
+    this.scrapeDateOverlayVisible = false
+    this.removeScrapeGuardListeners()
+  }
+
+  public getDownloadUrl () {
+    const url1 = 'http://v2202109132150164038.luckysrv.de/api/search?{%22collection%22:%22entscheidsuche%22,%20%22query%22:%22'
+    const url2 = '%22,%20%22filter%22:%22'
+    const url3 = '%22,%20%22getDocs%22:true,%22getZIP%22:true,%20%22getCSV%22:false,%20%22getHTML%22:true,%20%22getNiceHTML%22:false,%20%22getJSON%22:false,%20%22ui%22:true}'
+    const filter: any[] = []
+    for (const k in SearchModule.filters) {
+      const e1: any = {}
+      const e2: any = {}
+      const f = { ...SearchModule.filters[k].payload }
+      let kk = k
+      let term = 'terms'
+      if (kk === 'language') {
+        kk = 'attachment.language'
+      } else if (kk === 'hierarchie') {
+        kk = 'hierarchy'
+      } else if (kk === 'edatum') {
+        kk = 'date'
+        term = 'range'
+        if ('from' in f) {
+          f.gte = f.from
+          delete f.from
+        }
+        if ('to' in f) {
+          f.lte = f.to
+          delete f.to
+        }
+      } else if (kk === 'scrapedate') {
+        kk = 'scrapedate'
+        term = 'range'
+        if ('from' in f) {
+          f.gte = f.from
+          delete f.from
+        }
+        if ('to' in f) {
+          f.lte = f.to
+          delete f.to
+        }
+      }
+      e1[kk] = f
+      e2[term] = e1
+      filter.push(e2)
+    }
+    // "filter":[{"terms":{"attachment.language":["de"]}},{"terms":{"hierarchy":["AG"]}},{"range":{"date":{"lte":1509015759293}}}]}}
+    // "filters":"{"language":{"type":"language","payload":["de"]},"hierarchie":{"type":"hierarchie","payload":["CH"]}}"
+    return url1 + SearchModule.query + url2 + JSON.stringify(filter).replaceAll('"', '@') + url3
+  }
+
+  public onConfirmDateOverlay (): void {
+    if (this.dateFromState && this.dateToState && this.dateRangeState) {
+      const from = new Date(this.dateOverlayFrom)
+      const fromNumber = from.getTime()
+      const to = new Date(this.dateOverlayTo)
+      const toNumber = to.getTime();
+      (this.$refs.dateFilter as DateFilter).handleRangeChange(fromNumber, toNumber)
+      this.dateOverlayVisible = false
+      this.removeGuardListeners()
+    }
+  }
+
+  public onConfirmScrapeDateOverlay (): void {
+    if (this.scrapeDateFromState && this.scrapeDateToState && this.scrapeDateRangeState) {
+      const from = new Date(this.scrapeDateOverlayFrom)
+      const fromNumber = from.getTime()
+      const to = new Date(this.scrapeDateOverlayTo)
+      const toNumber = to.getTime();
+      (this.$refs.scrapeDateFilter as ScrapeDateFilter).handleRangeChange(fromNumber, toNumber)
+      this.scrapeDateOverlayVisible = false
+      this.removeScrapeGuardListeners()
+    }
+  }
+
+  public onShowOverlay (): void {
+    this.dateOverlayVisible = true
+    this.initOverlayDates()
+    this.$nextTick(() => {
+      const focusGuard1 = this.$refs.focusguardFirst as HTMLElement
+      const focusGuard2 = this.$refs.focusguardSecond as HTMLElement
+      if (focusGuard1) {
+        focusGuard1.addEventListener('focus', this.focusOnLast)
+      }
+      if (focusGuard2) {
+        focusGuard2.addEventListener('focus', this.focusOnFirst)
+      }
+      (this.$refs.confirmBtn as BButton).focus()
+    })
+  }
+
+  public onShowScrapeOverlay (): void {
+    this.scrapeDateOverlayVisible = true
+    this.initScrapeOverlayDates()
+    this.$nextTick(() => {
+      const focusGuard1 = this.$refs.scrapeFocusGuardFirst as HTMLElement
+      const focusGuard2 = this.$refs.scrapeFocusguardSecond as HTMLElement
+      if (focusGuard1) {
+        focusGuard1.addEventListener('focus', this.focusOnLastScrape)
+      }
+      if (focusGuard2) {
+        focusGuard2.addEventListener('focus', this.focusOnFirstScrape)
+      }
+      (this.$refs.confirmBtnScrape as BButton).focus()
+    })
+  }
+
+  public removeGuardListeners () {
+    const focusGuard1 = this.$refs.focusguardFirst as HTMLElement
+    const focusGuard2 = this.$refs.focusguardSecond as HTMLElement
+    if (focusGuard1) {
+      focusGuard1.removeEventListener('focus', this.focusOnLast)
+    }
+    if (focusGuard2) {
+      focusGuard2.removeEventListener('focus', this.focusOnFirst)
+    }
+  }
+
+  public removeScrapeGuardListeners () {
+    const focusGuard1 = this.$refs.focusguardFirstScrape as HTMLElement
+    const focusGuard2 = this.$refs.focusguardSecondScrape as HTMLElement
+    if (focusGuard1) {
+      focusGuard1.removeEventListener('focus', this.focusOnLastScrape)
+    }
+    if (focusGuard2) {
+      focusGuard2.removeEventListener('focus', this.focusOnFirstScrape)
+    }
+  }
+
+  public focusOnLast () {
+    (this.$refs.confirmBtn as BButton).focus()
+  }
+
+  public focusOnFirst () {
+    (this.$refs.fromField as HTMLInputElement).focus()
+  }
+
+  public focusOnLastScrape () {
+    (this.$refs.confirmBtnScrape as BButton).focus()
+  }
+
+  public focusOnFirstScrape () {
+    (this.$refs.fromFieldScrape as HTMLInputElement).focus()
+  }
+
   public onToggleFilter (): void {
     this.filterVisible = !this.filterVisible
   }
 
-  public onFullScreen (): void{
+  public directLink (result) {
+    if (result && result.url) {
+      const pathSegments = result.url.split('/').filter(Boolean)
+      return (/^[A-Z]{2}_/.test(pathSegments[3]) && !(/^(CH_EDOEB|XX_Upload|BE_ZivilStraf|BE_Anwaltsaufsicht|BE_Verwaltungsgericht|BE_Steuerrekurs|BS_Omni|GL_Omni|GR_Gerichte|JU_Gerichte|TG_OG|VS_Gerichte)$/.test(pathSegments[3])))
+    }
+    return false
+  }
+
+  public onSource (docurl): void {
+    // const protocol = 'https:'
+    // const host = 'entscheidsuche.ch'
+    // const protocol = window.location.protocol
+    // const host = window.location.host
+    const url = docurl.replace(/\.([a-zA-Z0-9]+)$/, '.json')
+
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok.')
+        }
+        return response.json()
+      })
+      .then(data => {
+        // Here 'data' is the JSON object you've fetched
+        console.log(data)
+        // You can now set this data to a component's data property or work with it as needed
+        this.processJsonData(data) // Process your data with another method
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error)
+      })
+  }
+
+  processJsonData (data) {
+    // Handle your JSON data here
+    // For example, you might want to set it to a Vue data property
+    let url = null
+    if ('PDF' in data) {
+      url = data.PDF.URL
+    } else if ('HTML' in data) {
+      url = data.HTML.URL
+    }
+    if (url) {
+      this.openPrint(url)
+    } else {
+      alert('no deeplink available')
+    }
+  }
+
+  public openPrint (url): void {
+    // Calculate width and height as 80% of the current window's dimensions
+    const width = window.innerWidth * 0.8
+    const height = window.innerHeight * 0.8
+
+    // Round down the numbers to avoid decimals
+    const roundedWidth = Math.floor(width)
+    const roundedHeight = Math.floor(height)
+
+    // Calculate the position of the new window to be centered
+    const left = (window.innerWidth / 2) - (roundedWidth / 2)
+    const top = (window.innerHeight / 2) - (roundedHeight / 2)
+
+    // Open a new window with the specified dimensions and position it in the center
+    const newWindow = window.open(url, 'newwindow', `width=${roundedWidth},height=${roundedHeight},top=${top},left=${left}`)
+
+    // Check if the new window was successfully opened
+    if (newWindow) {
+      // Focus the new window if it's opened in the background
+      newWindow.focus()
+    } else {
+      // If the new window was blocked by the browser's popup blocker, inform the user
+      alert('A popup blocker may be preventing the new window from opening.')
+    }
+  }
+
+  public onFullScreen (): void {
     const name = this.$route.name
     if (name !== 'View') {
       if (!this.fullScreen) {
@@ -1029,22 +1588,25 @@ export default class SearchResults extends Vue {
           SearchModule.SetFullScreen('')
         }
         this.fullScreen = false
+        setTimeout(() => {
+          this.scrollToSelectedRes()
+        }, 100)
       }
     } else if (this.fullScreen) {
       router.push({ name: 'Home' })
     }
   }
 
-  public onNewTab (): void{
-    if (!this.fullScreen) {
-      if ('id' in SearchModule.selectedResult) {
-        window.open('/view/' + SearchModule.selectedResult.id, '_blank')
-        self.focus()
-      }
+  public onNewTab (): void {
+    // if (!this.fullScreen) {
+    if ('id' in SearchModule.selectedResult) {
+      window.open('/view/' + SearchModule.selectedResult.id, '_blank')
+      self.focus()
     }
+    // }
   }
 
-  public onOpenPreview (): void{
+  public onOpenPreview (): void {
     this.previewVisible = true
     if (this.windowWidth <= 534) {
       this.fullScreen = true
@@ -1055,7 +1617,7 @@ export default class SearchResults extends Vue {
     return AppModule.showMessage === MessageState.VISIBLE
   }
 
-  public onClosePreview (): void{
+  public onClosePreview (): void {
     this.previewVisible = false
     SearchModule.SetPreview(false)
     if (this.fullScreen) {
@@ -1063,6 +1625,70 @@ export default class SearchResults extends Vue {
       if (this.windowWidth > 534) {
         this.previewVisible = true
       }
+    }
+    setTimeout(() => {
+      this.scrollToSelectedRes()
+    }, 100)
+  }
+
+  public initOverlayDates (): void {
+    const minEdatum = Number(SearchModule.aggregations.min_edatum[0].key)
+    const maxEdatum = Number(SearchModule.aggregations.max_edatum[0].key)
+    if (!Object.prototype.hasOwnProperty.call(this.filter, 'edatum')) {
+      if (minEdatum) {
+        this.dateOverlayFrom = this.dateToString(minEdatum)
+      }
+      if (maxEdatum) {
+        this.dateOverlayTo = this.dateToString(maxEdatum)
+      }
+    } else {
+      const from = this.filter.edatum.payload.from
+      const to = this.filter.edatum.payload.to
+      if (from) {
+        this.dateOverlayFrom = this.dateToString(from)
+      } else if (minEdatum) {
+        this.dateOverlayFrom = this.dateToString(minEdatum)
+      }
+      if (to) {
+        this.dateOverlayTo = this.dateToString(to)
+      } else if (maxEdatum) {
+        this.dateOverlayTo = this.dateToString(maxEdatum)
+      }
+    }
+  }
+
+  initScrapeOverlayDates (): void {
+    const minEdatum = Number(SearchModule.aggregations.min_scrapedate[0].key)
+    const maxEdatum = Number(SearchModule.aggregations.max_scrapedate[0].key)
+    if (!Object.prototype.hasOwnProperty.call(this.filter, 'scrapedate')) {
+      if (minEdatum) {
+        this.scrapeDateOverlayFrom = this.dateToString(minEdatum)
+      }
+      if (maxEdatum) {
+        this.scrapeDateOverlayTo = this.dateToString(maxEdatum)
+      }
+    } else {
+      const from = this.filter.scrapedate.payload.from
+      const to = this.filter.scrapedate.payload.to
+      if (from) {
+        this.scrapeDateOverlayFrom = this.dateToString(from)
+      } else if (minEdatum) {
+        this.scrapeDateOverlayFrom = this.dateToString(minEdatum)
+      }
+      if (to) {
+        this.scrapeDateOverlayTo = this.dateToString(to)
+      } else if (maxEdatum) {
+        this.scrapeDateOverlayTo = this.dateToString(maxEdatum)
+      }
+    }
+  }
+
+  public dateToString (date: Date | number): string {
+    if (date instanceof Date) {
+      return date.toISOString().split('T')[0]
+    } else {
+      const d = new Date(date)
+      return d.toISOString().split('T')[0]
     }
   }
 
@@ -1104,6 +1730,10 @@ export default class SearchResults extends Vue {
     SearchModule.RemoveFilter(FilterType.DATE)
   }
 
+  public undoScrapeDateFilter () {
+    SearchModule.RemoveFilter(FilterType.SCRAPEDATE)
+  }
+
   public undoLanguageFilter () {
     SearchModule.RemoveFilter(FilterType.LANGUAGE)
   }
@@ -1114,6 +1744,10 @@ export default class SearchResults extends Vue {
 
   public dateFilterEmpty () {
     return !(Object.keys(this.filter).includes('edatum'))
+  }
+
+  public scrapeDateFilterEmpty () {
+    return !(Object.keys(this.filter).includes('scrapedate'))
   }
 
   public languageFilterEmpty () {
@@ -1137,6 +1771,39 @@ export default class SearchResults extends Vue {
         button.style.transform = 'rotate(90deg)'
       } else {
         button.style.transform = 'rotate(0deg)'
+      }
+    }
+  }
+
+  public setRandomSponsors () {
+    const shuffledSponsors: {'sponsor': Sponsor; 'position': number}[] = []
+    for (let i = 0; i < this.sponsors.length; i++) {
+      shuffledSponsors[i] = { sponsor: this.sponsors[i], position: Math.random() }
+    }
+    shuffledSponsors.sort((a, b) => { return Math.sign(a.position - b.position) })
+    let visibleSponsors = 0
+    if (this.windowWidth <= 534) {
+      visibleSponsors = 2
+    } else if (this.windowWidth > 534) {
+      visibleSponsors = 4
+    } else {
+      visibleSponsors = 0
+    }
+    const newSponsors: Sponsor[] = []
+    for (let i = 0; i < visibleSponsors; i++) {
+      newSponsors.push((shuffledSponsors[i]).sponsor)
+    }
+    this.randomSponsors = newSponsors
+  }
+
+  public scrollToSelectedRes () {
+    const selectedRes = document.getElementById('selectedRes')
+    if (selectedRes) {
+      if (selectedRes.getBoundingClientRect().bottom > window.innerHeight) {
+        selectedRes.scrollIntoView({ block: 'center' })
+      }
+      if (selectedRes.getBoundingClientRect().top < 0) {
+        selectedRes.scrollIntoView({ block: 'center' })
       }
     }
   }

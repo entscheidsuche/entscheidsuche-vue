@@ -1,8 +1,8 @@
 import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult, SortOrder } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
 
-// const searchUrl = 'https://entscheidsuche.pansoft.de:9200/entscheidsuche-*/_search'
-const searchUrl = 'https://entscheidsuche.ch/_search.php'
+// const searchUrl = 'https://entscheidsuche.pansoft.de:9200/entscheidsuche.v2-*/_search'
+const searchUrl = 'https://entscheidsuche.ch/_searchV2.php'
 
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
@@ -26,40 +26,35 @@ export class SearchUtil {
       _source: {
         excludes: ['attachment.content']
       },
-      // eslint-disable-next-line @typescript-eslint/camelcase
       track_total_hits: true,
       query: {
         bool: {
           must: {
-            // eslint-disable-next-line @typescript-eslint/camelcase
             query_string: {
               query: query,
-              // eslint-disable-next-line @typescript-eslint/camelcase
               default_operator: 'AND',
               type: 'cross_fields',
               fields: [
-                'title.*',
-                'abstract.*',
-                'meta.*',
+                'title.*^5',
+                'abstract.*^3',
+                'meta.*^10',
                 'attachment.content',
-                'reference'
+                'reference^3'
               ]
             }
           }
         }
       },
       sort: [
-        { [sortOrder === SortOrder.RELEVANCE ? '_score' : 'date']: 'desc' },
+        { [sortOrder === SortOrder.RELEVANCE ? '_score' : sortOrder === SortOrder.DATE ? 'date' : 'scrapedate']: 'desc' },
         { id: 'desc' }
       ],
       highlight: {
         fields: {
           [`title.${lang}`]: {
-            // eslint-disable-next-line @typescript-eslint/camelcase
             number_of_fragments: 0
           },
           [`abstract.${lang}`]: {
-            // eslint-disable-next-line @typescript-eslint/camelcase
             number_of_fragments: 0
           },
           'attachment.content': {}
@@ -70,7 +65,6 @@ export class SearchUtil {
       search.query.bool.filter = SearchUtil.buildFilters(filters)
     }
     if (searchAfter !== undefined) {
-      // eslint-disable-next-line @typescript-eslint/camelcase
       search.search_after = searchAfter
     } else {
       if (filters.hierarchie === undefined) {
@@ -100,23 +94,40 @@ export class SearchUtil {
           search.aggs = {}
         }
         search.aggs.edatum = {
-          // eslint-disable-next-line @typescript-eslint/camelcase
           date_histogram: {
-            // eslint-disable-next-line @typescript-eslint/camelcase
             calendar_interval: SearchUtil.getCalendarInterval(filters),
             field: 'date'
           }
         }
-        // eslint-disable-next-line @typescript-eslint/camelcase
         search.aggs.min_edatum = {
           min: {
             field: 'date'
           }
         }
-        // eslint-disable-next-line @typescript-eslint/camelcase
         search.aggs.max_edatum = {
           max: {
             field: 'date'
+          }
+        }
+      }
+      if (filters.scrapedate === undefined) {
+        if (search.aggs === undefined) {
+          search.aggs = {}
+        }
+        search.aggs.scrapedate = {
+          date_histogram: {
+            calendar_interval: SearchUtil.getScrapeCalendarInterval(filters),
+            field: 'scrapedate'
+          }
+        }
+        search.aggs.min_scrapedate = {
+          min: {
+            field: 'scrapedate'
+          }
+        }
+        search.aggs.max_scrapedate = {
+          max: {
+            field: 'scrapedate'
           }
         }
       }
@@ -130,18 +141,16 @@ export class SearchUtil {
       query: {
         bool: {
           must: {
-            // eslint-disable-next-line @typescript-eslint/camelcase
             query_string: {
               query: query,
-              // eslint-disable-next-line @typescript-eslint/camelcase
               default_operator: 'AND',
               type: 'cross_fields',
               fields: [
-                'title.*',
-                'abstract.*',
-                'meta.*',
+                'title.*^5',
+                'abstract.*^3',
+                'meta.*^10',
                 'attachment.content',
-                'reference'
+                'reference^3'
               ]
             }
           }
@@ -168,23 +177,36 @@ export class SearchUtil {
       }
     } else if (filter.type === 'edatum') {
       search.aggs.edatum = {
-        // eslint-disable-next-line @typescript-eslint/camelcase
         date_histogram: {
-          // eslint-disable-next-line @typescript-eslint/camelcase
           calendar_interval: SearchUtil.getCalendarInterval(filters),
           field: 'date'
         }
       }
-      // eslint-disable-next-line @typescript-eslint/camelcase
       search.aggs.min_edatum = {
         min: {
           field: 'date'
         }
       }
-      // eslint-disable-next-line @typescript-eslint/camelcase
       search.aggs.max_edatum = {
         max: {
           field: 'date'
+        }
+      }
+    } else if (filter.type === 'scrapedate') {
+      search.aggs.scrapedate = {
+        date_histogram: {
+          calendar_interval: SearchUtil.getScrapeCalendarInterval(filters),
+          field: 'scrapedate'
+        }
+      }
+      search.aggs.min_scrapedate = {
+        min: {
+          field: 'scrapedate'
+        }
+      }
+      search.aggs.max_scrapedate = {
+        max: {
+          field: 'scrapedate'
         }
       }
     }
@@ -267,6 +289,23 @@ export class SearchUtil {
     return 'quarter'
   }
 
+  private static getScrapeCalendarInterval (filters: Filters): string {
+    const filter = filters.scrapedate
+    if (filter !== undefined) {
+      if (filter.type === 'scrapedate') {
+        const range = (filter.payload.to - filter.payload.from) / 1000 / 3600 / 24
+        if (range < 40) {
+          return 'day'
+        } else if (range < 280) {
+          return 'week'
+        } else if (range < 1200) {
+          return 'month'
+        }
+      }
+    }
+    return 'quarter'
+  }
+
   private static buildFilters (filters: Filters): any {
     const filterArray: Array<any> = []
     for (const type in filters) {
@@ -313,6 +352,34 @@ export class SearchUtil {
         }
       }
     }
+    if (filter.type === 'scrapedate') {
+      if (filter.payload.from !== undefined && filter.payload.to !== undefined) {
+        return {
+          range: {
+            scrapedate: {
+              gte: SearchUtil.transformDate(filter.payload.from),
+              lte: SearchUtil.transformDate(filter.payload.to)
+            }
+          }
+        }
+      } else if (filter.payload.from !== undefined) {
+        return {
+          range: {
+            scrapedate: {
+              gte: SearchUtil.transformDate(filter.payload.from)
+            }
+          }
+        }
+      } else if (filter.payload.to !== undefined) {
+        return {
+          range: {
+            scrapedate: {
+              lte: SearchUtil.transformDate(filter.payload.to)
+            }
+          }
+        }
+      }
+    }
     if (filter.type === 'hierarchie') {
       return {
         terms: {
@@ -353,6 +420,12 @@ export class SearchUtil {
         if (hit._source.date !== undefined && hit._source.date.length === 10) {
           date = SearchUtil.formatDate(hit._source.date)
         }
+        let scrapedate: string | undefined
+        if (hit._source.scrapedate !== undefined && hit._source.scrapedate.length === 10) {
+          scrapedate = SearchUtil.formatDate(hit._source.scrapedate)
+        } else {
+          scrapedate = undefined
+        }
         const pdf = SearchUtil.getDocType(hit._source.attachment.content_type)
         results.push({
           id: hit._id,
@@ -363,7 +436,8 @@ export class SearchUtil {
           canton: hit._source.canton.toUpperCase(),
           pdf,
           url: hit._source.attachment.content_url,
-          sort: hit.sort
+          sort: hit.sort,
+          scrapedate: scrapedate
         })
       }
       aggregations = SearchUtil.extractAggregations(resp)

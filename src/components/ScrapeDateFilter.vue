@@ -1,12 +1,12 @@
 <template>
   <DateFilterUI
-    ref="dateFilterUI"
+    ref="scrapedateFilterUI"
     v-if="showHistogram"
     :sliderWidth="sliderWidth"
     :interval="dateInterval"
     :range="dateRange"
     :dates="dates"
-    outerRef="dateHistogram"
+    outerRef="scrapeDateHistogram"
     @value-changed="onDateRangeChanged"
     @show-date-overlay="onShowDateOverlay"/>
 </template>
@@ -23,32 +23,8 @@
   }
   .irs-from,.irs-to,.irs-single{
     top:56px;
-
-    .handle-img {
-      position: absolute;
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      top: 0px;
-      border-radius: 0 4px 4px 0;
-      background-color: #6183ec;
-
-      .bg-img {
-        width: 13px;
-        height: 13px;
-        position: relative;
-        top: 2px;
-        left: 3px;
-        content: url('../assets/pencil-white.svg');
-      }
-    }
-
     @media (hover: none) and (pointer: coarse) {
       font-size: 16px;
-
-      .handle-img {
-        height: 22px;
-      }
     }
   }
   .irs-from::before,.irs-to::before,.irs-single::before{
@@ -78,7 +54,7 @@ import 'vue-histogram-slider/dist/histogram-slider.css'
     DateFilterUI
   }
 })
-export default class DateFilter extends Vue {
+export default class ScrapeDateFilter extends Vue {
   private showHistogram = false
   private dateInterval: { min: number; max: number } | undefined
   private dateRange: { from: number | undefined; to: number | undefined } | undefined
@@ -93,7 +69,7 @@ export default class DateFilter extends Vue {
   }
 
   get dates () {
-    const edatum = this.aggregations.edatum || []
+    const edatum = this.aggregations.scrapedate || []
     const datesArray: Date[] = []
     for (const agg of edatum) {
       const date = new Date(agg.key)
@@ -105,11 +81,10 @@ export default class DateFilter extends Vue {
   }
 
   public mounted () {
-    console.log(this.filters)
-    if (Object.prototype.hasOwnProperty.call(this.filters, 'edatum')) {
-      this.dateRange = { from: this.filters.edatum.payload.from, to: this.filters.edatum.payload.to }
+    if (Object.prototype.hasOwnProperty.call(this.filters, 'scrapedate')) {
+      this.dateRange = { from: this.filters.scrapedate.payload.from, to: this.filters.scrapedate.payload.to }
     }
-    if (Object.prototype.hasOwnProperty.call(this.aggregations, 'edatum')) {
+    if (Object.prototype.hasOwnProperty.call(this.aggregations, 'scrapedate')) {
       this.update()
     }
   }
@@ -130,13 +105,13 @@ export default class DateFilter extends Vue {
         for (let i = 0; i < filters.length; i++) {
           const currentFilter = filters[i]
           if (currentFilter !== null) {
-            if (currentFilter.substring(0, 1) === 'e') {
+            if (currentFilter.substring(0, 1) === 's') {
               edate = currentFilter
             }
           }
         }
       } else {
-        if (filters.substring(0, 1) === 'e') {
+        if (filters.substring(0, 1) === 's') {
           edate = filters
         }
       }
@@ -154,7 +129,7 @@ export default class DateFilter extends Vue {
     } else {
       dateFilters[1] = Number(dateStringFilters[1])
     }
-    const stateDate = SearchModule.filters.edatum
+    const stateDate = SearchModule.filters.scrapedate
     const stateDateFilters: Array<number|undefined> = []
     if (stateDate) {
       if (stateDate.payload.from) {
@@ -174,10 +149,10 @@ export default class DateFilter extends Vue {
     if (dateFilters[0] !== stateDateFilters[0] || dateFilters[1] !== stateDateFilters[1]) {
       this.dateRange = { from: dateFilters[0], to: dateFilters[1] }
       if (this.dateRange.from !== undefined || this.dateRange.to !== undefined) {
-        SearchModule.AddFilter({ type: FilterType.DATE, payload: this.dateRange })
+        SearchModule.AddFilter({ type: FilterType.SCRAPEDATE, payload: this.dateRange })
         this.dateInterval = { min: Number(dateFilters[0]), max: Number(dateFilters[1]) }
       } else {
-        SearchModule.RemoveFilter(FilterType.DATE)
+        SearchModule.RemoveFilter(FilterType.SCRAPEDATE)
         this.dateInterval = { min: Number(dateFilters[0]), max: Number(dateFilters[1]) }
       }
       this.update()
@@ -191,9 +166,9 @@ export default class DateFilter extends Vue {
         to: value.to < this.dateInterval.max ? value.to : undefined
       }
       if (this.dateRange.from !== undefined || this.dateRange.to !== undefined) {
-        SearchModule.AddFilter({ type: FilterType.DATE, payload: this.dateRange })
+        SearchModule.AddFilter({ type: FilterType.SCRAPEDATE, payload: this.dateRange })
       } else {
-        SearchModule.RemoveFilter(FilterType.DATE)
+        SearchModule.RemoveFilter(FilterType.SCRAPEDATE)
       }
     }
   }
@@ -207,7 +182,7 @@ export default class DateFilter extends Vue {
     if (aggs === oldAggs) {
       return
     }
-    if (aggs.edatum === oldAggs.edatum) {
+    if (aggs.scrapedate === oldAggs.scrapedate) {
       return
     }
     this.update()
@@ -215,13 +190,13 @@ export default class DateFilter extends Vue {
 
   @Watch('filters')
   public onFilterChanged (filters: Filters) {
-    if (!Object.prototype.hasOwnProperty.call(filters, 'edatum')) {
+    if (!Object.prototype.hasOwnProperty.call(filters, 'scrapedate')) {
       this.update()
     }
   }
 
   public handleRangeChange (fromUpdated: number, toUpdated: number) {
-    (this.$refs.dateFilterUI as DateFilterUI).handleRangeChange(fromUpdated, toUpdated)
+    (this.$refs.scrapedateFilterUI as DateFilterUI).handleRangeChange(fromUpdated, toUpdated)
   }
 
   private update () {
@@ -230,13 +205,13 @@ export default class DateFilter extends Vue {
     let max = 0
     let from: number | undefined
     let to: number | undefined
-    const edatum = SearchModule.aggregations.edatum || []
-    const minEdatum = SearchModule.aggregations.min_edatum || []
-    const maxEdatum = SearchModule.aggregations.max_edatum || []
+    const edatum = SearchModule.aggregations.scrapedate || []
+    const minEdatum = SearchModule.aggregations.min_scrapedate || []
+    const maxEdatum = SearchModule.aggregations.max_scrapedate || []
 
-    if (Object.prototype.hasOwnProperty.call(this.filters, 'edatum')) {
-      from = this.filters.edatum.payload.from
-      to = this.filters.edatum.payload.to
+    if (Object.prototype.hasOwnProperty.call(this.filters, 'scrapedate')) {
+      from = this.filters.scrapedate.payload.from
+      to = this.filters.scrapedate.payload.to
     }
     let tempMin: number | undefined
     let tempMax: number | undefined

@@ -6,314 +6,7 @@
       </div>
       <h1>{{$t('support')}}</h1>
       <b-card-group id='bcards' deck>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://my-d.org/index.php/www-my-d-org" target="_blank">
-            <b-card-img src="~/../assets/sponsors/sponsor1.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="MY-D Foundation, Geneva">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              MY-D Foundation, Geneva
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www3.unifr.ch/ius/de/" target="_blank">
-            <b-card-img src="~/../assets/sponsors/sponsor2.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Université de Fribourg Universität Freiburg">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Université de Fribourg Universität Freiburg
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.advo-schreiber.ch/advo/" target="_blank">
-            <b-card-img src="~/../assets/sponsors/sponsor3.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Advokatur Schreiber">
-             <div class="card-text-wrapper">
-              <b-card-text>
-              Advokatur Schreiber
-              </b-card-text>
-             </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.unisg.ch/de/universitaet/schools/law" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor4.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Universität St.Gallen, Law School">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Universität St.Gallen, Law School
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.legalis.ch/de/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor5.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="legalis.ch">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              legalis.ch
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.bav-aab.ch/de/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor6.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Bernischer Anwaltsverband Association des avocats bernois">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Bernischer Anwaltsverband Association des avocats bernois
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.zav.ch/" target="_blank">
-            <b-card-img src="~/../assets/sponsors/sponsor7.jpg" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Zürcher Anwaltsverband">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Zürcher Anwaltsverband
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.zhaw.ch/de/hochschule/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor8.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Zürcher Hochschule für Angewandte Wissenschaften">
-            <div class="card-text-wrapper">
-              <b-card-text>
-                Zürcher Hochschule für Angewandte Wissenschaften
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.kellerhals-carrard.ch/de/home/index.php" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor9.svg" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Kellerhals Carrard">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Kellerhals Carrard
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www3.unifr.ch/federalism/en/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor11.jpg" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Institut für Föderalismus, Universität Freiburg Institut du Fédéralisme, Université de Fribourg">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Institut für Föderalismus, Universität Freiburg Institut du Fédéralisme, Université de Fribourg
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.oav.ch/" target="_blank">
-            <b-card-img src="~/../assets/sponsors/sponsor12.jpg" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Ordre des avocats vaudois">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Ordre des avocats vaudois
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.schkg-vereinigung.ch/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor13.jpg" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="SchKG-Vereinigung Association LP">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              SchKG-Vereinigung Association LP
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.sgav.ch/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor14.svg" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="St.Galler Anwaltsverband">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              St.Galler Anwaltsverband
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://pansoft.de/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor15.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Pansoft GmbH">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Pansoft GmbH
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.betreibung-konkurs.ch/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor16.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Konferenz der Betreibungs- und Konkursbeamten der Schweiz">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Konferenz der Betreibungs- und Konkursbeamten der Schweiz
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.oeffentlichkeitsgesetz.ch/deutsch" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor17.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Öffentlichkeitsgesetz">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Öffentlichkeitsgesetz
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://steigerlegal.ch" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor18.svg" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Steiger Legal">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Steiger Legal
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://aslantas.ch" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor19.jpg" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Anwaltskanzlei Aslantas">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Anwaltskanzlei Aslantas
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.sedlex-avocats.ch/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor20.jpg" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="sedlex Rechtsanwälte Lausanne">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              sedlex Rechtsanwälte Lausanne
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.ub.unibe.ch/teilbibliotheken/rechtswissenschaft/juristische_bibliothek_jbb/index_ger.html" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor21.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Universitätsbibliothek Bern, Juristische Bibliothek">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Universitätsbibliothek Bern, Juristische Bibliothek
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://fritschi.foundation/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor22.jpg" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Marco Fritschi, Fritschi Foundation">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Marco Fritschi, Fritschi Foundation
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://www.stulz-recht.ch/" target="_blank">
-              <b-card-img src="~/../assets/sponsors/sponsor23.jpg" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div class="card-footer" v-b-tooltip.hover title="Anwaltskanzlei Stulz">
-            <div class="card-text-wrapper">
-              <b-card-text>
-              Anwaltskanzlei Stulz
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
+        <sponsor-card v-for="(sponsor, index) in this.sponsors" :key="index" :logo="sponsor.logo" :link="sponsor.link" :text="sponsor.text" :tooltip="sponsor.tooltip"/>
 
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
@@ -394,6 +87,19 @@ Johannes <b>Wagner</b>, Appenzell;
 
 #home {
   .content{
+    .banner{
+      background-color: #fff;
+      border:none;
+      box-shadow: 0 2px 30px rgba(0,0,0,.15);
+      border-radius: 0 0 20px 0;
+      margin: 5px 0 5px 0;
+      width: 100%;
+      .banner:hover{
+        .banner{
+           transform: matrix(1,0,0,1,0,0);
+        }
+      }
+    }
     .card-deck{
       width:100%;
       display:flex;
@@ -437,6 +143,7 @@ Johannes <b>Wagner</b>, Appenzell;
               bottom: 0;
             }
           }
+
           .card-footer{
             height:60px;
             width:100%;
@@ -669,12 +376,19 @@ Johannes <b>Wagner</b>, Appenzell;
 import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import { AppModule } from '@/store/modules/app'
+import SponsorCard from '@/components/SponsorCard.vue'
+import data from '../data/sponsors.json'
 
 @Component({
-  name: 'Home'
+  name: 'Home',
+  components: {
+    SponsorCard
+  }
 })
 
 export default class Home extends Vue {
+  public sponsors = data.filter(s => s.active)
+
   mounted () {
     const bcards = document.getElementById('bcards')
     if (bcards) {
@@ -707,19 +421,3 @@ export default class Home extends Vue {
   }
 }
 </script>
-<!--
-        <b-card>
-          <div class="card-img-wapper">
-            <a href="https://my-d.org/index.php/www-my-d-org" target="_blank" id='bc-a1'>
-            <b-card-img id='bc-b1' src="~/../assets/sponsors/sponsor2.png" alt="Image" top></b-card-img>
-            </a>
-          </div>
-          <div id='bc-c1' class="card-footer" v-b-tooltip.hover title="XXXXMY-D Foundation, Geneva">
-            <div class="card-text-wrapper">
-              <b-card-text id='bc-d1'>
-              XXXMY-D Foundation, Geneva
-              </b-card-text>
-            </div>
-          </div>
-        </b-card>
--->
