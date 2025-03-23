@@ -306,7 +306,8 @@ export class SearchUtil {
     return 'quarter'
   }
 
-  private static buildFilters (filters: Filters): any {
+  // wird für den Downloader benötigt
+  public static buildFilters (filters: Filters): any {
     const filterArray: Array<any> = []
     for (const type in filters) {
       filterArray.push(SearchUtil.buildFilter(filters[type]))

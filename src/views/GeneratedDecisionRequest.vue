@@ -1,48 +1,30 @@
 <template>
-  <div id="decisionRequest">
-    <template>
-      <h1>{{ $t('decisionRequest') }}</h1>
-      <p>{{ $t('generatedDecisionRequestText') }}</p>
-      <b-form class="decisionRequestForm" @submit="onSubmit">
-        <div v-html="generatedForm.sender1" class="readonly"></div>
-        <div v-html="generatedForm.sender2" class="readonly"></div>
-        <div v-html="generatedForm.sender3" class="readonly"></div>
-        <div v-html="generatedForm.sender4" class="readonly"></div>
-        <div v-html="generatedForm.sender5" class="readonly"></div>
-        <div v-html="generatedForm.email" class="readonly"></div>
-        <div v-html="generatedForm.gerName" class="readonly right"></div>
-        <div v-html="generatedForm.gerStrasse" class="readonly right"></div>
-        <div v-html="generatedForm.gerPostfach" class="readonly right"></div>
-        <div v-html="generatedForm.gerStadt" class="readonly right mb-16"></div>
-        <b-form-textarea
-          id="letterText"
-          v-model="generatedForm.letterText"
-          rows="20"
-          placeholder=""
-          required
-          :oninvalid="this.customErrorMessage()"
-          oninput="this.setCustomValidity('')"
-        ></b-form-textarea>
-        <b-form-radio-group class="custom-radio mt-16 mb-16" v-model="generatedForm.membershipType" required stacked>
-            <b-form-radio value="member">{{ $t('member') }}</b-form-radio>
-            <b-form-radio value="becomeMember">{{ $t('becomeMember') }}</b-form-radio>
-            <b-form-radio value="notMember">{{ $t('notMember') }}</b-form-radio>
-          </b-form-radio-group>
-        <!-- TODO: CAPTCHA-->
-        <b-form-checkbox-group required>
-          <b-form-checkbox
-            id="policyAgreement"
-            class="custom-checkbox"
-            v-model="generatedForm  .policyAgreement"
-            :oninvalid="this.customErrorMessage()"
-            oninput="this.setCustomValidity('')">
-              {{ $t('policyAgreement') }}
-          </b-form-checkbox>
-        </b-form-checkbox-group>
-        <p class="mt-16">{{ $t('privacyAgreementPartOne') }}<br>{{ $t('privacyAgreementPartTwo') }}<b-link href='https://entscheidsuche.ch/datenschutz' target='_blank'>{{ $t('privacyAgreementPartThree') }}</b-link></p>
-        <b-button id="generate-pdf" type="submit" variant="primary">{{ $t('generatePdf') }}</b-button>
-      </b-form>
-    </template>
+  <div id="generatedDecisionRequest">
+    <h1>{{ $t('decisionRequest') }}</h1>
+    <p>{{ $t('generatedDecisionRequestText') }}</p>
+    <b-form class="decisionRequestForm" @submit="onSubmit">
+      <div v-html="generatedForm.salutation" class="readonly"></div>
+      <div v-html="generatedForm.firstName" class="readonly"></div>
+      <div v-html="generatedForm.lastName" class="readonly"></div>
+      <div v-html="generatedForm.street" class="readonly"></div>
+      <div v-html="generatedForm.streetSecond" class="readonly"></div>
+      <div v-html="generatedForm.postCode" class="readonly"></div>
+      <div v-html="generatedForm.city" class="readonly"></div>
+      <div v-html="generatedForm.country" class="readonly"></div>
+      <div v-html="generatedForm.email" class="readonly"></div>
+      <div v-html="generatedForm.courtName" class="readonly right"></div>
+      <div v-html="generatedForm.courtAddress" class="readonly right"></div>
+      <b-form-textarea
+        id="letterText"
+        v-model="generatedForm.letterText"
+        rows="20"
+        placeholder=""
+        required
+        :oninvalid="this.customErrorMessage()"
+        oninput="this.setCustomValidity('')"
+      ></b-form-textarea>
+      <b-button id="generate-pdf" type="submit" variant="primary">{{ $t('generatePdf') }}</b-button>
+    </b-form>
   </div>
 </template>
 
@@ -84,6 +66,21 @@ import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import { AppModule } from '@/store/modules/app'
 
+interface Form {
+  salutation: string,
+  firstName: string,
+  lastName: string,
+  street: string,
+  streetSecond: string,
+  postCode: string,
+  city: string,
+  country: string,
+  email: string,
+  courtName: string,
+  courtAdress: string,
+  letterText: string
+}
+
 const requestUrl = 'http://v2202109132150164038.luckysrv.de/pdf/index.py'
 
 @Component({
@@ -95,22 +92,30 @@ export default class GeneratedDecisionRequest extends Vue {
     }
   }
 
-  private generatedForm: object = {
-    sender1: 'Rechtsanwältin',
-    sender2: 'Dagmar Immerrecht',
-    sender3: 'Gerichtsstrasse 42',
-    sender4: '1205 Genf',
-    sender5: '',
-    email: 'dagmar@immerrecht.ch',
-    gerName: 'Bundesgericht',
-    gerStrasse: 'Avenue du Tribunal 29',
-    gerPostfach: '',
-    gerStadt: '1005 Lausanne',
-    letterText: 'Sehr geehrte Damen und Herren,\n\nGerne möchte ich Sie bitten, mir eine Kopie des Urteils 12T 3/2021 des ' +
-     'Bundesgeichts vom 1.12.2021 vorzugsweise per E-Mail an die oben genannte Adresse zu schicken.\n\nGemäss Urteil des ' +
-     'Bundesgerichts 1C_194/2020 vom 27. Juli 2021...\n\nMit freundlichen Grüßen\nDagmar Immerrecht',
-    membershipType: '',
-    policyAgreement: ''
+  private generatedForm: Form = {
+    salutation: '',
+    firstName: '',
+    lastName: '',
+    street: '',
+    streetSecond: '',
+    postCode: '',
+    city: '',
+    country: '',
+    email: '',
+    courtName: '',
+    courtAdress: '',
+    letterText: ''
+  }
+
+  mounted () {
+    const queryData = this.$route.query
+    window.console.log('Habe folgende Formulardaten erhalten:', JSON.stringify(queryData))
+    for (const key in this.generatedForm) {
+      if (Object.prototype.hasOwnProperty.call(queryData, key)) {
+        this.generatedForm[key] = queryData[key] // Überschreiben, wenn der Schlüssel existiert
+      }
+    }
+    console.log('Komponente wurde gemountet und initialisiert')
   }
 
   public get locale () {

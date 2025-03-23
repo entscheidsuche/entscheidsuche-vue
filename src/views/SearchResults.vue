@@ -1015,6 +1015,7 @@ import { BButton } from 'bootstrap-vue'
 import i18n from '@/i18n'
 import SponsorCard from '@/components/SponsorCard.vue'
 import data from '../data/sponsors.json'
+import { SearchUtil } from '@/util/search/search'
 
 @Component({
   name: 'SearchResult',
@@ -1396,7 +1397,7 @@ export default class SearchResults extends Vue {
     }
     // "filter":[{"terms":{"attachment.language":["de"]}},{"terms":{"hierarchy":["AG"]}},{"range":{"date":{"lte":1509015759293}}}]}}
     // "filters":"{"language":{"type":"language","payload":["de"]},"hierarchie":{"type":"hierarchie","payload":["CH"]}}"
-    return url1 + SearchModule.query + url2 + JSON.stringify(filter).replaceAll('"', '@') + url3
+    return url1 + SearchModule.query + url2 + SearchUtil.buildFilters(SearchModule.filters).replaceAll('"', '@') + url3
   }
 
   public onConfirmDateOverlay (): void {
