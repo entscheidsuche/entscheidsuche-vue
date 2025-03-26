@@ -1015,6 +1015,7 @@ import { BButton } from 'bootstrap-vue'
 import i18n from '@/i18n'
 import SponsorCard from '@/components/SponsorCard.vue'
 import data from '../data/sponsors.json'
+import { SearchUtil } from '@/util/search/search'
 
 @Component({
   name: 'SearchResult',
@@ -1356,47 +1357,7 @@ export default class SearchResults extends Vue {
     const url1 = 'http://v2202109132150164038.luckysrv.de/api/search?{%22collection%22:%22entscheidsuche%22,%20%22query%22:%22'
     const url2 = '%22,%20%22filter%22:%22'
     const url3 = '%22,%20%22getDocs%22:true,%22getZIP%22:true,%20%22getCSV%22:false,%20%22getHTML%22:true,%20%22getNiceHTML%22:false,%20%22getJSON%22:false,%20%22ui%22:true}'
-    const filter: any[] = []
-    for (const k in SearchModule.filters) {
-      const e1: any = {}
-      const e2: any = {}
-      const f = { ...SearchModule.filters[k].payload }
-      let kk = k
-      let term = 'terms'
-      if (kk === 'language') {
-        kk = 'attachment.language'
-      } else if (kk === 'hierarchie') {
-        kk = 'hierarchy'
-      } else if (kk === 'edatum') {
-        kk = 'date'
-        term = 'range'
-        if ('from' in f) {
-          f.gte = f.from
-          delete f.from
-        }
-        if ('to' in f) {
-          f.lte = f.to
-          delete f.to
-        }
-      } else if (kk === 'scrapedate') {
-        kk = 'scrapedate'
-        term = 'range'
-        if ('from' in f) {
-          f.gte = f.from
-          delete f.from
-        }
-        if ('to' in f) {
-          f.lte = f.to
-          delete f.to
-        }
-      }
-      e1[kk] = f
-      e2[term] = e1
-      filter.push(e2)
-    }
-    // "filter":[{"terms":{"attachment.language":["de"]}},{"terms":{"hierarchy":["AG"]}},{"range":{"date":{"lte":1509015759293}}}]}}
-    // "filters":"{"language":{"type":"language","payload":["de"]},"hierarchie":{"type":"hierarchie","payload":["CH"]}}"
-    return url1 + SearchModule.query + url2 + JSON.stringify(filter).replaceAll('"', '@') + url3
+    return url1 + SearchModule.query + url2 + JSON.stringify(SearchUtil.buildFilters(SearchModule.filters)).replaceAll('"', '@') + url3
   }
 
   public onConfirmDateOverlay (): void {
