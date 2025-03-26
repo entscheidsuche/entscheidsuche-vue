@@ -4,6 +4,9 @@
       <div class="intro">
         <p>{{$t('intro')}}</p>
       </div>
+      <a href="https://jobfairzav.ch" target="_blank">
+        <img class="banner" src="~/../assets/sponsors/Banner.jpg" alt="Banner Job Fair ZAV" top v-b-tooltip.hover title="Job Fair ZAV"/>
+      </a>
       <h1>{{$t('support')}}</h1>
       <b-card-group id='bcards' deck>
         <sponsor-card v-for="(sponsor, index) in this.sponsors" :key="index" :logo="sponsor.logo" :link="sponsor.link" :text="sponsor.text" :tooltip="sponsor.tooltip"/>
