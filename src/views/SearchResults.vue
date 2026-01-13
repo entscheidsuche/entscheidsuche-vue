@@ -1284,10 +1284,10 @@ export default class SearchResults extends Vue {
     if (query && query !== this.query && ((fullScreen && this.windowWidth > 534) || (preview && this.windowWidth <= 534))) {
       this.fullScreen = true
       this.previewVisible = true
-      SearchModule.ResetQuery(query.toString())
+      SearchModule.ResetQuery({ query: query.toString(), aiSearch: false })
       return
     } else if (query && query !== this.query) {
-      SearchModule.ResetQuery(query.toString())
+      SearchModule.ResetQuery({ query: query.toString(), aiSearch: false })
       return
     }
     if ('id' in this.selectedResult) {

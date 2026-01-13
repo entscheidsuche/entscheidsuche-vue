@@ -49,5 +49,6 @@
   "courtHover": "Lien direct vers la page du tribunal",
   "pdfHover": "Consulter la décision (PDF)",
   "htmlHover": "Consulter la décision (HTML)",
-  "downloadHover": "Télécharger tous les résultats (via scigate)"  
+  "downloadHover": "Télécharger tous les résultats (via scigate)",
+  "aiSearch": "Rechercher IA"
 }

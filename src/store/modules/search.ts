@@ -17,7 +17,7 @@ export enum SortOrder {
   RELEVANCE = 'relevance', DATE = 'date', SCRAPEDATE = 'scrapedate'
 }
 
-function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrder, selectedId?: string, preview?: string, fullScreen?: string): void {
+function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrder, selectedId?: string, preview?: string, fullScreen?: string, aiSearch?: string): void {
   const name = router.currentRoute.name
   const query = { ...router.currentRoute.query }
   const existingQueryString = query.query
@@ -32,6 +32,8 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
   const newPreview = preview !== '' ? preview : undefined
   const existingFullScreen = query.fullScreen
   const newFullScreen = fullScreen !== '' ? fullScreen : undefined
+  const existingAiSearch = query.aiSearch
+  const newAiSearch = aiSearch !== '' ? aiSearch : undefined
 
   if (newFilters !== undefined) {
     for (const filterKey in filters) {
@@ -50,7 +52,7 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
     }
   }
   if (existingQueryString !== newQueryString || !_.isEqual(existingFilters, newFilters) || existingSort !== newSort ||
-    name !== 'Search' || newSelectedId !== existingSelectedId || newPreview !== existingPreview || newFullScreen !== existingFullScreen) {
+    name !== 'Search' || newSelectedId !== existingSelectedId || newPreview !== existingPreview || newFullScreen !== existingFullScreen || newAiSearch !== existingAiSearch) {
     if (newQueryString !== undefined) {
       query.query = newQueryString
     } else {
@@ -81,8 +83,13 @@ function updateRoute (queryString: string, filters: Filters, sortOrder: SortOrde
     } else {
       delete query.fullScreen
     }
+    if (newAiSearch !== undefined) {
+      query.aiSearch = newAiSearch
+    } else {
+      delete query.aiSearch
+    }
     if (name !== undefined && name !== null && newQueryString !== undefined) {
-      router.push({ name: 'Search', query: query })
+      router.push({ name: 'Search', query })
     }
   }
 }
@@ -172,6 +179,7 @@ export interface SearchState {
 export class Search extends VuexModule implements SearchState {
   private prist = true
   private queryString = ''
+  private aiSearch = false
   private doc = ''
   private resPending = false
   private total = 0
@@ -190,49 +198,53 @@ export class Search extends VuexModule implements SearchState {
   }
 
   @Mutation
-  public SET_QUERY (query: string) {
-    this.queryString = query
+  public SET_QUERY (queryData: { query: string, aiSearch: boolean }) {
+    this.queryString = queryData.query
+    this.aiSearch = queryData.aiSearch
     this.doc = ''
-    if (query === '') {
+    if (queryData.query === '') {
       this.filt = {}
     }
-    updateRoute(query, this.filt, this.sort)
+    updateRoute(queryData.query, this.filt, this.sort, undefined, undefined, undefined, this.aiSearch.toString())
   }
 
   @Action
-  public SetQuery (query: string) {
+  public SetQuery (payload: { query: string, aiSearch: boolean }) {
+    const { query, aiSearch } = payload
     if (this.fac.length === 0) {
       return this.context.dispatch('GetFacets').then(() => {
-        if (query !== this.queryString) {
-          this.context.commit('SET_QUERY', query)
+        if (query !== this.queryString || this.aiSearch !== aiSearch) {
+          this.context.commit('SET_QUERY', { query, aiSearch })
           return this.context.dispatch('SetResults')
         }
       })
     } else {
-      if (query !== this.queryString) {
-        this.context.commit('SET_QUERY', query)
+      if (query !== this.queryString || this.aiSearch !== aiSearch) {
+        this.context.commit('SET_QUERY', { query, aiSearch })
         return this.context.dispatch('SetResults')
       }
     }
   }
 
   @Mutation
-  public RESET_QUERY (query: string) {
-    this.queryString = query
+  public RESET_QUERY (queryData: { query: string, aiSearch: boolean }) {
+    this.queryString = queryData.query
+    this.aiSearch = queryData.aiSearch
   }
 
   @Action
-  public ResetQuery (query: string) {
+  public ResetQuery (payload: { query: string, aiSearch: boolean }) {
+    const { query, aiSearch } = payload
     if (this.fac.length === 0) {
       return this.context.dispatch('GetFacets').then(() => {
         if (query !== this.queryString) {
-          this.context.commit('RESET_QUERY', query)
+          this.context.commit('RESET_QUERY', { query, aiSearch })
           return this.context.dispatch('SetResults')
         }
       })
     } else {
       if (query !== this.queryString) {
-        this.context.commit('RESET_QUERY', query)
+        this.context.commit('RESET_QUERY', { query, aiSearch })
         return this.context.dispatch('SetResults')
       }
     }
@@ -365,7 +377,7 @@ export class Search extends VuexModule implements SearchState {
   @Mutation
   public ADD_FILTER (filter: Filter) {
     this.filt = { ...this.filt, [filter.type]: filter }
-    updateRoute(this.queryString, this.filt, this.sort)
+    updateRoute(this.queryString, this.filt, this.sort, undefined, undefined, undefined, this.aiSearch.toString())
   }
 
   @Mutation
@@ -373,7 +385,7 @@ export class Search extends VuexModule implements SearchState {
     const newFilters = { ...this.filt }
     delete newFilters[type]
     this.filt = newFilters
-    updateRoute(this.queryString, newFilters, this.sort)
+    updateRoute(this.queryString, newFilters, this.sort, undefined, undefined, undefined, this.aiSearch.toString())
   }
 
   @Action
@@ -480,8 +492,11 @@ export class Search extends VuexModule implements SearchState {
   @Action({ commit: 'SET_RESULTS' })
   public async SetResults () {
     this.context.commit('RESULTS_PENDING', true)
-    return SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort)
-      .finally(() => this.context.commit('RESULTS_PENDING', false))
+    return this.aiSearch
+      ? SearchUtil.aiSearch(this.query, AppModule.locale, this.filters, this.sortOrder)
+        .finally(() => this.context.commit('RESULTS_PENDING', false))
+      : SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort)
+        .finally(() => this.context.commit('RESULTS_PENDING', false))
   }
 
   @Action({ commit: 'SET_DOCUMENT_RESULT' })

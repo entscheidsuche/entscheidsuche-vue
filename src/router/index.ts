@@ -34,7 +34,7 @@ const routes: Array<RouteConfig> = [
         SearchModule.SetSortOrder(SortOrder.RELEVANCE)
       }
       if (to.query.query !== undefined && typeof to.query.query === 'string') {
-        SearchModule.SetQuery(to.query.query)
+        SearchModule.SetQuery({ query: to.query.query, aiSearch: (to.query.aiSearch === 'true') })
       }
       next()
     }
@@ -109,7 +109,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if ((to.name !== 'Search' && to.name !== 'View') && from.name === 'Search') {
-    const clearQuery = SearchModule.SetQuery('')
+    const clearQuery = SearchModule.SetQuery({ query: '', aiSearch: false })
     if (clearQuery !== undefined) {
       clearQuery.then(() => next())
     } else {

@@ -1,8 +1,11 @@
 import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult, SortOrder } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
 
-// const searchUrl = 'https://entscheidsuche.pansoft.de:9200/entscheidsuche.v2-*/_search'
 const searchUrl = 'https://entscheidsuche.ch/_searchV2.php'
+const llmUrl = `${process.env.VUE_APP_LLM_API_URL}`
+const embeddingSearchUrl = `${process.env.VUE_APP_EMBEDDING_SEARCH_URL}`
+const elasticsearchUser = `${process.env.VUE_APP_ELASTICSEARCH_USER}`
+const elasticsearchPassword = `${process.env.VUE_APP_ELASTICSEARCH_PASSWORD}`
 
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
@@ -237,6 +240,266 @@ export class SearchUtil {
         return SearchUtil.searchAggs(searches, searchResults, total, aggregations)
       }
     })
+  }
+
+  public static async aiSearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): Promise<any> {
+    const embedding = await this.getEmbedding(query)
+    const embeddingSearch = this.buildEmbeddingSearch(embedding, 20)
+    const matches = new Map<string, string>()
+    await axios.post(embeddingSearchUrl, embeddingSearch, {
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
+      auth: {
+        username: elasticsearchUser,
+        password: elasticsearchPassword
+      }
+    }).then(resp => {
+      if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
+        resp.data.hits.hits.forEach(hit => {
+          matches.set(hit.fields.documentId[0], hit.fields.chunkText[0])
+        })
+      }
+    })
+    const termSearch = this.buildTermSearch(Array.from(matches.keys()), lang, filters, sortOrder, searchAfter)
+    const searches: Array<any> = []
+    if (searchAfter === undefined && Object.keys(filters).length > 0) {
+      for (const type in filters) {
+        const filter = filters[type]
+        const remainingFilters = { ...filters }
+        delete remainingFilters[type]
+        searches.push(this.buildAggregationSearch(query, filter, remainingFilters))
+      }
+    }
+    let searchResults, total, aggregations
+    return axios.post(searchUrl,
+      termSearch,
+      {
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
+      }).then(async resp => {
+      [searchResults, total, aggregations] = SearchUtil.extractSearchResults(resp, lang)
+      for (const sr of searchResults) {
+        const text = <string>matches.get(sr.id)
+        if (!text) continue
+
+        const sentences = this.splitByChars(text, 800, 100)
+          .map(s => s.trim())
+          .filter(Boolean)
+
+        const sentenceEmbeddings = await Promise.all(
+          sentences.map(s => this.getEmbedding(s))
+        )
+
+        const scores = this.cosineSimilarityBatch(
+          embedding,
+          sentenceEmbeddings
+        )
+
+        let bestIdx = 0
+        let bestScore = -Infinity
+
+        for (let i = 0; i < scores.length; i++) {
+          if (scores[i] > bestScore) {
+            bestScore = scores[i]
+            bestIdx = i
+          }
+        }
+
+        const topText = sentences[bestIdx]
+        sr.text = '...' + topText + '...'
+      }
+      if (searches.length === 0) {
+        return [searchResults, total, aggregations]
+      } else {
+        return SearchUtil.searchAggs(searches, searchResults, total, aggregations)
+      }
+    })
+  }
+
+  private static splitByChars (
+    text: string,
+    chunkSize: number,
+    overlap: number
+  ): string[] {
+    if (chunkSize <= overlap) {
+      throw new Error('chunkSize must be larger than overlap')
+    }
+
+    const chunks: string[] = []
+    let start = 0
+
+    while (start < text.length) {
+      const end = Math.min(start + chunkSize, text.length)
+      chunks.push(text.slice(start, end))
+      start += chunkSize - overlap
+    }
+
+    return chunks
+  }
+
+  private static cosineSimilarityBatch (
+    query: number[],
+    vectors: number[][]
+  ): number[] {
+    const queryNorm = Math.sqrt(query.reduce((s, x) => s + x * x, 0))
+
+    return vectors.map(v => {
+      let dot = 0
+      let vNorm = 0
+
+      for (let i = 0; i < v.length; i++) {
+        dot += query[i] * v[i]
+        vNorm += v[i] * v[i]
+      }
+
+      return (queryNorm && vNorm)
+        ? dot / (queryNorm * Math.sqrt(vNorm))
+        : 0
+    })
+  }
+
+  private static cosineSimilarity (a: number[], b: number[]): number {
+    if (a.length !== b.length) {
+      throw new Error('Vectors must be the same length')
+    }
+
+    let dot = 0
+    let normA = 0
+    let normB = 0
+
+    for (let i = 0; i < a.length; i++) {
+      dot += a[i] * b[i]
+      normA += a[i] * a[i]
+      normB += b[i] * b[i]
+    }
+
+    if (normA === 0 || normB === 0) {
+      return 0
+    }
+
+    return dot / (Math.sqrt(normA) * Math.sqrt(normB))
+  }
+
+  private static async getEmbedding (query: string): Promise<any> {
+    return axios.post(llmUrl, { model: 'qwen3-embedding', input: query })
+      .then(resp => {
+        return resp.data.embeddings[0]
+      })
+  }
+
+  private static buildEmbeddingSearch (embedding: number[], size: number): Promise<any> {
+    const search: any = {
+      size,
+      knn: {
+        field: 'embedding',
+        query_vector: embedding,
+        k: size,
+        num_candidates: Math.max(size * 5, 100)
+      },
+      fields: [
+        'documentId',
+        '_id',
+        'chunkText'
+      ]
+    }
+    return search
+  }
+
+  private static buildTermSearch (ids: string[], lang: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): any {
+    const search : any = {
+      size: 20,
+      _source: {
+        excludes: ['attachment.content']
+      },
+      track_total_hits: true,
+      query: {
+        bool: {
+          must: [
+            {
+              terms: {
+                _id: ids
+              }
+            }
+          ]
+        }
+      },
+      sort: [
+        { [sortOrder === SortOrder.RELEVANCE ? '_score' : sortOrder === SortOrder.DATE ? 'date' : 'scrapedate']: 'desc' },
+        { id: 'desc' }
+      ]
+    }
+    if (Object.keys(filters).length > 0) {
+      search.query.bool.filter = SearchUtil.buildFilters(filters)
+    }
+    if (searchAfter !== undefined) {
+      search.search_after = searchAfter
+    } else {
+      if (filters.hierarchie === undefined) {
+        if (search.aggs === undefined) {
+          search.aggs = {}
+        }
+        search.aggs.hierarchie = {
+          terms: {
+            size: 1000,
+            field: 'hierarchy'
+          }
+        }
+      }
+      if (filters.language === undefined) {
+        if (search.aggs === undefined) {
+          search.aggs = {}
+        }
+        search.aggs.language = {
+          terms: {
+            size: 3,
+            field: 'attachment.language'
+          }
+        }
+      }
+      if (filters.edatum === undefined) {
+        if (search.aggs === undefined) {
+          search.aggs = {}
+        }
+        search.aggs.edatum = {
+          date_histogram: {
+            calendar_interval: SearchUtil.getCalendarInterval(filters),
+            field: 'date'
+          }
+        }
+        search.aggs.min_edatum = {
+          min: {
+            field: 'date'
+          }
+        }
+        search.aggs.max_edatum = {
+          max: {
+            field: 'date'
+          }
+        }
+      }
+      if (filters.scrapedate === undefined) {
+        if (search.aggs === undefined) {
+          search.aggs = {}
+        }
+        search.aggs.scrapedate = {
+          date_histogram: {
+            calendar_interval: SearchUtil.getScrapeCalendarInterval(filters),
+            field: 'scrapedate'
+          }
+        }
+        search.aggs.min_scrapedate = {
+          min: {
+            field: 'scrapedate'
+          }
+        }
+        search.aggs.max_scrapedate = {
+          max: {
+            field: 'scrapedate'
+          }
+        }
+      }
+    }
+    return search
   }
 
   public static async document (document: string, lang: string): Promise<SearchResult | undefined> {

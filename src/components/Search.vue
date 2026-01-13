@@ -3,6 +3,7 @@
     <b-form-input v-on:keyup.enter="onSearch($event)" is-text v-model="searchterm" :placeholder="$t('searchterm')" v-bind:class="$t('postitMessage') !== '' ? 'hasPostit' : ''"/>
     <b-input-group-append>
       <b-button variant="secondary" id="toggle-search" v-on:click="onSearch($event)">{{ $t('search') }}</b-button>
+      <b-button variant="warning" id="toggle-ai-search" v-on:click="onAiSearch($event)">{{ $t('aiSearch') }} <span class="superscript">Beta</span></b-button>
     </b-input-group-append>
     <div class="post-it" v-bind:class="$t('postitMessage') === '' ? 'empty' : ''">
       <a class="post-inner" v-if="$t('postitMessage') !== ''" :href="$t('postitUrl')" target="_blank" v-b-tooltip.hover :title="$t('postitHover')">
@@ -26,6 +27,13 @@
       align-items: center;
       justify-content: center;
       display:flex;
+
+      .superscript{
+        font-size:10px;
+        position: absolute;
+        top: 0;
+        right: 5px;
+      }
 
       .post-it {
         position: relative;
@@ -104,7 +112,7 @@
         width: 100%;
         margin-left:0;
         input{
-          max-width: calc(100% - 140px);
+          max-width: calc(100% - 280px);
           padding:0;
           padding-left:15px;
 
@@ -144,7 +152,7 @@ export default class Search extends Vue {
     const name = this.$route.name
     if (name === 'Home' && this.searchterm !== '') {
       this.searchterm = ''
-      SearchModule.SetQuery('')
+      SearchModule.SetQuery({ query: '', aiSearch: false })
     }
     if (name === 'View' && this.searchterm !== '') {
       this.searchterm = ''
@@ -161,13 +169,22 @@ export default class Search extends Vue {
       ($event.target as HTMLElement).blur()
     }
     if (this.searchterm !== '') {
-      SearchModule.SetQuery(this.searchterm)
+      SearchModule.SetQuery({ query: this.searchterm, aiSearch: false })
       /*
       if (this.$route.name !== 'Search' ||
             (this.$route.query.query === undefined || this.$route.query.query !== this.searchterm)) {
         router.push({ name: 'Search', query: { query: this.searchterm } })
       }
        */
+    }
+  }
+
+  public onAiSearch ($event: Event) {
+    if ($event.target !== null) {
+      ($event.target as HTMLElement).blur()
+    }
+    if (this.searchterm !== '') {
+      SearchModule.SetQuery({ query: this.searchterm, aiSearch: true })
     }
   }
 }
