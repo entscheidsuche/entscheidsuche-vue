@@ -4,9 +4,6 @@ import axios, { AxiosResponse } from 'axios'
 const searchUrl = 'https://entscheidsuche.ch/_searchV2.php'
 const llmUrl = `${process.env.VUE_APP_LLM_API_URL}`
 const embeddingSearchUrl = `${process.env.VUE_APP_EMBEDDING_SEARCH_URL}`
-const elasticsearchUser = `${process.env.VUE_APP_ELASTICSEARCH_USER}`
-const elasticsearchPassword = `${process.env.VUE_APP_ELASTICSEARCH_PASSWORD}`
-
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
     return axios.get('https://entscheidsuche.ch/docs/Facetten.json')
@@ -248,11 +245,7 @@ export class SearchUtil {
     const matches = new Map<string, string>()
     await axios.post(embeddingSearchUrl, embeddingSearch, {
       maxContentLength: Infinity,
-      maxBodyLength: Infinity,
-      auth: {
-        username: elasticsearchUser,
-        password: elasticsearchPassword
-      }
+      maxBodyLength: Infinity
     }).then(resp => {
       if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
         resp.data.hits.hits.forEach(hit => {
@@ -385,6 +378,7 @@ export class SearchUtil {
       .then(resp => {
         return resp.data.embeddings[0]
       })
+      .catch(err => console.log(err))
   }
 
   private static buildEmbeddingSearch (embedding: number[], size: number): Promise<any> {
