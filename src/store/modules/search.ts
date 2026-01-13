@@ -493,7 +493,7 @@ export class Search extends VuexModule implements SearchState {
   public async SetResults () {
     this.context.commit('RESULTS_PENDING', true)
     return this.aiSearch
-      ? SearchUtil.aiSearch(this.query, AppModule.locale, this.filters, this.sortOrder)
+      ? SearchUtil.aiSearch(this.query, AppModule.locale, this.filters, this.sortOrder, 10)
         .finally(() => this.context.commit('RESULTS_PENDING', false))
       : SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort)
         .finally(() => this.context.commit('RESULTS_PENDING', false))

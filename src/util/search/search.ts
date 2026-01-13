@@ -239,9 +239,9 @@ export class SearchUtil {
     })
   }
 
-  public static async aiSearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): Promise<any> {
+  public static async aiSearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, size: number, searchAfter?: Array<any>): Promise<any> {
     const embedding = await this.getEmbedding(query)
-    const embeddingSearch = this.buildEmbeddingSearch(embedding, 20)
+    const embeddingSearch = this.buildEmbeddingSearch(embedding, size)
     const matches = new Map<string, string>()
     await axios.post(embeddingSearchUrl, embeddingSearch, {
       maxContentLength: Infinity,
@@ -253,7 +253,7 @@ export class SearchUtil {
         })
       }
     })
-    const termSearch = this.buildTermSearch(Array.from(matches.keys()), lang, filters, sortOrder, searchAfter)
+    const termSearch = this.buildTermSearch(Array.from(matches.keys()), lang, filters, sortOrder, size, searchAfter)
     const searches: Array<any> = []
     if (searchAfter === undefined && Object.keys(filters).length > 0) {
       for (const type in filters) {
@@ -399,9 +399,9 @@ export class SearchUtil {
     return search
   }
 
-  private static buildTermSearch (ids: string[], lang: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): any {
+  private static buildTermSearch (ids: string[], lang: string, filters: Filters, sortOrder: SortOrder, size: number, searchAfter?: Array<any>): any {
     const search : any = {
-      size: 20,
+      size: size,
       _source: {
         excludes: ['attachment.content']
       },
