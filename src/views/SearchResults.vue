@@ -161,6 +161,7 @@
             </div>
             <div class="result-index">
               <p>{{ $t('hit') }} {{ index + 1}} {{ $t('of') }} {{ resultsTotal }}</p>
+              <p v-if="result.score">Score: {{result.score}}</p>
             </div>
           </div>
         </div>
@@ -1269,7 +1270,7 @@ export default class SearchResults extends Vue {
 
   handleScroll () {
     const searchResultsDiv = document.getElementById('results')
-    if (!SearchModule.allResultsLoaded && !SearchModule.resultsPending && searchResultsDiv !== null) {
+    if (!SearchModule.allResultsLoaded && !SearchModule.resultsPending && searchResultsDiv !== null && !SearchModule.isAiSearch) {
       if (searchResultsDiv.scrollTop + searchResultsDiv.clientHeight >= searchResultsDiv.scrollHeight - 10) {
         this.getMoreResults()
       }

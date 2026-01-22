@@ -1,7 +1,7 @@
 import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult, SortOrder } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
 
-const searchUrl = 'https://entscheidsuche.ch/_searchV2.php'
+const searchUrl = `${process.env.VUE_APP_SEARCH_URL}`
 const llmUrl = `${process.env.VUE_APP_LLM_API_URL}`
 const embeddingSearchUrl = `${process.env.VUE_APP_EMBEDDING_SEARCH_URL}`
 export class SearchUtil {
@@ -243,6 +243,7 @@ export class SearchUtil {
     const embedding = await this.getEmbedding(query)
     const embeddingSearch = this.buildEmbeddingSearch(embedding, size)
     const matches = new Map<string, string>()
+    const chunkScores = new Map<string, number>()
     await axios.post(embeddingSearchUrl, embeddingSearch, {
       maxContentLength: Infinity,
       maxBodyLength: Infinity
@@ -250,6 +251,7 @@ export class SearchUtil {
       if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
         resp.data.hits.hits.forEach(hit => {
           matches.set(hit.fields.documentId[0], hit.fields.chunkText[0])
+          chunkScores.set(hit.fields.documentId[0], hit._score)
         })
       }
     })
@@ -273,6 +275,7 @@ export class SearchUtil {
       [searchResults, total, aggregations] = SearchUtil.extractSearchResults(resp, lang)
       for (const sr of searchResults) {
         const text = <string>matches.get(sr.id)
+        const score = <number>chunkScores.get(sr.id)
         if (!text) continue
 
         const sentences = this.splitByChars(text, 800, 100)
@@ -300,6 +303,10 @@ export class SearchUtil {
 
         const topText = sentences[bestIdx]
         sr.text = '...' + topText + '...'
+        sr.score = score
+      }
+      if (sortOrder === SortOrder.RELEVANCE) {
+        searchResults = searchResults.sort((sr1, sr2) => sr2.score - sr1.score)
       }
       if (searches.length === 0) {
         return [searchResults, total, aggregations]
@@ -695,7 +702,8 @@ export class SearchUtil {
           pdf,
           url: hit._source.attachment.content_url,
           sort: hit.sort,
-          scrapedate: scrapedate
+          scrapedate: scrapedate,
+          score: hit._source.score
         })
       }
       aggregations = SearchUtil.extractAggregations(resp)

@@ -149,6 +149,7 @@ export interface SearchResult {
   pdf: boolean;
   url: string;
   sort: Array<string | number>;
+  score: number;
 }
 
 export interface Aggregation {
@@ -592,6 +593,10 @@ export class Search extends VuexModule implements SearchState {
 
   public get aggregations (): Aggregations {
     return this.aggs
+  }
+
+  public get isAiSearch (): boolean {
+    return this.aiSearch
   }
 }
 
