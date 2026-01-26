@@ -21,13 +21,6 @@
         "active": true
     },
     {
-        "logo": "sponsor4.png",
-        "link": "https://www.unisg.ch/de/universitaet/schools/law",
-        "text": "Universität St.Gallen, Law School",
-        "tooltip": "",
-        "active": true
-    },
-    {
         "logo": "sponsor5.png",
         "link": "https://www.legalis.ch/de/",
         "text": "legalis.ch",
@@ -112,13 +105,6 @@
         "active": true
     },
     {
-        "logo": "sponsor18.svg",
-        "link": "https://steigerlegal.ch",
-        "text": "Steiger Legal",
-        "tooltip": "",
-        "active": true
-    },
-    {
         "logo": "sponsor19.jpg",
         "link": "https://aslantas.ch",
         "text": "Anwaltskanzlei Aslantas",
@@ -140,9 +126,9 @@
         "active": true
     },
     {
-        "logo": "sponsor22.jpg",
-        "link": "https://fritschi.foundation/",
-        "text": "Fonds ÆQUITAS, Fritschi Foundation",
+        "logo": "justeco-charity.svg",
+        "link": "https://justeco.charity/fonds-aequitas/",
+        "text": "JUSTECO, Fonds ÆQUITAS",
         "tooltip": "",
         "active": true
     },
@@ -312,6 +298,34 @@
         "link": "https://www.bfh.ch/ipst",
         "text": "Institut Public Sector Transformation",
         "tooltip": "Institut Public Sector Transformation, Berner Fachhochschule",
+        "active": true
+    },
+	{
+        "logo": "sponsor49.svg",
+        "link": "https://www.sportstribunal.ch/",
+        "text": "SWISS SPORTS TRIBUNAL",
+        "tooltip": "",
+        "active": true
+    },
+	{
+        "logo": "sponsor50.png",
+        "link": "/about#support",
+        "text": "Unterstützen Sie uns per Twint mit 20 CHF",
+        "tooltip": "Klicken Sie hier, für weitere Möglichkeiten der Unterstützung",
+        "active": true
+    },
+	{
+        "logo": "sponsor51.jpg",
+        "link": "https://www.keel-raster.ch",
+        "text": "Keel & Raster",
+        "tooltip": "Keel & Raster Planungs- und Baurecht GmbH",
+        "active": true
+    },
+    {
+        "logo": "Schadenanwaelte.png",
+        "link": "https://www.schadenanwaelte.ch/",
+        "text": "Schadenanwälte AG",
+        "tooltip": "Schadenanwälte AG, Fachanwaltskanzlei für Haftpflicht und Versichertenrecht",
         "active": true
     }
 ]
