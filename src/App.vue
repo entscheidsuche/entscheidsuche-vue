@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <Header/>
-    <div class="app-content">
+    <Header ref="header"/>
+    <div class="app-content" :style="{ paddingTop: headerHeight + 'px' }">
       <div v-bind:class="['content-wrapper',
                           this.inSearch ? 'full-width' : '',
                           this.showMessage ? 'messageOffset' : 'noMessageOffset']">
@@ -51,20 +51,20 @@
         position:relative;
         &.messageOffset{
           padding-top: 0;
-          top:110px;
-          height: calc(100vh - 110px);
+          top:40px;
+          height: calc(100vh - 40px);
         }
         &.noMessageOffset{
           padding-top: 0;
-          top:70px;
-          height: calc(100vh - 70px);
+          top:0;
+          height: 100vh;
         }
       }
       &.messageOffset{
-        padding-top: 110px;
+        padding-top: 40px;
       }
       &.noMessageOffset{
-        padding-top: 70px;
+        padding-top: 0;
       }
     }
   }
@@ -84,20 +84,20 @@
 
         &.full-width{
           &.messageOffset{
-            top:160px;
-            height: calc(100vh - 160px);
+            top:40px;
+            height: calc(100vh - 40px);
           }
           &.noMessageOffset{
-            top:120px;
-            height: calc(100vh - 120px);
+            top:0;
+            height: 100vh;
           }
         }
 
         &.messageOffset{
-          padding-top: 160px;
+          padding-top: 40px;
         }
         &.noMessageOffset{
-          padding-top: 120px;
+          padding-top: 0;
         }
       }
     }
@@ -134,7 +134,12 @@ import { store } from '@/store'
     Footer
   }
 })
+
 export default class App extends Vue {
+  private headerHeight: number = 0
+
+  private resizeObserver: ResizeObserver | null = null
+
   public get showMessage () {
     return AppModule.showMessage === MessageState.VISIBLE
   }
@@ -142,5 +147,37 @@ export default class App extends Vue {
   public get inSearch () {
     return store.state.route.path === '/search' || store.state.route.name === 'View'
   }
+
+  mounted (): void {
+    this.initHeaderObserver()
+  }
+
+  beforeDestroy (): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect()
+      this.resizeObserver = null
+    }
+  }
+
+  private initHeaderObserver (): void {
+    const headerRef = this.$refs.header
+    let el: HTMLElement | null = null
+    if (headerRef && '$el' in headerRef) {
+      el = headerRef.$el as HTMLElement
+    } else if (headerRef instanceof HTMLElement) {
+      el = headerRef
+    }
+
+    if (!el) return
+
+    this.headerHeight = el.offsetHeight
+
+    this.resizeObserver = new ResizeObserver(() => {
+      this.headerHeight = el!.offsetHeight
+    })
+
+    this.resizeObserver.observe(el)
+  }
 }
+
 </script>

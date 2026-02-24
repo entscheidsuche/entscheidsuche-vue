@@ -75,7 +75,6 @@
       }
 
       .language-icon {
-        position: absolute;
         top: 21px;
         right: 85px;
         background: url('../assets/world2.svg') no-repeat center;
@@ -153,7 +152,7 @@
 @media (max-width: 1024px) {
   #header {
     .header-main {
-      height: 120px;
+      min-height: 120px;
       position: relative;
       display: flex;
 

@@ -1,6 +1,6 @@
 <template>
-  <b-input-group id="header-search" class="mt">
-    <b-form-input v-on:keyup.enter="onSearch($event)" is-text v-model="searchterm" :placeholder="$t('searchterm')" v-bind:class="$t('postitMessage') !== '' ? 'hasPostit' : ''"/>
+  <b-input-group ref="headerSearch" id="header-search" class="mt">
+    <b-form-textarea ref="searchTextarea" v-on:keyup.enter.exact="onSearch($event)" @input="autoResize" is-text v-model="searchterm" :placeholder="$t('searchterm')" v-bind:class="$t('postitMessage') !== '' ? 'hasPostit' : ''"/>
     <b-input-group-append>
       <b-button variant="secondary" id="toggle-search" v-on:click="onSearch($event)">{{ $t('search') }}</b-button>
       <b-button variant="warning" id="toggle-ai-search" v-on:click="onAiSearch($event)">{{ $t('aiSearch') }} <span class="superscript">Beta</span></b-button>
@@ -17,7 +17,7 @@
 #header{
   .header-main{
     #header-search{
-      height:40px;
+      height:auto;
       width:100%;
       flex-grow:1;
       flex-wrap: nowrap;
@@ -76,21 +76,37 @@
         }
       }
 
-      input{
+      textarea{
         height:40px;
-        width: calc(100% - 140px);
+        width: calc(100% - 80px);
         max-width: 379px;
         border:0;
         padding:0;
         //border-radius:0;
         font-size: 16px;
         padding-left:15px;
+        line-height:20px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-right: 10px;
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+        resize: none;
       }
       input:focus{
         border:none;
         outline:none;
       }
       #toggle-search{
+        flex-shrink: 0;
+        height:40px;
+        width:100px;
+        padding:0;
+        font-size: 16px;
+        font-weight: bold;
+        position:relative;
+      }
+      #toggle-ai-search{
         flex-shrink: 0;
         height:40px;
         width:100px;
@@ -107,7 +123,7 @@
   #header{
     .header-main{
       #header-search{
-        position: absolute;
+        margin-top: 70px;
         bottom:15px;
         width: 100%;
         margin-left:0;
@@ -138,6 +154,42 @@ import { SearchModule } from '@/store/modules/search'
 @Component
 export default class Search extends Vue {
   private searchterm = ''
+  private textAreaMaxHeight: number = 120
+
+  mounted (): void {
+    this.$nextTick(() => {
+      this.autoResize()
+    })
+  }
+
+  private autoResize (): void {
+    const wrapper = this.$refs.searchTextarea as Vue | undefined
+    if (!wrapper) return
+
+    // BootstrapVue wraps the actual textarea
+    const el = wrapper.$el as HTMLTextAreaElement | null
+    if (!el) return
+
+    // Reset height so scrollHeight recalculates correctly
+    el.style.height = 'auto'
+
+    if (el.scrollHeight > this.textAreaMaxHeight) {
+      el.style.height = this.textAreaMaxHeight + 'px'
+      el.style.overflowY = 'auto'
+      // el.style.marginTop = (this.textAreaMaxHeight - 40) + 'px'
+    } else {
+      el.style.height = el.scrollHeight + 'px'
+      el.style.overflowY = 'hidden'
+      // el.style.marginTop = (el.scrollHeight - 40) + 'px'
+    }
+  }
+
+  @Watch('searchterm')
+  onSearchTermChanged (): void {
+    this.$nextTick(() => {
+      this.autoResize()
+    })
+  }
 
   public get query () {
     return SearchModule.query
