@@ -21,7 +21,7 @@
       width:100%;
       flex-grow:1;
       flex-wrap: nowrap;
-      margin-right:45px;
+      margin-right:20px;
       margin-left:20px;
       margin-top: 0;
       align-items: center;
@@ -78,8 +78,7 @@
 
       textarea{
         height:40px;
-        width: calc(100% - 80px);
-        max-width: 379px;
+        width: 100%;
         border:0;
         padding:0;
         //border-radius:0;
@@ -89,9 +88,11 @@
         margin-top: 10px;
         margin-bottom: 10px;
         margin-right: 10px;
+        margin-left: 20px;
         border-top-right-radius: 0.25rem;
         border-bottom-right-radius: 0.25rem;
         resize: none;
+        padding-top: 10px;
       }
       input:focus{
         border:none;
@@ -154,7 +155,7 @@ import { SearchModule } from '@/store/modules/search'
 @Component
 export default class Search extends Vue {
   private searchterm = ''
-  private textAreaMaxHeight: number = 120
+  private textAreaMaxHeight: number = 100
 
   mounted (): void {
     this.$nextTick(() => {
@@ -178,7 +179,7 @@ export default class Search extends Vue {
       el.style.overflowY = 'auto'
       // el.style.marginTop = (this.textAreaMaxHeight - 40) + 'px'
     } else {
-      el.style.height = el.scrollHeight + 'px'
+      el.style.height = (el.scrollHeight - 10) + 'px'
       el.style.overflowY = 'hidden'
       // el.style.marginTop = (el.scrollHeight - 40) + 'px'
     }
