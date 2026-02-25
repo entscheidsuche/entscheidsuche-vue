@@ -207,7 +207,7 @@ export default class Status extends Vue {
         element.type = 'text/javascript'
         element.appendChild(document.createTextNode(code))
         head.appendChild(element)
-        const url = 'https://entscheidsuche.ch/docs/Facetten.json'
+        const url = 'https://entscheidsuche.ch/docs/Facetten_alle.json'
         fetch(url).then(function (response) {
           response.json().then(function (content) {
             process(content, thist)
