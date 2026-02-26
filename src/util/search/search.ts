@@ -1,12 +1,12 @@
 import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult, SortOrder } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
 
-// const searchUrl = 'https://entscheidsuche.pansoft.de:9200/entscheidsuche.v2-*/_search'
-const searchUrl = 'https://entscheidsuche.ch/_searchV2.php'
+// noch nicht der Reverse proxy
+const searchUrl = 'https://entscheidsuche.ch/_search_AfA.php'
 
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
-    return axios.get('https://entscheidsuche.ch/docs/Facetten.json')
+    return axios.get('https://www.recherche.histoirerurale.ch/Facetten.json')
       .then(resp => SearchUtil.transformResultToFacets(resp))
   }
 
@@ -508,40 +508,16 @@ export class SearchUtil {
       for (const key in resp.data) {
         const facet = resp.data[key]
         const firstLevelChildren: Facets = []
-        for (const secondKey in facet.gerichte) {
-          const secondFacet = facet.gerichte[secondKey]
-          const secondLevelChildren: Facets = []
-          for (const thirdKey in secondFacet.kammern) {
-            const thirdFacet = secondFacet.kammern[thirdKey]
-            secondLevelChildren.push({
-              id: thirdKey,
-              label: {
-                de: thirdFacet.de,
-                fr: thirdFacet.fr,
-                it: thirdFacet.it
-              }
-            })
-          }
-          if (secondLevelChildren.length === 1) {
-            firstLevelChildren.push({
-              id: secondKey,
-              label: {
-                de: secondFacet.de,
-                fr: secondFacet.fr,
-                it: secondFacet.it
-              }
-            })
-          } else {
-            firstLevelChildren.push({
-              id: secondKey,
-              label: {
-                de: secondFacet.de,
-                fr: secondFacet.fr,
-                it: secondFacet.it
-              },
-              children: secondLevelChildren
-            })
-          }
+        for (const secondKey in facet.Quellen) {
+          const secondFacet = facet.Quellen[secondKey]
+          firstLevelChildren.push({
+            id: secondKey,
+            label: {
+              de: secondFacet.de,
+              fr: secondFacet.fr,
+              it: secondFacet.it
+            }
+          })
         }
         facets.push({
           id: key,
