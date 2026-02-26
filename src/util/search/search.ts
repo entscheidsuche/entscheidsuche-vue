@@ -2,7 +2,8 @@ import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult, SortO
 import axios, { AxiosResponse } from 'axios'
 
 // noch nicht der Reverse proxy
-const searchUrl = 'https://entscheidsuche.ch/_search_AfA.php'
+// const searchUrl = 'https://entscheidsuche.ch/_search_AfA.php'
+const searchUrl = 'https://www.recherche.histoirerurale.ch/_search.php'
 
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
