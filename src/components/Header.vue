@@ -38,7 +38,7 @@
   left: 0;
   position: fixed;
   width: 100%;
-  background-color: #A00000;
+  background-color: #6183ec;
 
   .header-main {
     padding-top: 5px;
