@@ -327,5 +327,26 @@
         "text": "Schadenanwälte AG",
         "tooltip": "Schadenanwälte AG, Fachanwaltskanzlei für Haftpflicht und Versichertenrecht",
         "active": true
+    },
+    {
+        "logo": "RechtGPT.svg",
+        "link": "https://rechtgpt.ch",
+        "text": "RechtGPT",
+        "tooltip": "RechtGPT",
+        "active": true
+    }, 
+    {
+        "logo": "WickiRechtsanwaelte.jpg",
+        "link": "https://wickipartners.ch/",
+        "text": "Wicki Partners AG",
+        "tooltip": "Wicki Partners AG",
+        "active": true
+    }, 
+    {
+        "logo": "prime-ai.svg",
+        "link": "https://prime-ai.eu/",
+        "text": "Prime AI GmbH",
+        "tooltip": "Prime AI GmbH",
+        "active": false
     }
 ]
