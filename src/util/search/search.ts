@@ -4,6 +4,9 @@ import axios, { AxiosResponse } from 'axios'
 const searchUrl = `${process.env.VUE_APP_SEARCH_URL}`
 const llmUrl = `${process.env.VUE_APP_LLM_API_URL}`
 const embeddingSearchUrl = `${process.env.VUE_APP_EMBEDDING_SEARCH_URL}`
+const embeddingMicroSearchUrl = `${process.env.VUE_APP_EMBEDDING_MICRO_SEARCH_URL}`
+const indexMicroChunksUrl = `${process.env.VUE_APP_INDEX_MICRO_CHUNK_URL}`
+
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
     return axios.get('https://entscheidsuche.ch/docs/Facetten.json')
@@ -239,9 +242,9 @@ export class SearchUtil {
     })
   }
 
-  public static async aiSearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, size: number, searchAfter?: Array<any>): Promise<any> {
+  public static async aiSearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, totalSize: number, pageSize: number): Promise<any> {
     const embedding = await this.getEmbedding(query)
-    const embeddingSearch = this.buildEmbeddingSearch(embedding, size)
+    const embeddingSearch = this.buildEmbeddingSearch(embedding, totalSize, filters)
     const matches = new Map<string, string>()
     const chunkScores = new Map<string, number>()
     await axios.post(embeddingSearchUrl, embeddingSearch, {
@@ -250,70 +253,108 @@ export class SearchUtil {
     }).then(resp => {
       if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
         resp.data.hits.hits.forEach(hit => {
-          matches.set(hit.fields.documentId[0], hit.fields.chunkText[0])
+          matches.set(hit.fields.documentId[0], '') // hit.fields.chunkText[0])
           chunkScores.set(hit.fields.documentId[0], hit._score)
         })
       }
     })
-    const termSearch = this.buildTermSearch(Array.from(matches.keys()), lang, filters, sortOrder, size, searchAfter)
-    const searches: Array<any> = []
-    if (searchAfter === undefined && Object.keys(filters).length > 0) {
-      for (const type in filters) {
-        const filter = filters[type]
-        const remainingFilters = { ...filters }
-        delete remainingFilters[type]
-        searches.push(this.buildAggregationSearch(query, filter, remainingFilters))
-      }
-    }
+    const termSearch = this.buildTermSearch(Array.from(matches.keys()), lang, filters, sortOrder, totalSize)
     let searchResults, total, aggregations
-    return axios.post(searchUrl,
+    [searchResults, total, aggregations] = await axios.post(searchUrl,
       termSearch,
       {
         maxContentLength: Infinity,
         maxBodyLength: Infinity
       }).then(async resp => {
       [searchResults, total, aggregations] = SearchUtil.extractSearchResults(resp, lang)
-      for (const sr of searchResults) {
-        const text = <string>matches.get(sr.id)
-        const score = <number>chunkScores.get(sr.id)
-        if (!text) continue
+      return [searchResults, total, aggregations]
+    })
 
-        const sentences = this.splitByChars(text, 800, 100)
-          .map(s => s.trim())
-          .filter(Boolean)
+    for (const sr of searchResults) {
+      const score = <number>chunkScores.get(sr.id)
+      sr.score = score
+    }
 
-        const sentenceEmbeddings = await Promise.all(
-          sentences.map(s => this.getEmbedding(s))
-        )
+    if (sortOrder === SortOrder.RELEVANCE) {
+      searchResults = searchResults.sort((sr1, sr2) => sr2.score - sr1.score)
+    }
+    for (let i = 0; i < pageSize; i++) {
+      const sr = searchResults[i]
+      const bestMicroChunk = await this.getBestMicroChunk(sr.id, embedding)
+      if (bestMicroChunk !== undefined && bestMicroChunk !== null) {
+        sr.text = bestMicroChunk._source.chunkText
+      }
+    }
+    return [searchResults, total, aggregations]
+  }
 
-        const scores = this.cosineSimilarityBatch(
-          embedding,
-          sentenceEmbeddings
-        )
+  public static async aiGetMoreResults (allResults: Array<any>, pageNumber, pageSize, queryString): Promise<any> {
+    const newResults = allResults.slice()
+    if (pageNumber * pageSize < newResults[0].length) {
+      newResults[0] = newResults[0].slice((pageNumber - 1) * pageSize, pageNumber * pageSize)
+    } else if (pageNumber * (pageSize - 1) < newResults[0].length) {
+      newResults[0] = newResults[0].slice((pageNumber - 1) * pageSize, newResults[0].length)
+    } else {
+      newResults[0] = []
+    }
+    const embedding = await this.getEmbedding(queryString)
+    for (const sr of newResults[0]) {
+      const bestMicroChunk = await this.getBestMicroChunk(sr.id, embedding)
+      if (bestMicroChunk !== undefined && bestMicroChunk !== null) {
+        sr.text = bestMicroChunk._source.chunkText
+      }
+    }
+    return newResults
+  }
 
-        let bestIdx = 0
-        let bestScore = -Infinity
+  private static async getBestMicroChunk (documentId: string, embedding: number[]): Promise<any> {
+    let bestMicroChunk = await this.searchBestMicroChunk(documentId, embedding)
+    if (bestMicroChunk === undefined || bestMicroChunk === null) {
+      await axios.post(indexMicroChunksUrl, { id: documentId })
+      bestMicroChunk = await this.searchBestMicroChunk(documentId, embedding)
+    }
+    return bestMicroChunk
+  }
 
-        for (let i = 0; i < scores.length; i++) {
-          if (scores[i] > bestScore) {
-            bestScore = scores[i]
-            bestIdx = i
+  private static async searchBestMicroChunk (documentId: string, embedding: number[]): Promise<any> {
+    const search = this.buildMicroChunkSearch(documentId, embedding)
+    return await axios.post(embeddingMicroSearchUrl,
+      search,
+      {
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
+      })
+      .then(async resp => {
+        if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
+          return resp.data.hits.hits[0]
+        } else {
+          return undefined
+        }
+      })
+  }
+
+  private static buildMicroChunkSearch (documentId: string, embedding: number[]): any {
+    const search: any = {
+      size: 1,
+      knn: {
+        field: 'embedding',
+        query_vector: embedding,
+        k: 1,
+        num_candidates: 20,
+        filter: {
+          term: {
+            documentId
           }
         }
-
-        const topText = sentences[bestIdx]
-        sr.text = '...' + topText + '...'
-        sr.score = score
-      }
-      if (sortOrder === SortOrder.RELEVANCE) {
-        searchResults = searchResults.sort((sr1, sr2) => sr2.score - sr1.score)
-      }
-      if (searches.length === 0) {
-        return [searchResults, total, aggregations]
-      } else {
-        return SearchUtil.searchAggs(searches, searchResults, total, aggregations)
-      }
-    })
+      },
+      fields: [
+        '_id',
+        'offset',
+        'len',
+        'chunkText'
+      ]
+    }
+    return search
   }
 
   private static splitByChars (
@@ -388,20 +429,23 @@ export class SearchUtil {
       .catch(err => console.log(err))
   }
 
-  private static buildEmbeddingSearch (embedding: number[], size: number): Promise<any> {
+  private static buildEmbeddingSearch (embedding: number[], size: number, filters: Filters): Promise<any> {
     const search: any = {
       size,
       knn: {
         field: 'embedding',
         query_vector: embedding,
-        k: size,
-        num_candidates: Math.max(size * 5, 100)
+        k: size * 1.5,
+        num_candidates: size * 6
       },
       fields: [
         'documentId',
         '_id',
         'chunkText'
       ]
+    }
+    if (Object.keys(filters).length > 0) {
+      search.knn.filter = SearchUtil.buildEmbeddingSearchFilters(filters)
     }
     return search
   }
@@ -435,68 +479,60 @@ export class SearchUtil {
     if (searchAfter !== undefined) {
       search.search_after = searchAfter
     } else {
-      if (filters.hierarchie === undefined) {
-        if (search.aggs === undefined) {
-          search.aggs = {}
-        }
-        search.aggs.hierarchie = {
-          terms: {
-            size: 1000,
-            field: 'hierarchy'
-          }
+      if (search.aggs === undefined) {
+        search.aggs = {}
+      }
+      search.aggs.hierarchie = {
+        terms: {
+          size: 1000,
+          field: 'hierarchy'
         }
       }
-      if (filters.language === undefined) {
-        if (search.aggs === undefined) {
-          search.aggs = {}
-        }
-        search.aggs.language = {
-          terms: {
-            size: 3,
-            field: 'attachment.language'
-          }
+      if (search.aggs === undefined) {
+        search.aggs = {}
+      }
+      search.aggs.language = {
+        terms: {
+          size: 3,
+          field: 'attachment.language'
         }
       }
-      if (filters.edatum === undefined) {
-        if (search.aggs === undefined) {
-          search.aggs = {}
-        }
-        search.aggs.edatum = {
-          date_histogram: {
-            calendar_interval: SearchUtil.getCalendarInterval(filters),
-            field: 'date'
-          }
-        }
-        search.aggs.min_edatum = {
-          min: {
-            field: 'date'
-          }
-        }
-        search.aggs.max_edatum = {
-          max: {
-            field: 'date'
-          }
+      if (search.aggs === undefined) {
+        search.aggs = {}
+      }
+      search.aggs.edatum = {
+        date_histogram: {
+          calendar_interval: SearchUtil.getCalendarInterval(filters),
+          field: 'date'
         }
       }
-      if (filters.scrapedate === undefined) {
-        if (search.aggs === undefined) {
-          search.aggs = {}
+      search.aggs.min_edatum = {
+        min: {
+          field: 'date'
         }
-        search.aggs.scrapedate = {
-          date_histogram: {
-            calendar_interval: SearchUtil.getScrapeCalendarInterval(filters),
-            field: 'scrapedate'
-          }
+      }
+      search.aggs.max_edatum = {
+        max: {
+          field: 'date'
         }
-        search.aggs.min_scrapedate = {
-          min: {
-            field: 'scrapedate'
-          }
+      }
+      if (search.aggs === undefined) {
+        search.aggs = {}
+      }
+      search.aggs.scrapedate = {
+        date_histogram: {
+          calendar_interval: SearchUtil.getScrapeCalendarInterval(filters),
+          field: 'scrapedate'
         }
-        search.aggs.max_scrapedate = {
-          max: {
-            field: 'scrapedate'
-          }
+      }
+      search.aggs.min_scrapedate = {
+        min: {
+          field: 'scrapedate'
+        }
+      }
+      search.aggs.max_scrapedate = {
+        max: {
+          field: 'scrapedate'
         }
       }
     }
@@ -580,6 +616,16 @@ export class SearchUtil {
     return filterArray.length === 1 ? filterArray[0] : filterArray
   }
 
+  public static buildEmbeddingSearchFilters (filters: Filters): any {
+    // wird auch für den Downloader benötigt
+    const filterArray: Array<any> = []
+    for (const type in filters) {
+      filterArray.push(SearchUtil.buildEmbeddingSearchFilter(filters[type]))
+    }
+
+    return filterArray.length === 1 ? filterArray[0] : filterArray
+  }
+
   private static transformDate (milliseconds: number): number | string {
     if (milliseconds >= 0) {
       return milliseconds
@@ -656,6 +702,72 @@ export class SearchUtil {
       return {
         terms: {
           'attachment.language': filter.payload
+        }
+      }
+    }
+  }
+
+  private static buildEmbeddingSearchFilter (filter: Filter): any {
+    if (filter.type === 'edatum') {
+      if (filter.payload.from !== undefined && filter.payload.to !== undefined) {
+        return {
+          range: {
+            date: {
+              gte: SearchUtil.transformDate(filter.payload.from),
+              lte: SearchUtil.transformDate(filter.payload.to)
+            }
+          }
+        }
+      } else if (filter.payload.from !== undefined) {
+        return {
+          range: {
+            date: {
+              gte: SearchUtil.transformDate(filter.payload.from)
+            }
+          }
+        }
+      } else if (filter.payload.to !== undefined) {
+        return {
+          range: {
+            date: {
+              lte: SearchUtil.transformDate(filter.payload.to)
+            }
+          }
+        }
+      }
+    }
+    if (filter.type === 'scrapedate') {
+      if (filter.payload.from !== undefined && filter.payload.to !== undefined) {
+        return {
+          range: {
+            scrape: {
+              gte: SearchUtil.transformDate(filter.payload.from),
+              lte: SearchUtil.transformDate(filter.payload.to)
+            }
+          }
+        }
+      } else if (filter.payload.from !== undefined) {
+        return {
+          range: {
+            scrape: {
+              gte: SearchUtil.transformDate(filter.payload.from)
+            }
+          }
+        }
+      } else if (filter.payload.to !== undefined) {
+        return {
+          range: {
+            scrape: {
+              lte: SearchUtil.transformDate(filter.payload.to)
+            }
+          }
+        }
+      }
+    }
+    if (filter.type === 'language') {
+      return {
+        terms: {
+          language: filter.payload
         }
       }
     }

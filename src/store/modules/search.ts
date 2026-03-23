@@ -193,6 +193,8 @@ export class Search extends VuexModule implements SearchState {
   private sort = SortOrder.RELEVANCE
   private preview = ''
   private fullscreen = ''
+  private aiPageSize = 10
+  private aiAllResults: [Array<SearchResult>, number, any] = [[], 0, 0]
 
   public get pristine () {
     return this.prist
@@ -439,6 +441,10 @@ export class Search extends VuexModule implements SearchState {
       this.prist = false
     }
     this.results = results[0]
+    if (this.aiSearch) {
+      this.aiAllResults = results
+      this.results = results[0].slice(0, this.aiPageSize)
+    }
     this.allResLoaded = false
     if ('id' in this.selectedRes) {
       const id = this.selectedRes.id
@@ -494,7 +500,7 @@ export class Search extends VuexModule implements SearchState {
   public async SetResults () {
     this.context.commit('RESULTS_PENDING', true)
     return this.aiSearch
-      ? SearchUtil.aiSearch(this.query, AppModule.locale, this.filters, this.sortOrder, 10)
+      ? SearchUtil.aiSearch(this.query, AppModule.locale, this.filters, this.sortOrder, 100, this.aiPageSize)
         .finally(() => this.context.commit('RESULTS_PENDING', false))
       : SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort)
         .finally(() => this.context.commit('RESULTS_PENDING', false))
@@ -511,9 +517,13 @@ export class Search extends VuexModule implements SearchState {
   public async SetMoreResults () {
     if (this.results.length > 0) {
       const sortAfter = this.results[this.results.length - 1].sort
+      const pageNumber = this.results.length / this.aiPageSize + 1
       this.context.commit('RESULTS_PENDING', true)
-      return SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort, sortAfter)
-        .finally(() => this.context.commit('RESULTS_PENDING', false))
+      return this.aiSearch
+        ? SearchUtil.aiGetMoreResults(this.aiAllResults, pageNumber, this.aiPageSize, this.queryString)
+          .finally(() => this.context.commit('RESULTS_PENDING', false))
+        : SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort, sortAfter)
+          .finally(() => this.context.commit('RESULTS_PENDING', false))
     }
   }
 

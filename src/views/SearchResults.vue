@@ -1270,7 +1270,7 @@ export default class SearchResults extends Vue {
 
   handleScroll () {
     const searchResultsDiv = document.getElementById('results')
-    if (!SearchModule.allResultsLoaded && !SearchModule.resultsPending && searchResultsDiv !== null && !SearchModule.isAiSearch) {
+    if (!SearchModule.allResultsLoaded && !SearchModule.resultsPending && searchResultsDiv !== null) {
       if (searchResultsDiv.scrollTop + searchResultsDiv.clientHeight >= searchResultsDiv.scrollHeight - 10) {
         this.getMoreResults()
       }
