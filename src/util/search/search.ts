@@ -275,9 +275,8 @@ export class SearchUtil {
       sr.score = score
     }
 
-    if (sortOrder === SortOrder.RELEVANCE) {
-      searchResults = searchResults.sort((sr1, sr2) => sr2.score - sr1.score)
-    }
+    searchResults = searchResults.sort((sr1, sr2) => sr2.score - sr1.score)
+
     for (let i = 0; i < pageSize; i++) {
       const sr = searchResults[i]
       const bestMicroChunk = await this.getBestMicroChunk(sr.id, embedding)

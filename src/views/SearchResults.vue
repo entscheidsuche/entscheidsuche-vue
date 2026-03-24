@@ -10,7 +10,7 @@
         <div class="total-hits">
           <div class="title-wrapper">
             <p class="title">
-              <span style="">
+              <span v-if="!this.aiSearch" style="">
                 <a :href="this.getDownloadUrl()" target="_blank">
                   <b-button variant="primary" id="result-download-btn" :title="$t('downloadHover')">
                     <b-icon id="download" icon="cloud-download" scale="5" font-scale=".2" height="20"></b-icon>
@@ -27,7 +27,7 @@
             </div>
           </div>
         </div>
-        <div class="sort">
+        <div v-if="!this.aiSearch" class="sort">
           <div class="title-wrapper">
             <p class="title">{{ $t('sort') }}:</p>
           </div>
@@ -430,7 +430,7 @@
         width:0;
         padding: 8px 0 8px 0;
         border:0;
-        overflow:none;
+        overflow: hidden;
       }
       .card-group-title {
         margin: 0;
@@ -1062,6 +1062,10 @@ export default class SearchResults extends Vue {
         })
       }
     }
+  }
+
+  get aiSearch () {
+    return SearchModule.isAiSearch
   }
 
   get results () {

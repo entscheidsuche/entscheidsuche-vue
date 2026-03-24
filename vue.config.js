@@ -35,6 +35,11 @@ module.exports = {
   },
 
   devServer: {
+    allowedHosts: [
+      'entscheidsuche-beta.pansoft.de',
+      '192.168.99.235:8080',
+      'localhost:8080'
+    ],
     proxy: {
       '/api/elasticsearch': {
         target: 'https://192.168.99.235:9200',
