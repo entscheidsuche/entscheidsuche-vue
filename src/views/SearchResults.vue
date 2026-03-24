@@ -179,6 +179,11 @@
                 </div>
                 <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
                 <div class="controls-wrapper">
+                  <a @click.prevent.stop="onOpenDebug()">
+                    <b-button variant="primary" id="debug-btn" :title="$t('debugHover')">
+                      <b-icon id="debug" icon="bug"></b-icon>
+                    </b-button>
+                  </a>
                   <a v-if="directLink(selectedResult)" :href="selectedResult.url" target="_blank" @click.prevent.stop="onSource(selectedResult.url)">
                     <b-button variant="primary" id="court-btn" :title="$t('courtHover')">
                       <b-icon id="court"></b-icon>
@@ -215,8 +220,61 @@
             </div>
           </div>
           <div id="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
-            <iframe v-if="this.windowWidth > 1024" frameborder="0" id="result-iframe" class="desktop-pdf result-iframe" scrolling="auto" :src="this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
-            <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf result-iframe" id="mobile-result-iframe" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : selectedResult.url" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+            <iframe v-on:load="highlightByOffset(selectedResult)" ref="desktopResultIframe" v-if="this.windowWidth > 1024" frameborder="0" id="result-iframe" class="desktop-pdf" scrolling="auto" :src="this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+            <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" id="mobile-result-iframe" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : selectedResult.url" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+          </div>
+        </div>
+      </div>
+      <div v-if="this.debugVisible" v-bind:class="['preview', this.debugVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '']">
+        <div class="preview-content" v-show="this.selectedResult">
+          <div class="doc-info">
+            <div class="doc-header">
+              <div class="flex-row">
+                <div v-if="selectedResult.canton !== undefined">
+                  <img :src="getImgUrl(selectedResult.canton)" class="canton-logo">
+                </div>
+                <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
+                <div class="controls-wrapper">
+                  <a v-if="directLink(selectedResult)" :href="selectedResult.url" target="_blank" @click.prevent.stop="onSource(selectedResult.url)">
+                    <b-button variant="primary" id="court-btn" :title="$t('courtHover')">
+                      <b-icon id="court"></b-icon>
+                    </b-button>
+                  </a>
+                  <a v-if="directLink(selectedResult)" :href="selectedResult.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(selectedResult.url.replace('/docs/','/dok/'))">
+                    <b-button variant="primary" id="print-btn" :title="$t('printHover')">
+                      <b-icon id="print" icon="printer"></b-icon>
+                    </b-button>
+                  </a>
+                  <b-button variant="primary" v-on:click="onCloseDebug()" id="close-preview-btn">
+                    <b-icon id="close-preview"></b-icon>
+                  </b-button>
+                </div>
+              </div>
+              <h4 v-if="this.windowWidth <= 1024" class="result-title-mobile" v-html="selectedResult.title"/>
+            </div>
+          </div>
+          <div id="outer-pdf" class="results" style="-webkit-overflow-scrolling: touch; overflow: auto;">
+            <div v-for="(microChunk, index) in selectedResult.microChunks" :key="microChunk._id">
+              <div class="result-item">
+                <div class="result-header">
+                  <h4 class="result-title">{{ index + 1 }}. Micro-Chunk</h4>
+                </div>
+                <div class="result-body">
+                  <div class="text-preview">
+                    <p v-html="microChunk._source.chunkText"/>
+                  </div>
+                  <div class="result-index">
+                    <p>{{ $t('hit') }} {{ index + 1}} {{ $t('of') }} 10</p>
+                    <p v-if="microChunk._score">Score: {{microChunk._score}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h4>Big Chunk Content</h4>
+            <div class="result-index">
+              <p v-if="selectedResult.score">Score: {{selectedResult.score}}</p>
+            </div>
+            <p v-html="this.selectedResult.bigChunkText"></p>
           </div>
         </div>
       </div>
@@ -561,7 +619,6 @@
                 left:3px;
               }
             }
-
             .canton-logo{
               max-height:36px;
               width: auto;
@@ -723,6 +780,18 @@
                   position: relative;
                   #court{
                     background: url('../assets/court.svg') no-repeat center;
+                    height:22px;
+                    width:22px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
+                  }
+                }
+                #debug-btn{
+                  height:30px;
+                  width:30px;
+                  position: relative;
+                  #debug{
                     height:22px;
                     width:22px;
                     position:absolute;
@@ -1001,7 +1070,7 @@
 </style>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue, { nextTick } from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState, Sponsor } from '@/store/modules/app'
 import { Filters, FilterType, SearchModule, SearchResult } from '@/store/modules/search'
@@ -1035,6 +1104,7 @@ export default class SearchResults extends Vue {
   private fullScreen = false
   private windowWidth = 0
   private previewVisible = false
+  private debugVisible = false
   private sliderWidth = 1
   private allowUndoFilter = false
   private iframeUrl = ''
@@ -1538,6 +1608,13 @@ export default class SearchResults extends Vue {
     }
   }
 
+  public onOpenDebug (): void {
+    this.debugVisible = true
+    if (this.windowWidth <= 534) {
+      this.fullScreen = true
+    }
+  }
+
   public onFullScreen (): void {
     const name = this.$route.name
     if (name !== 'View') {
@@ -1579,6 +1656,61 @@ export default class SearchResults extends Vue {
     }
   }
 
+  public async highlightByOffset (result) {
+    await nextTick()
+    console.log('loaded Iframe for ' + result)
+    const start = result.textOffset
+    const length = result.textLength
+    const iframe = this.$refs.desktopResultIframe as HTMLIFrameElement
+
+    const root = iframe.contentDocument?.body
+
+    if (!root) {
+      console.error('Iframe not ready or cross-origin')
+      return
+    }
+    const walker = document.createTreeWalker(
+      root,
+      NodeFilter.SHOW_TEXT,
+      null
+    )
+
+    let currentOffset = 0
+    let startNode : any = null
+    let startOffset = 0
+    let endNode : any = null
+    let endOffset = 0
+
+    while (walker.nextNode()) {
+      const node = walker.currentNode
+      const textLength = node.textContent ? node.textContent.length : 0
+
+      // Find start
+      if (!startNode && currentOffset + textLength >= start) {
+        startNode = node
+        startOffset = start - currentOffset
+      }
+
+      // Find end
+      if (!endNode && currentOffset + textLength >= start + length) {
+        endNode = node
+        endOffset = start + length - currentOffset
+        break
+      }
+
+      currentOffset += textLength
+    }
+
+    if (startNode && endNode) {
+      const range = document.createRange()
+      range.setStart(startNode, startOffset)
+      range.setEnd(endNode, endOffset)
+
+      const highlight = document.createElement('mark')
+      range.surroundContents(highlight)
+    }
+  }
+
   public get showMessage () {
     return AppModule.showMessage === MessageState.VISIBLE
   }
@@ -1586,6 +1718,20 @@ export default class SearchResults extends Vue {
   public onClosePreview (): void {
     this.previewVisible = false
     SearchModule.SetPreview(false)
+    if (this.fullScreen) {
+      this.fullScreen = false
+      if (this.windowWidth > 534) {
+        this.previewVisible = true
+      }
+    }
+    setTimeout(() => {
+      this.scrollToSelectedRes()
+    }, 100)
+  }
+
+  public onCloseDebug (): void {
+    this.debugVisible = false
+    SearchModule.SetDebug(false)
     if (this.fullScreen) {
       this.fullScreen = false
       if (this.windowWidth > 534) {

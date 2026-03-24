@@ -253,7 +253,7 @@ export class SearchUtil {
     }).then(resp => {
       if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
         resp.data.hits.hits.forEach(hit => {
-          matches.set(hit.fields.documentId[0], '') // hit.fields.chunkText[0])
+          matches.set(hit.fields.documentId[0], hit.fields.chunkText[0])
           chunkScores.set(hit.fields.documentId[0], hit._score)
         })
       }
@@ -273,15 +273,19 @@ export class SearchUtil {
     for (const sr of searchResults) {
       const score = <number>chunkScores.get(sr.id)
       sr.score = score
+      sr.bigChunkText = matches.get(sr.id)
     }
 
     searchResults = searchResults.sort((sr1, sr2) => sr2.score - sr1.score)
 
     for (let i = 0; i < pageSize; i++) {
       const sr = searchResults[i]
-      const bestMicroChunk = await this.getBestMicroChunk(sr.id, embedding)
-      if (bestMicroChunk !== undefined && bestMicroChunk !== null) {
-        sr.text = bestMicroChunk._source.chunkText
+      const bestMicroChunks = await this.getBestMicroChunks(sr.id, embedding)
+      if (bestMicroChunks !== undefined && bestMicroChunks !== null) {
+        sr.text = bestMicroChunks[0]._source.chunkText
+        sr.textOffset = bestMicroChunks[0]._source.offset
+        sr.textLength = bestMicroChunks[0]._source.len
+        sr.microChunks = bestMicroChunks
       }
     }
     return [searchResults, total, aggregations]
@@ -298,24 +302,27 @@ export class SearchUtil {
     }
     const embedding = await this.getEmbedding(queryString)
     for (const sr of newResults[0]) {
-      const bestMicroChunk = await this.getBestMicroChunk(sr.id, embedding)
-      if (bestMicroChunk !== undefined && bestMicroChunk !== null) {
-        sr.text = bestMicroChunk._source.chunkText
+      const bestMicroChunks = await this.getBestMicroChunks(sr.id, embedding)
+      if (bestMicroChunks[0] !== undefined && bestMicroChunks[0] !== null) {
+        sr.text = bestMicroChunks[0]._source.chunkText
+        sr.textOffset = bestMicroChunks[0]._source.offset
+        sr.textLength = bestMicroChunks[0]._source.len
+        sr.microChunks = bestMicroChunks
       }
     }
     return newResults
   }
 
-  private static async getBestMicroChunk (documentId: string, embedding: number[]): Promise<any> {
-    let bestMicroChunk = await this.searchBestMicroChunk(documentId, embedding)
-    if (bestMicroChunk === undefined || bestMicroChunk === null) {
+  private static async getBestMicroChunks (documentId: string, embedding: number[]): Promise<any> {
+    let bestMicroChunk = await this.searchBestMicroChunks(documentId, embedding)
+    if (bestMicroChunk[0] === undefined || bestMicroChunk[0] === null) {
       await axios.post(indexMicroChunksUrl, { id: documentId })
-      bestMicroChunk = await this.searchBestMicroChunk(documentId, embedding)
+      bestMicroChunk = await this.searchBestMicroChunks(documentId, embedding)
     }
     return bestMicroChunk
   }
 
-  private static async searchBestMicroChunk (documentId: string, embedding: number[]): Promise<any> {
+  private static async searchBestMicroChunks (documentId: string, embedding: number[]): Promise<any> {
     const search = this.buildMicroChunkSearch(documentId, embedding)
     return await axios.post(embeddingMicroSearchUrl,
       search,
@@ -325,7 +332,7 @@ export class SearchUtil {
       })
       .then(async resp => {
         if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
-          return resp.data.hits.hits[0]
+          return resp.data.hits.hits
         } else {
           return undefined
         }
@@ -334,12 +341,12 @@ export class SearchUtil {
 
   private static buildMicroChunkSearch (documentId: string, embedding: number[]): any {
     const search: any = {
-      size: 1,
+      size: 10,
       knn: {
         field: 'embedding',
         query_vector: embedding,
-        k: 1,
-        num_candidates: 20,
+        k: 10,
+        num_candidates: 50,
         filter: {
           term: {
             documentId
@@ -813,6 +820,8 @@ export class SearchUtil {
         results.push({
           id: hit._id,
           text,
+          textLength: 0,
+          textOffset: 0,
           title,
           abstract: _abstract,
           date,
@@ -820,8 +829,10 @@ export class SearchUtil {
           pdf,
           url: hit._source.attachment.content_url,
           sort: hit.sort,
-          scrapedate: scrapedate,
-          score: hit._source.score
+          scrapedate,
+          score: hit._source.score,
+          bigChunkText: '',
+          microChunks: []
         })
       }
       aggregations = SearchUtil.extractAggregations(resp)

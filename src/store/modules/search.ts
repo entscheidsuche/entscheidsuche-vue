@@ -143,6 +143,8 @@ export interface SearchResult {
   title: string;
   abstract: string;
   text: string;
+  textOffset: number;
+  textLength: number;
   date: string;
   scrapedate?: string;
   canton: string;
@@ -150,6 +152,8 @@ export interface SearchResult {
   url: string;
   sort: Array<string | number>;
   score: number;
+  bigChunkText: string;
+  microChunks: Array<any>;
 }
 
 export interface Aggregation {
@@ -192,6 +196,7 @@ export class Search extends VuexModule implements SearchState {
   private filt: Filters = {}
   private sort = SortOrder.RELEVANCE
   private preview = ''
+  private debug = ''
   private fullscreen = ''
   private aiPageSize = 10
   private aiAllResults: [Array<SearchResult>, number, any] = [[], 0, 0]
@@ -575,6 +580,13 @@ export class Search extends VuexModule implements SearchState {
     }
   }
 
+  @Mutation
+  public SET_DEBUG (debug: boolean) {
+    if (!debug && 'id' in this.selectedRes) {
+      this.debug = ''
+    }
+  }
+
   @Action({ commit: 'SELECT_RESULT' })
   public Select (selectedResult?: SearchResult) {
     return selectedResult
@@ -583,6 +595,11 @@ export class Search extends VuexModule implements SearchState {
   @Action({ commit: 'SET_PREVIEW' })
   public SetPreview (visible: boolean) {
     return visible
+  }
+
+  @Action({ commit: 'SET_DEBUG' })
+  public SetDebug (debug: boolean) {
+    return debug
   }
 
   public get selectedResult (): SearchResult | {} {
