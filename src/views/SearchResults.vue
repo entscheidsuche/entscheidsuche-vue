@@ -126,7 +126,7 @@
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
-        <div v-if="!pristine && results.length === 0" class="no-results">
+        <div v-if="!pristine && results.length === 0 && !this.resultsPending" class="no-results">
           <h3 class="hint">Ihre Suche nach "{{ query }}" ergab leider keine Treffer</h3>
         </div>
         <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-bind:id="isSelected(result) ? 'selectedRes' : ''" v-on:click="[onOpenPreview(), onSelectResult(result)]">
@@ -215,8 +215,8 @@
             </div>
           </div>
           <div id="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
-            <iframe v-if="this.windowWidth > 1024" frameborder="0" id="result-iframe" class="desktop-pdf" scrolling="auto" :src="this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
-            <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" id="mobile-result-iframe" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : selectedResult.url" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+            <iframe v-if="this.windowWidth > 1024" frameborder="0" id="result-iframe" class="desktop-pdf result-iframe" scrolling="auto" :src="this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+            <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf result-iframe" id="mobile-result-iframe" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : selectedResult.url" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
           </div>
         </div>
       </div>
@@ -661,7 +661,7 @@
       overflow-x: hidden;
       overflow-y: hidden;
       flex-grow:0;
-      transition: width 0 linear;
+      transition: width 100ms linear;
 
       .preview-content{
         height:100%;

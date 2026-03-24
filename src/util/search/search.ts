@@ -288,7 +288,7 @@ export class SearchUtil {
   }
 
   public static async aiGetMoreResults (allResults: Array<any>, pageNumber, pageSize, queryString): Promise<any> {
-    const newResults = allResults.slice()
+    const newResults = [allResults[0].map(sr => ({ ...sr })), allResults[1], allResults[2]]
     if (pageNumber * pageSize < newResults[0].length) {
       newResults[0] = newResults[0].slice((pageNumber - 1) * pageSize, pageNumber * pageSize)
     } else if (pageNumber * (pageSize - 1) < newResults[0].length) {
@@ -767,6 +767,13 @@ export class SearchUtil {
       return {
         terms: {
           language: filter.payload
+        }
+      }
+    }
+    if (filter.type === 'hierarchie') {
+      return {
+        terms: {
+          hierarchy: filter.payload
         }
       }
     }

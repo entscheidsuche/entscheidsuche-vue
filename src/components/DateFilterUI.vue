@@ -17,7 +17,6 @@
     :prettify="prettifyDate"
     :grid="false"
     @finish="onValueChanged"
-    @update="onValueChanged"
   />
 </template>
 
