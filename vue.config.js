@@ -68,6 +68,16 @@ module.exports = {
           proxyReq.removeHeader('origin')
         },
         pathRewrite: { '^/api/llm': '' }
+      },
+      '/api/docs/': {
+        target: 'https://entscheidsuche.ch/docs/',
+        changeOrigin: true,
+        secure: true, // we want SSL verification
+        pathRewrite: { '^/api/docs/': '' },
+        onProxyReq (proxyReq) {
+          // Remove Origin header
+          proxyReq.removeHeader('origin')
+        }
       }
     }
   }

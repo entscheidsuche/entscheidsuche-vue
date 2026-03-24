@@ -220,8 +220,8 @@
             </div>
           </div>
           <div id="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
-            <iframe v-on:load="highlightByOffset(selectedResult)" ref="desktopResultIframe" v-if="this.windowWidth > 1024" frameborder="0" id="result-iframe" class="desktop-pdf" scrolling="auto" :src="this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
-            <iframe v-if="this.windowWidth <= 1024" class="mobile-pdf" id="mobile-result-iframe" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : selectedResult.url" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+            <iframe v-on:load="highlightByOffset(selectedResult, true)" ref="desktopResultIframe" v-if="this.windowWidth > 1024" frameborder="0" id="result-iframe" class="desktop-pdf" scrolling="auto" :src="this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+            <iframe v-on:load="highlightByOffset(selectedResult, false)" ref="mobileResultIframe" v-if="this.windowWidth <= 1024" class="mobile-pdf" id="mobile-result-iframe" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
           </div>
         </div>
       </div>
@@ -1263,7 +1263,10 @@ export default class SearchResults extends Vue {
     }
     const iFrameParent = document.getElementById('outer-pdf')
     if (iFrame && iFrameParent && selectedResult.url) {
-      const newUrl = selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
+      let newUrl = selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
+      if (!selectedResult.pdf) {
+        newUrl = newUrl.replace('https://entscheidsuche.ch/docs/', '/api/docs/')
+      }
       const url = iFrame.getAttribute('src')
       if (url !== newUrl) {
         iFrame.remove()
@@ -1291,7 +1294,10 @@ export default class SearchResults extends Vue {
           this.previewVisible = true
           this.fullScreen = true
         }
-        const newUrl = this.selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
+        let newUrl = this.selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
+        if (!this.selectedResult.pdf) {
+          newUrl = newUrl.replace('https://entscheidsuche.ch/docs/', '/api/docs/')
+        }
         this.iframeUrl = newUrl
       }
     }
@@ -1656,12 +1662,13 @@ export default class SearchResults extends Vue {
     }
   }
 
-  public async highlightByOffset (result) {
+  public async highlightByOffset (result, desktop : boolean) {
+    if (result.pdf) return
     await nextTick()
     console.log('loaded Iframe for ' + result)
     const start = result.textOffset
     const length = result.textLength
-    const iframe = this.$refs.desktopResultIframe as HTMLIFrameElement
+    const iframe = desktop ? this.$refs.desktopResultIframe as HTMLIFrameElement : this.$refs.mobileResultIframe as HTMLIFrameElement
 
     const root = iframe.contentDocument?.body
 
@@ -1683,7 +1690,7 @@ export default class SearchResults extends Vue {
 
     while (walker.nextNode()) {
       const node = walker.currentNode
-      const textLength = node.textContent ? node.textContent.length : 0
+      const textLength = node.textContent ? node.textContent.replaceAll(/\s+/g, ' ').length : 0
 
       // Find start
       if (!startNode && currentOffset + textLength >= start) {
@@ -1705,9 +1712,11 @@ export default class SearchResults extends Vue {
       const range = document.createRange()
       range.setStart(startNode, startOffset)
       range.setEnd(endNode, endOffset)
-
-      const highlight = document.createElement('mark')
-      range.surroundContents(highlight)
+      const fragment = range.extractContents()
+      const mark = document.createElement('div')
+      mark.style.backgroundColor = 'yellow'
+      mark.appendChild(fragment)
+      range.insertNode(mark)
     }
   }
 
