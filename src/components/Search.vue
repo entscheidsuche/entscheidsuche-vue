@@ -4,6 +4,7 @@
     <b-input-group-append>
       <b-button variant="secondary" id="toggle-search" v-on:click="onSearch($event)">{{ $t('search') }}</b-button>
       <b-button variant="warning" id="toggle-ai-search" v-on:click="onAiSearch($event)">{{ $t('aiSearch') }} <span class="superscript">Beta</span></b-button>
+      <b-button variant="warning" id="ai-search-info"><router-link :to="{ name: 'Suchhilfe' }"><b-icon id="info" icon="question-circle"></b-icon></router-link></b-button>
     </b-input-group-append>
     <div class="post-it" v-bind:class="$t('postitMessage') === '' ? 'empty' : ''">
       <a class="post-inner" v-if="$t('postitMessage') !== ''" :href="$t('postitUrl')" target="_blank" v-b-tooltip.hover :title="$t('postitHover')">
@@ -115,6 +116,18 @@
         font-size: 16px;
         font-weight: bold;
         position:relative;
+      }
+      #ai-search-info{
+        flex-shrink: 0;
+        height:40px;
+        width:40px;
+        padding:0;
+        font-size: 16px;
+        font-weight: bold;
+        position:relative;
+      }
+      #info {
+        color: black;
       }
     }
   }
