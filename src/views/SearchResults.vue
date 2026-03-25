@@ -234,17 +234,7 @@
                   <img :src="getImgUrl(selectedResult.canton)" class="canton-logo">
                 </div>
                 <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
-                <div class="controls-wrapper">
-                  <a v-if="directLink(selectedResult)" :href="selectedResult.url" target="_blank" @click.prevent.stop="onSource(selectedResult.url)">
-                    <b-button variant="primary" id="court-btn" :title="$t('courtHover')">
-                      <b-icon id="court"></b-icon>
-                    </b-button>
-                  </a>
-                  <a v-if="directLink(selectedResult)" :href="selectedResult.url.replace('/docs/','/dok/')" target="_blank" @click.prevent.stop="openPrint(selectedResult.url.replace('/docs/','/dok/'))">
-                    <b-button variant="primary" id="print-btn" :title="$t('printHover')">
-                      <b-icon id="print" icon="printer"></b-icon>
-                    </b-button>
-                  </a>
+                <div class="controls-wrapper" id="debug-controls">
                   <b-button variant="primary" v-on:click="onCloseDebug()" id="close-preview-btn">
                     <b-icon id="close-preview"></b-icon>
                   </b-button>
@@ -751,11 +741,14 @@
                 margin-right:10px;
                 flex-shrink: 0;
               }
+              #debug-controls {
+                justify-content: right;
+              }
               .controls-wrapper{
                 display: flex;
                 flex-direction: row;
                 justify-content: space-between;
-                width:170px;
+                width:200px;
                 height:30px;
                 margin-left: 20px;
                 position:relative;
