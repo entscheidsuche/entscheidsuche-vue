@@ -408,11 +408,19 @@ export class SearchUtil {
       for (const hit of hits) {
         let text = ''
         let title = hit._source.title !== undefined ? hit._source.title[lang] : ''
+        let meta = hit._source.meta !== undefined ? hit._source.meta[lang] : ''
+        let urloriginal = hit._source.url !== undefined ? hit._source.url[lang] : ''
         let _abstract = hit._source.abstract !== undefined ? hit._source.abstract[lang] : ''
         if (hit.highlight !== undefined) {
           text = SearchUtil.getExtract(hit.highlight['attachment.content'])
           if (hit.highlight[`title.${lang}`] !== undefined) {
             title = SearchUtil.getExtract(hit.highlight[`title.${lang}`])
+          }
+          if (hit.highlight[`meta.${lang}`] !== undefined) {
+            meta = SearchUtil.getExtract(hit.highlight[`meta.${lang}`])
+          }
+          if (hit.highlight[`url.${lang}`] !== undefined) {
+            urloriginal = SearchUtil.getExtract(hit.highlight[`url.${lang}`])
           }
           if (hit.highlight[`abstract.${lang}`] !== undefined) {
             _abstract = SearchUtil.getExtract(hit.highlight[`abstract.${lang}`])
@@ -433,6 +441,8 @@ export class SearchUtil {
           id: hit._id,
           text,
           title,
+          meta,
+          urloriginal,
           abstract: _abstract,
           date,
           canton: hit._source.canton.toUpperCase(),
@@ -511,6 +521,18 @@ export class SearchUtil {
         const firstLevelChildren: Facets = []
         for (const secondKey in facet.Quellen) {
           const secondFacet = facet.Quellen[secondKey]
+          const secondLevelChildren: Facets = []
+          for (const thirdKey in secondFacet.Sammlungen) {
+            const thirdFacet = secondFacet.Sammlungen[thirdKey]
+            secondLevelChildren.push({
+              id: thirdKey,
+              label: {
+                de: thirdFacet.de,
+                fr: thirdFacet.fr,
+                it: thirdFacet.it
+              }
+            })
+          }
           firstLevelChildren.push({
             id: secondKey,
             label: {

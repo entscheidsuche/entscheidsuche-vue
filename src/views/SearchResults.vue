@@ -10,13 +10,13 @@
         <div class="total-hits">
           <div class="title-wrapper">
             <p class="title">
-              <span style="">
+              <!--<span style="">
                 <a :href="this.getDownloadUrl()" target="_blank">
                   <b-button variant="primary" id="result-download-btn" :title="$t('downloadHover')">
                     <b-icon id="download" icon="cloud-download" scale="5" font-scale=".2" height="20"></b-icon>
                   </b-button>
                 </a>
-              </span>
+              </span>-->
               {{ $t('allHits') }}: {{ resultsTotal }}
             </p>
           </div>
@@ -27,13 +27,13 @@
             </div>
           </div>
         </div>
-        <div class="sort">
+        <!--<div class="sort">
           <div class="title-wrapper">
             <p class="title">{{ $t('sort') }}:</p>
           </div>
           <SortOrderSelector/>
-        </div>
-        <div class="year-range">
+        </div>-->
+        <!--<div class="year-range">
           <div id="slider-wrapper">
             <p class="title title-wrapper" v-if="dateFilterEmpty() && scrapeDateFilterEmpty()">{{ $t('year') }}</p>
             <div v-bind:class="['title-wrapper', !dateFilterEmpty() ? 'active' : '']" v-on:click="undoDateFilter()">
@@ -98,14 +98,14 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="languages">
+        </div>-->
+        <!--<div class="languages">
           <div v-bind:class="['title-wrapper', this.languageFilterEmpty() ? '' : 'active']" v-on:click="undoLanguageFilter()">
             <p class="title">{{ $t('language') }}</p>
             <b-icon class="undo-filter" icon="x"></b-icon>
           </div>
           <LanguageFilter/>
-        </div>
+        </div>-->
         <div class="authority">
           <div v-bind:class="['title-wrapper', this.hierarchieFilterEmpty() ? '' : 'active']" v-on:click="undoHierarchieFilter()">
             <div class="row-wrapper">
@@ -133,7 +133,10 @@
           <div class="result-body">
             <div class="result-header">
               <img :src="getImgUrl(result.canton)" class="canton-logo">
-              <h4 class="result-title" v-html="result.title"/>
+              <div class="result-title">
+                <h4 class="result-title result-meta" v-html="result.meta"/>
+                <h4 class="result-title" v-html="result.title"/>
+              </div>
 
               <a v-if="directLink(result)" :href="result.url" target="_blank" @click.prevent.stop="onSource(result.url)">
                 <b-button variant="primary" id="result-court-btn" :title="$t('courtHover')">
@@ -176,9 +179,12 @@
                 <div v-if="selectedResult.canton !== undefined">
                   <img :src="getImgUrl(selectedResult.canton)" class="canton-logo">
                 </div>
-                <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
+                <div class="result-title">
+                  <h4 v-if="this.windowWidth > 1024" class="result-title result-meta" v-html="selectedResult.meta"/>
+                  <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
+                </div>
                 <div class="controls-wrapper">
-                  <a v-if="directLink(selectedResult)" :href="selectedResult.url" target="_blank" @click.prevent.stop="onSource(selectedResult.url)">
+                  <a href="selectedResult.url" target="_blank" @click.prevent.stop="onSource(selectedResult.url)">
                     <b-button variant="primary" id="court-btn" :title="$t('courtHover')">
                       <b-icon id="court"></b-icon>
                     </b-button>
@@ -191,9 +197,9 @@
                   <b-button variant="primary"  v-on:click="onFullScreen()" id="maximize-preview-btn">
                     <b-icon id="maximize-preview" icon="arrows-fullscreen"></b-icon>
                   </b-button>
-                  <b-button variant="primary"  v-on:click="onNewTab()" id="separate-preview-btn">
+                  <!--<b-button variant="primary"  v-on:click="onNewTab()" id="separate-preview-btn">
                     <b-icon id="separate-preview" icon="folder-plus"></b-icon>
-                  </b-button>
+                  </b-button>-->
                   <b-button variant="primary"  v-on:click="onFullScreen()" id="minimize-preview-btn">
                     <b-icon id="minimize-preview" icon="fullscreen-exit"></b-icon>
                   </b-button>
@@ -267,7 +273,7 @@
         }
         &.active{
           cursor:pointer;
-          background-color: #6183ec;
+          background-color: #A00000;
           .title{
             color:#fff;
           }
@@ -281,7 +287,7 @@
           }
         }
         &.active:hover{
-          background-color: #3f68e8;
+          background-color: #870000;
         }
       }
 
@@ -306,7 +312,7 @@
           height:38px;
           width:20px;
           border-radius: 4px 0 0 4px;
-          background-color: #6183ec;
+          background-color: #A00000;
           color:#fff;
           z-index:999;
           justify-content: center;
@@ -318,7 +324,7 @@
           }
         }
         .hide-filter:hover{
-          background-color: #3f68e8;
+          background-color: #870000;
         }
       }
       .button-wrapper:hover{
@@ -477,7 +483,7 @@
           height:38px;
           width:0px;
           border-radius: 0 4px 4px 0;
-          background-color: #6183ec;
+          background-color: #A00000;
           color:#fff;
           z-index:998;
           justify-content: center;
@@ -499,7 +505,7 @@
           }
         }
         .show-filter.visible:hover{
-          background-color: #3f68e8;
+          background-color: #870000;
           width:26px;
         }
       }
@@ -547,19 +553,6 @@
                 left:3px;
               }
             }
-            #result-print-btn{
-              height:30px;
-              width:30px;
-              margin-left: 5px;
-              position: relative;
-              #result-print{
-                height:22px;
-                width:22px;
-                position:absolute;
-                top:3px;
-                left:3px;
-              }
-            }
 
             .canton-logo{
               max-height:36px;
@@ -581,10 +574,15 @@
               width:100%;
               margin-bottom: 0;
               word-break: break-all;
+              font-weight: bold;
               em{
                 font-style: italic;
                 background-color: #FFFF00;
               }
+            }
+            .result-meta{
+              font-weight: normal;
+              font-size: 14px;
             }
           }
           .abstract{
@@ -640,14 +638,14 @@
             font-size: 12px;
             p{
               margin-bottom:0;
-              color: #6183ec;
+              color: #A00000;
               text-align: right;
             }
           }
         }
         &.selected{
-          background-color: rgba(97, 131, 236, 0.2);
-          border-color: rgba(97, 131, 236, 0.2);
+          background-color: rgba(160, 0, 0, 0.1);
+          border-color: rgba(160, 0, 0, 0.1);
         }
       }
     }
@@ -729,6 +727,19 @@
                     left:3px;
                   }
                 }
+                #link-btn{
+                  height:30px;
+                  width:30px;
+                  position: relative;
+                  #link{
+                    background: url('../assets/world2.svg') no-repeat center;
+                    height:22px;
+                    width:22px;
+                    position:absolute;
+                    top:3px;
+                    left:3px;
+                  }
+                }
                 #print-btn{
                   height:30px;
                   width:30px;
@@ -786,6 +797,11 @@
                 width:100%;
                 margin-bottom: 0;
                 word-break: break-all;
+                font-weight:bold;
+              }
+              .result-meta{
+                font-weight:normal;
+                font-size: 16px;
               }
             }
             .result-title-mobile{
@@ -1037,6 +1053,7 @@ export default class SearchResults extends Vue {
   private sliderWidth = 1
   private allowUndoFilter = false
   private iframeUrl = ''
+  private dataurl = ''
   public dateOverlayVisible = false
   public scrapeDateOverlayVisible = false
   public dateOverlayFrom = ''
@@ -1188,7 +1205,11 @@ export default class SearchResults extends Vue {
     }
     const iFrameParent = document.getElementById('outer-pdf')
     if (iFrame && iFrameParent && selectedResult.url) {
-      const newUrl = selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
+      // const newUrl = selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
+      console.log(selectedResult.url)
+      this.onPreview(selectedResult.url)
+      console.log(this.dataurl)
+      const newUrl = this.dataurl
       const url = iFrame.getAttribute('src')
       if (url !== newUrl) {
         iFrame.remove()
@@ -1216,7 +1237,8 @@ export default class SearchResults extends Vue {
           this.previewVisible = true
           this.fullScreen = true
         }
-        const newUrl = this.selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
+        this.onPreview(this.selectedResult.url)
+        const newUrl = this.dataurl
         this.iframeUrl = newUrl
       }
     }
@@ -1505,6 +1527,41 @@ export default class SearchResults extends Vue {
     } else {
       alert('no deeplink available')
     }
+  }
+
+  onPreview (docurl) : void {
+    // const protocol = 'https:'
+    // const host = 'entscheidsuche.ch'
+    // const protocol = window.location.protocol
+    // const host = window.location.host
+    const url = docurl.replace(/\.([a-zA-Z0-9]+)$/, '.json')
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok.')
+        }
+        return response.json()
+      })
+      .then(data => {
+        // Here 'data' is the JSON object you've fetched
+        // console.log(data)
+        // You can now set this data to a component's data property or work with it as needed
+        let url = null
+        if ('PDF' in data) {
+          url = docurl
+        } else if ('HTML' in data) {
+          url = data.HTML.URL
+        }
+        if (url) {
+          // console.log(url)
+          this.dataurl = url
+        } else {
+          alert('no deeplink available')
+        }
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error)
+      })
   }
 
   public openPrint (url): void {

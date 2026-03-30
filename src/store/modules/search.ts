@@ -134,6 +134,8 @@ export type Filters = {
 export interface SearchResult {
   id: string;
   title: string;
+  meta: string;
+  urloriginal: string;
   abstract: string;
   text: string;
   date: string;
