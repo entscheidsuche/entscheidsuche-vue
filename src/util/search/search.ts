@@ -529,25 +529,41 @@ export class SearchUtil {
               label: {
                 de: thirdFacet.de,
                 fr: thirdFacet.fr,
-                it: thirdFacet.it
+                it: thirdFacet.it,
+                en: thirdFacet.en
               }
             })
           }
-          firstLevelChildren.push({
-            id: secondKey,
-            label: {
-              de: secondFacet.de,
-              fr: secondFacet.fr,
-              it: secondFacet.it
-            }
-          })
+          if (secondLevelChildren.length === 1) {
+            firstLevelChildren.push({
+              id: secondKey,
+              label: {
+                de: secondFacet.de,
+                fr: secondFacet.fr,
+                it: secondFacet.it,
+                en: secondFacet.en
+              }
+            })
+          } else {
+            firstLevelChildren.push({
+              id: secondKey,
+              label: {
+                de: secondFacet.de,
+                fr: secondFacet.fr,
+                it: secondFacet.it,
+                en: secondFacet.en
+              },
+              children: secondLevelChildren
+            })
+          }
         }
         facets.push({
           id: key,
           label: {
             de: facet.de,
             fr: facet.fr,
-            it: facet.it
+            it: facet.it,
+            en: facet.en
           },
           children: firstLevelChildren
         })

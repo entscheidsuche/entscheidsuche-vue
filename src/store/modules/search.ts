@@ -113,6 +113,7 @@ export interface Label {
   de: string;
   fr: string;
   it: string;
+  en: string;
 }
 
 export type Facet = {
