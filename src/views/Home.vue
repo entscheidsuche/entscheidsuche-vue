@@ -1,9 +1,9 @@
 <template>
   <div id="home">
     <div class="content">
-      <div class="intro">
+      <!--<div class="intro">
         <p v-html="$t('intro')"></p>
-      </div>
+      </div>-->
       <!--<a href="https://jobfairzav.ch" target="_blank">
         <img class="banner" src="~/../assets/sponsors/Banner.jpg" alt="Banner Job Fair ZAV" top v-b-tooltip.hover title="Job Fair ZAV"/>
       </a>-->
@@ -15,7 +15,7 @@
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
       </b-card-group>
-      <div class="other-sponsors">
+      <!--<div class="other-sponsors">
       <h1 v-if="locale==='de'">Weitere Unterstützung erhalten wir von:</h1>
       <h1 v-if="locale==='fr'">Autres soutiens :</h1>
       <h1 v-if="locale==='it'">Altro sostegno:</h1>
@@ -78,7 +78,7 @@ Johannes <b>Wagner</b>, Appenzell;
 <font v-if="locale==='de'"><b>sowie</b> vielen weiteren Unterstützerinnen und Unterstützern, die anonym bleiben wollen.</font>
 <font v-if="locale==='fr'"><b>ainsi</b> que de nombreux autres soutiens qui souhaitent rester anonymes.</font>
 <font v-if="locale==='it'"><b>e</b> molti altri sostenitori che desiderano rimanere anonimi</font>
-     </div>
+     </div>-->
     </div>
   </div>
 </template>

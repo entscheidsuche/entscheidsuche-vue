@@ -30,7 +30,7 @@
 
   .vue-treeselect__multi-value-item{
     color:#fff;
-    background-color: #6183ec;
+    background-color: #A00000;
     border-radius: 4px;
     .vue-treeselect__multi-value-label{
       white-space: nowrap;
@@ -44,7 +44,7 @@
     }
   }
   .vue-treeselect__multi-value-item:hover{
-    background-color:#3f68e8;
+    background-color:#870000;
   }
   .vue-treeselect__checkbox{
     width:16px;
@@ -63,8 +63,8 @@
       left:3px;
     }
     &.vue-treeselect__checkbox--checked,&.vue-treeselect__checkbox--indeterminate{
-      background-color: #6183ec;
-      border-color: #6183ec;
+      background-color: #A00000;
+      border-color: #A00000;
     }
   }
   .vue-treeselect__label{
