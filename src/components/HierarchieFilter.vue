@@ -211,7 +211,7 @@ export default class HierarchieFilter extends Vue {
       }
       return 0
     }
-    facets.forEach((facet: Facet) => {
+    facets.forEach((facet: Facet, index: number) => {
       if (facet.children !== null && facet.children !== undefined) {
         if (facet.children.length > 0) {
           const childrenArray: Array<TreeModel> = []
@@ -228,7 +228,7 @@ export default class HierarchieFilter extends Vue {
               childrenArray.push({ id: child.id, label: child.label[locale], count: lookupCount(child.id) })
             }
           })
-          tree.push({ id: facet.id, label: facet.label[locale], children: childrenArray, count: lookupCount(facet.id) })
+          tree.push({ id: facet.id, label: facet.label[locale], children: childrenArray, count: lookupCount(facet.id), isDefaultExpanded: index === 0 })
         }
       } else {
         tree.push({ id: facet.id, label: facet.label[locale], count: lookupCount(facet.id) })
