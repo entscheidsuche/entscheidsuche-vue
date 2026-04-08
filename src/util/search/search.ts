@@ -428,6 +428,8 @@ export class SearchUtil {
           scrapedate = undefined
         }
         const pdf = SearchUtil.getDocType(hit._source.attachment.content_type)
+        const match = hit._id.match(/^([^_]*_[^_]*)/)
+        const gericht = match ? match[1] : hit._id
         results.push({
           id: hit._id,
           text,
@@ -435,6 +437,7 @@ export class SearchUtil {
           abstract: _abstract,
           date,
           canton: hit._source.canton.toUpperCase(),
+          gericht: gericht.toUpperCase(),
           pdf,
           url: hit._source.attachment.content_url,
           sort: hit.sort,

@@ -132,9 +132,10 @@
         <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-bind:id="isSelected(result) ? 'selectedRes' : ''" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
             <div class="result-header">
-              <img :src="getImgUrl(result.canton)" class="canton-logo">
-              <h4 class="result-title" v-html="result.title"/>
-
+              <img v-if="getImgUrl(selectedResult.canton, selectedResult.gericht)" :src="getImgUrl(selectedResult.canton, selectedResult.gericht)" class="canton-logo"/>
+                <h4 class="result-title result-meta" v-html="result.meta"/>
+                <h4 class="result-title" v-html="result.title"/>
+              </div>
               <a v-if="directLink(result)" :href="result.url" target="_blank" @click.prevent.stop="onSource(result.url)">
                 <b-button variant="primary" id="result-court-btn" :title="$t('courtHover')">
                   <b-icon id="result-court"></b-icon>
@@ -174,7 +175,7 @@
             <div class="doc-header">
               <div class="flex-row">
                 <div v-if="selectedResult.canton !== undefined">
-                  <img :src="getImgUrl(selectedResult.canton)" class="canton-logo">
+                  <img v-if="getImgUrl(selectedResult.canton, selectedResult.gericht)" :src="getImgUrl(selectedResult.canton, selectedResult.gericht)" class="canton-logo"/>
                 </div>
                 <h4 v-if="this.windowWidth > 1024" class="result-title" v-html="selectedResult.title"/>
                 <div class="controls-wrapper">
@@ -1017,6 +1018,8 @@ import SponsorCard from '@/components/SponsorCard.vue'
 import data from '../data/sponsors.json'
 import { SearchUtil } from '@/util/search/search'
 
+const context = require.context('../assets/cantons', false, /\.png$/)
+const available = new Set(context.keys())
 @Component({
   name: 'SearchResult',
   components: {
@@ -1653,8 +1656,6 @@ export default class SearchResults extends Vue {
     }
   }
 
-  public getImgUrl (canton: string) {
-    return require('../assets/cantons/' + canton + '.png')
   }
 
   public onSelectResult (result: SearchResult): void {

@@ -139,6 +139,7 @@ export interface SearchResult {
   date: string;
   scrapedate?: string;
   canton: string;
+  gericht: string;
   pdf: boolean;
   url: string;
   sort: Array<string | number>;
