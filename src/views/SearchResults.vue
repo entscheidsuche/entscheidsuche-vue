@@ -133,6 +133,7 @@
           <div class="result-body">
             <div class="result-header">
               <img v-if="getImgUrl(selectedResult.canton, selectedResult.gericht)" :src="getImgUrl(selectedResult.canton, selectedResult.gericht)" class="canton-logo"/>
+              <div class="result-title">
                 <h4 class="result-title result-meta" v-html="result.meta"/>
                 <h4 class="result-title" v-html="result.title"/>
               </div>
@@ -1020,6 +1021,7 @@ import { SearchUtil } from '@/util/search/search'
 
 const context = require.context('../assets/cantons', false, /\.png$/)
 const available = new Set(context.keys())
+
 @Component({
   name: 'SearchResult',
   components: {
@@ -1656,6 +1658,11 @@ export default class SearchResults extends Vue {
     }
   }
 
+  public getImgUrl (canton: string, gericht: string | null) {
+    const cantonKey = `./${canton}.png`
+    const gerichtKey = `./${gericht}.png`
+    const imgUrl = available.has(gerichtKey) ? context(gerichtKey) : available.has(cantonKey) ? context(cantonKey) : null
+    return imgUrl
   }
 
   public onSelectResult (result: SearchResult): void {
