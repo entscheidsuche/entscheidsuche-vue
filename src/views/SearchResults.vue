@@ -1672,7 +1672,19 @@ export default class SearchResults extends Vue {
     const walker = document.createTreeWalker(
       root,
       NodeFilter.SHOW_TEXT,
-      null
+      {
+        acceptNode (node) {
+          // Skip if inside a <table>
+          let el = node.parentElement
+          while (el) {
+            if (el.tagName === 'TABLE') {
+              return NodeFilter.FILTER_REJECT
+            }
+            el = el.parentElement
+          }
+          return NodeFilter.FILTER_ACCEPT
+        }
+      }
     )
 
     let currentOffset = 0
@@ -1680,11 +1692,16 @@ export default class SearchResults extends Vue {
     let startOffset = 0
     let endNode : any = null
     let endOffset = 0
+    // let text = ''
+    let prevNodeEndsWithWhitespace = true
 
     while (walker.nextNode()) {
       const node = walker.currentNode
-      const textLength = node.textContent ? node.textContent.replaceAll(/\s+/g, ' ').length : 0
-
+      if (node.nodeName === 'TABLE') continue
+      let textContent = node.textContent ? node.textContent.replaceAll(/\s+/g, ' ') : ''
+      textContent = prevNodeEndsWithWhitespace ? textContent.trimStart() : textContent
+      const textLength = textContent.length
+      // text += textContent
       // Find start
       if (!startNode && currentOffset + textLength >= start) {
         startNode = node
@@ -1697,16 +1714,23 @@ export default class SearchResults extends Vue {
         endOffset = start + length - currentOffset
         break
       }
+      if (textContent.endsWith(' ') || textContent === '') {
+        prevNodeEndsWithWhitespace = true
+      } else {
+        prevNodeEndsWithWhitespace = false
+      }
 
       currentOffset += textLength
     }
+
+    // console.log(text)
 
     if (startNode && endNode) {
       const range = document.createRange()
       range.setStart(startNode, startOffset)
       range.setEnd(endNode, endOffset)
       const fragment = range.extractContents()
-      const mark = document.createElement('div')
+      const mark = document.createElement('mark')
       mark.style.backgroundColor = 'yellow'
       mark.appendChild(fragment)
       range.insertNode(mark)
