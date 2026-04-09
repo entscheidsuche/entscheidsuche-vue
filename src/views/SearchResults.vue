@@ -1725,16 +1725,129 @@ export default class SearchResults extends Vue {
 
     // console.log(text)
 
-    if (startNode && endNode) {
-      const range = document.createRange()
-      range.setStart(startNode, startOffset)
-      range.setEnd(endNode, endOffset)
-      const fragment = range.extractContents()
+    this.highlightRange(startNode, startOffset, endNode, endOffset)
+  }
+
+  private highlightRange (
+    startNode: Node,
+    startOffset: number,
+    endNode: Node,
+    endOffset: number
+  ): void {
+    const range = document.createRange()
+    range.setStart(startNode, startOffset)
+    range.setEnd(endNode, endOffset)
+
+    const commonAncestor = range.commonAncestorContainer
+
+    const startContainer: Node = range.startContainer
+    const endContainer: Node = range.endContainer
+
+    if (
+      startContainer === endContainer &&
+      startContainer.nodeType === Node.TEXT_NODE
+    ) {
+      const textNode = startContainer as Text
+      const parent = textNode.parentNode
+      if (!parent) return
+
+      const text = textNode.nodeValue ?? ''
+      const beforeText = text.slice(0, range.startOffset)
+      const selectedText = text.slice(range.startOffset, range.endOffset)
+      const afterText = text.slice(range.endOffset)
+
+      const beforeNode = beforeText ? document.createTextNode(beforeText) : null
       const mark = document.createElement('mark')
-      mark.style.backgroundColor = 'yellow'
-      mark.appendChild(fragment)
-      range.insertNode(mark)
+      mark.textContent = selectedText
+      const afterNode = afterText ? document.createTextNode(afterText) : null
+
+      if (beforeNode) {
+        parent.insertBefore(beforeNode, textNode)
+      }
+      parent.insertBefore(mark, textNode)
+      if (afterNode) {
+        parent.insertBefore(afterNode, textNode)
+      }
+      parent.removeChild(textNode)
+      return
     }
+
+    if (startContainer.nodeType === Node.TEXT_NODE) {
+      this.splitTextNode(startContainer as Text, range.startOffset)
+    }
+
+    if (endContainer.nodeType === Node.TEXT_NODE) {
+      this.splitTextNode(endContainer as Text, range.endOffset)
+    }
+
+    const selectedNodes: Text[] = []
+
+    const walkerRoot =
+      commonAncestor.nodeType === Node.TEXT_NODE
+        ? commonAncestor.parentNode
+        : commonAncestor
+
+    if (!walkerRoot) return
+
+    const walker = document.createTreeWalker(
+      walkerRoot,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: (node: Node): number => {
+          if (node.nodeType !== Node.TEXT_NODE) {
+            return NodeFilter.FILTER_REJECT
+          }
+
+          const textNode = node as Text
+          const value = textNode.nodeValue ?? ''
+
+          if (!value.trim()) {
+            return NodeFilter.FILTER_REJECT
+          }
+
+          try {
+            return range.intersectsNode(textNode)
+              ? NodeFilter.FILTER_ACCEPT
+              : NodeFilter.FILTER_REJECT
+          } catch {
+            return NodeFilter.FILTER_REJECT
+          }
+        }
+      }
+    )
+
+    let currentNode: Node | null = walker.nextNode()
+    while (currentNode) {
+      if (currentNode.nodeType === Node.TEXT_NODE) {
+        selectedNodes.push(currentNode as Text)
+      }
+      currentNode = walker.nextNode()
+    }
+
+    selectedNodes.forEach((node: Text) => {
+      const parent = node.parentNode
+      if (!parent) return
+
+      const text = node.textContent ?? ''
+      if (!text.trim()) return
+
+      const mark = document.createElement('mark')
+      mark.textContent = text
+      parent.replaceChild(mark, node)
+    })
+  }
+
+  private splitTextNode (textNode, startOffset) {
+    const parent = textNode.parentNode
+    const beforeText = textNode.nodeValue.slice(0, startOffset)
+    const afterText = textNode.nodeValue.slice(startOffset)
+
+    const beforeNode = beforeText ? document.createTextNode(beforeText) : null
+    const afterNode = afterText ? document.createTextNode(afterText) : null
+
+    if (beforeNode) textNode.before(beforeNode)
+    if (afterNode) textNode.after(afterNode)
+    parent.removeChild(textNode)
   }
 
   public get showMessage () {
