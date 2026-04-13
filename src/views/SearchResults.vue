@@ -132,11 +132,8 @@
         <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-bind:id="isSelected(result) ? 'selectedRes' : ''" v-on:click="[onOpenPreview(), onSelectResult(result)]">
           <div class="result-body">
             <div class="result-header">
-              <img v-if="getImgUrl(selectedResult.canton, selectedResult.gericht)" :src="getImgUrl(selectedResult.canton, selectedResult.gericht)" class="canton-logo"/>
-              <div class="result-title">
-                <h4 class="result-title result-meta" v-html="result.meta"/>
-                <h4 class="result-title" v-html="result.title"/>
-              </div>
+              <img v-if="getImgUrl(result.canton, result.gericht)" :src="getImgUrl(result.canton, result.gericht)" class="canton-logo"/>
+              <h4 class="result-title" v-html="result.title"/>
               <a v-if="directLink(result)" :href="result.url" target="_blank" @click.prevent.stop="onSource(result.url)">
                 <b-button variant="primary" id="result-court-btn" :title="$t('courtHover')">
                   <b-icon id="result-court"></b-icon>
