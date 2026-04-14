@@ -153,6 +153,7 @@ export interface SearchResult {
   sort: Array<string | number>;
   score: number;
   bigChunkText: string;
+  bigChunkId: string;
   microChunks: Array<any>;
 }
 
@@ -333,7 +334,7 @@ export class Search extends VuexModule implements SearchState {
   @Action
   public SetSortOrder (sortOrder: SortOrder) {
     this.context.commit('SET_SORT_ORDER', sortOrder)
-    if (this.queryString !== '') {
+    if (this.queryString !== '' && !this.aiSearch) {
       return this.context.dispatch('SetResults')
     }
   }

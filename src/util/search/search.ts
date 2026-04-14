@@ -245,7 +245,7 @@ export class SearchUtil {
   public static async aiSearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, totalSize: number, pageSize: number): Promise<any> {
     const embedding = await this.getEmbedding(query)
     const embeddingSearch = this.buildEmbeddingSearch(embedding, totalSize, filters)
-    const matches = new Map<string, string>()
+    const matches = new Map<string, Array<string>>()
     const chunkScores = new Map<string, number>()
     await axios.post(embeddingSearchUrl, embeddingSearch, {
       maxContentLength: Infinity,
@@ -253,7 +253,7 @@ export class SearchUtil {
     }).then(resp => {
       if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
         resp.data.hits.hits.forEach(hit => {
-          matches.set(hit.fields.documentId[0], hit.fields.chunkText[0])
+          matches.set(hit.fields.documentId[0], [hit._id, hit.fields.chunkText[0]])
           chunkScores.set(hit.fields.documentId[0], hit._score)
         })
       }
@@ -273,15 +273,16 @@ export class SearchUtil {
     for (const sr of searchResults) {
       const score = <number>chunkScores.get(sr.id)
       sr.score = score
-      sr.bigChunkText = matches.get(sr.id)
+      sr.bigChunkText = matches.get(sr.id)?.at(1)
+      sr.bigChunkId = matches.get(sr.id)?.at(0)
     }
 
     searchResults = searchResults.sort((sr1, sr2) => sr2.score - sr1.score)
 
     for (let i = 0; i < pageSize; i++) {
       const sr = searchResults[i]
-      const bestMicroChunks = await this.getBestMicroChunks(sr.id, embedding)
-      if (bestMicroChunks !== undefined && bestMicroChunks !== null) {
+      const bestMicroChunks = await this.getBestMicroChunks(sr.id, embedding, sr.bigChunkId)
+      if (bestMicroChunks !== undefined && bestMicroChunks !== null && bestMicroChunks.length > 0) {
         sr.text = bestMicroChunks[0]._source.chunkText
         sr.textOffset = bestMicroChunks[0]._source.offset
         sr.textLength = bestMicroChunks[0]._source.len
@@ -302,8 +303,8 @@ export class SearchUtil {
     }
     const embedding = await this.getEmbedding(queryString)
     for (const sr of newResults[0]) {
-      const bestMicroChunks = await this.getBestMicroChunks(sr.id, embedding)
-      if (bestMicroChunks[0] !== undefined && bestMicroChunks[0] !== null) {
+      const bestMicroChunks = await this.getBestMicroChunks(sr.id, embedding, sr.bigChunkId)
+      if (bestMicroChunks[0] !== undefined && bestMicroChunks[0] !== null && bestMicroChunks.length > 0) {
         sr.text = bestMicroChunks[0]._source.chunkText
         sr.textOffset = bestMicroChunks[0]._source.offset
         sr.textLength = bestMicroChunks[0]._source.len
@@ -313,17 +314,17 @@ export class SearchUtil {
     return newResults
   }
 
-  private static async getBestMicroChunks (documentId: string, embedding: number[]): Promise<any> {
-    let bestMicroChunk = await this.searchBestMicroChunks(documentId, embedding)
+  private static async getBestMicroChunks (documentId: string, embedding: number[], chunkId?: string): Promise<any> {
+    let bestMicroChunk = await this.searchBestMicroChunks(documentId, embedding, chunkId)
     if (bestMicroChunk[0] === undefined || bestMicroChunk[0] === null) {
-      await axios.post(indexMicroChunksUrl, { id: documentId })
-      bestMicroChunk = await this.searchBestMicroChunks(documentId, embedding)
+      await axios.post(indexMicroChunksUrl, { id: documentId, chunkId })
+      bestMicroChunk = await this.searchBestMicroChunks(documentId, embedding, chunkId)
     }
     return bestMicroChunk
   }
 
-  private static async searchBestMicroChunks (documentId: string, embedding: number[]): Promise<any> {
-    const search = this.buildMicroChunkSearch(documentId, embedding)
+  private static async searchBestMicroChunks (documentId: string, embedding: number[], chunkId?: string): Promise<any> {
+    const search = this.buildMicroChunkSearch(documentId, embedding, chunkId)
     return await axios.post(embeddingMicroSearchUrl,
       search,
       {
@@ -339,7 +340,11 @@ export class SearchUtil {
       })
   }
 
-  private static buildMicroChunkSearch (documentId: string, embedding: number[]): any {
+  private static buildMicroChunkSearch (documentId: string, embedding: number[], chunkId?: string): any {
+    let term : any = { documentId }
+    if (chunkId) {
+      term = { chunkId }
+    }
     const search: any = {
       size: 10,
       knn: {
@@ -348,9 +353,7 @@ export class SearchUtil {
         k: 10,
         num_candidates: 50,
         filter: {
-          term: {
-            documentId
-          }
+          term
         }
       },
       fields: [
@@ -832,6 +835,7 @@ export class SearchUtil {
           scrapedate,
           score: hit._source.score,
           bigChunkText: '',
+          bigChunkId: '',
           microChunks: []
         })
       }
