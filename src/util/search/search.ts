@@ -317,7 +317,7 @@ export class SearchUtil {
   private static async getBestMicroChunks (documentId: string, embedding: number[], chunkId?: string): Promise<any> {
     let bestMicroChunk = await this.searchBestMicroChunks(documentId, embedding, chunkId)
     if (bestMicroChunk[0] === undefined || bestMicroChunk[0] === null) {
-      await axios.post(indexMicroChunksUrl, { id: documentId, chunkId })
+      await axios.post(indexMicroChunksUrl, { id: documentId, chunkId }, { timeout: 120000 }).catch(() => console.log('Failed to index microChunks for ' + documentId))
       bestMicroChunk = await this.searchBestMicroChunks(documentId, embedding, chunkId)
     }
     return bestMicroChunk
