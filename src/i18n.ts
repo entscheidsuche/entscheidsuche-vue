@@ -7,7 +7,8 @@ Vue.use(VueI18n)
 const supportedLocales = {
   de: 'german',
   fr: 'french',
-  it: 'italian'
+  it: 'italian',
+  en: 'english'
 }
 
 function loadLocaleMessages (): LocaleMessages {

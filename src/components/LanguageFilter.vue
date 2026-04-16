@@ -40,7 +40,8 @@ export default class LanguageFilter extends Vue {
   myOptions = [
     { text: 'DE', value: 'de', count: 0 },
     { text: 'FR', value: 'fr', count: 0 },
-    { text: 'IT', value: 'it', count: 0 }
+    { text: 'IT', value: 'it', count: 0 },
+    { text: 'EN', value: 'en', count: 0 }
   ]
 
   get aggregations () {

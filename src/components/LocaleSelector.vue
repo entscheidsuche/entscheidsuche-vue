@@ -11,6 +11,7 @@
             <b-form-radio v-model="localeChangeSelected" name="some-radios" value="de">{{ $t('german') }}</b-form-radio>
             <b-form-radio v-model="localeChangeSelected" name="some-radios" value="fr">{{ $t('french') }}</b-form-radio>
             <b-form-radio v-model="localeChangeSelected" name="some-radios" value="it">{{ $t('italian') }}</b-form-radio>
+            <b-form-radio v-model="localeChangeSelected" name="some-radios" value="en">{{ $t('english') }}</b-form-radio>
           </b-form-group>
         </div>
       </div>

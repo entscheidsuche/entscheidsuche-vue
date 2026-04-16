@@ -1,22 +1,22 @@
 [
     {
-        "logo": "AFA.png",
+        "logo": "AFA.svg",
         "link": "www.histoirerurale.ch",
         "text": "Archiv für Agrargeschichte",
         "tooltip": "",
         "active": true
     },
     {
-        "logo": "loterie_romande.jpg",
+        "logo": "0618.png",
         "link": "",
-        "text": "Loterie romande",
+        "text": "Abbildungen, Fotos",
         "tooltip": "",
         "active": true
     },
     {
-        "logo": "logo-memoriav.svg",
+        "logo": "bild_1.png",
         "link": "",
-        "text": "Memoriav",
+        "text": "Filme",
         "tooltip": "",
         "active": true
     },
@@ -28,30 +28,30 @@
         "active": true
     },
     {
-        "logo": "logo_eurho.jpg",
+        "logo": "lien_sources.png",
         "link": "",
-        "text": "European Rural History Organisation",
+        "text": "Archivbestände",
         "tooltip": "",
         "active": true
     },
     {
-        "logo": "sgg-ssh-logo.png",
+        "logo": "lien_sources.png",
         "link": "",
-        "text": "Schweizeriche Gesellschaft für Geschichte",
+        "text": "Editionen",
         "tooltip": "",
         "active": true
     },
     {
-        "logo": "logo_cinematheque.svg",
+        "logo": "persons.png",
         "link": "",
-        "text": "Cinémathèque suisse",
+        "text": "Personen und Institutionen",
         "tooltip": "",
         "active": true
     },
     {
-        "logo": "logo_lichtspiel.jpg",
+        "logo": "02_Walter-Schmid_Thumbnail_zugeschnitten.png",
         "link": "",
-        "text": "Lichtspiel, Kinemathek Bern",
+        "text": "Visual History",
         "tooltip": "",
         "active": true
     }

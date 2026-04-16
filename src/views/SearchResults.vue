@@ -7,6 +7,7 @@
             <b-icon icon="caret-left-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
+        <p class="suchhilfe"><router-link :to="{ name: 'Home' }" >{{ $t('suchhilfe') }}</router-link></p>
         <div class="total-hits">
           <div class="title-wrapper">
             <p class="title">
@@ -117,10 +118,11 @@
         </div>
       </div>
       <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']" @scroll="handleScroll" id="results">
-        <h1 class="card-group-title">{{$t('also support')}}</h1>
-        <b-card-group id='bcardsResults' deck>
+        <h1 class="card-group-title-h1">{{$t('also support')}}</h1>
+        <h3 class="card-group-title">{{$t('powered')}}</h3>
+        <!--<b-card-group id='bcardsResults' deck>
           <sponsor-card v-for="(sponsor, index) in this.randomSponsors" :key="index" :logo="sponsor.logo" :link="sponsor.link" :text="sponsor.text" :tooltip="sponsor.tooltip"/>
-        </b-card-group>
+        </b-card-group>-->
         <div v-bind:class="['button-wrapper', this.showMessage ? 'messageOffset' : '']">
           <div v-on:click="onToggleFilter()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible', this.fullScreen ? 'fullScreen' : '']">
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
@@ -333,7 +335,10 @@
           width:26px;
         }
       }
-
+      .suchhilfe{
+        text-align: right;
+        margin: 0;
+      }
       .total-hits{
         margin-bottom:2px;
         .title{
@@ -439,7 +444,12 @@
       }
       .card-group-title {
         margin: 0;
-        padding-bottom: 15px;
+        padding-bottom: 20px;
+        font-size: 20px;
+        font-style: italic;
+      }
+      .card-group-title-h1{
+        margin: 0;
       }
       .card-deck{
         width:100%;
@@ -1193,7 +1203,7 @@ export default class SearchResults extends Vue {
   }
 
   @Watch('selectedResult')
-  public onSelectedResultChanged (selectedResult: SearchResult) {
+  async onSelectedResultChanged (selectedResult: SearchResult) {
     if (!('id' in selectedResult)) {
       this.previewVisible = false
       this.fullScreen = false
@@ -1207,7 +1217,7 @@ export default class SearchResults extends Vue {
     if (iFrame && iFrameParent && selectedResult.url) {
       // const newUrl = selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
       console.log(selectedResult.url)
-      this.onPreview(selectedResult.url)
+      await this.onPreview(selectedResult.url)
       console.log(this.dataurl)
       const newUrl = this.dataurl
       const url = iFrame.getAttribute('src')
@@ -1229,7 +1239,7 @@ export default class SearchResults extends Vue {
   }
 
   @Watch('$route', { immediate: true, deep: true })
-  onRouteChange (from: Route, to: Route) {
+  async onRouteChange (from: Route, to: Route) {
     const name = this.$route.name
     if (name === 'View') {
       if ('url' in this.selectedResult) {
@@ -1237,7 +1247,7 @@ export default class SearchResults extends Vue {
           this.previewVisible = true
           this.fullScreen = true
         }
-        this.onPreview(this.selectedResult.url)
+        await this.onPreview(this.selectedResult.url)
         const newUrl = this.dataurl
         this.iframeUrl = newUrl
       }
@@ -1529,13 +1539,13 @@ export default class SearchResults extends Vue {
     }
   }
 
-  onPreview (docurl) : void {
+  async onPreview (docurl) {
     // const protocol = 'https:'
     // const host = 'entscheidsuche.ch'
     // const protocol = window.location.protocol
     // const host = window.location.host
     const url = docurl.replace(/\.([a-zA-Z0-9]+)$/, '.json')
-    fetch(url)
+    await fetch(url)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok.')

@@ -2,16 +2,17 @@
   <div id="header">
     <div class="header-main">
       <router-link :to="{ name: 'Home' }" class="logo"></router-link>
+      <!--<p>{{ $t('sub_logo') }}</p>-->
       <Search/>
       <div id="language-toggler" v-on:click="onLocaleChange()">
         <span id="current">{{locale.toUpperCase()}}</span>
          <a class="language-icon"></a>
       </div>
-      <div v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;box-shadow:none;"></div>
+      <!--<div v-b-toggle.sidebar-right id="burger" style="border:none;outline:none;box-shadow:none;"></div>-->
     </div>
     <Message/>
     <LocaleSelector/>
-    <b-sidebar id="sidebar-right" right no-header>
+    <!--<b-sidebar id="sidebar-right" right no-header>
       <div class="menu-overlay">
         <b-button v-b-toggle.sidebar-right variant="primary" id="close-menu-btn">
           <b-icon id="close-menu"></b-icon>
@@ -27,7 +28,7 @@
           </ul>
         </nav>
       </div>
-    </b-sidebar>
+    </b-sidebar>-->
   </div>
 </template>
 
@@ -77,7 +78,7 @@
       .language-icon {
         position: absolute;
         top: 21px;
-        right: 85px;
+        right: 100px;
         background: url('../assets/world2.svg') no-repeat center;
         background-size: 26px;
         height: 30px;

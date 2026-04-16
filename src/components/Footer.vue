@@ -1,7 +1,7 @@
 <template>
   <div id="footer">
     <footer>
-      <a class="logo" href="#" onclick=""></a> <a class="twitter" title="entscheidsuche.ch on Twitter" href="https://twitter.com/entscheidsuche"></a>  powered by <a href="https://pansoft.de"><img src="~/../assets/sponsors/sponsor15.png" height="35px"></a>
+      <a class="logo" href="#" onclick=""></a> <!--<a class="twitter" title="entscheidsuche.ch on Twitter" href="https://twitter.com/entscheidsuche"></a>-->  powered by <a href="https://pansoft.de"><img src="~/../assets/sponsors/AFA.svg" height="35px"></a> and <a href="https://pansoft.de"><img src="~/../assets/sponsors/sponsor15.png" height="35px"></a>
     </footer>
   </div>
 </template>
