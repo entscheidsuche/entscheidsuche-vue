@@ -319,6 +319,19 @@ export class SearchUtil {
     if (bestMicroChunk[0] === undefined || bestMicroChunk[0] === null) {
       await axios.post(indexMicroChunksUrl, { id: documentId, chunkId }, { timeout: 120000 }).catch(() => console.log('Failed to index microChunks for ' + documentId))
       bestMicroChunk = await this.searchBestMicroChunks(documentId, embedding, chunkId)
+      if (bestMicroChunk[0] === undefined || bestMicroChunk[0] === null) {
+        const chunkSplit = chunkId?.split('_')
+        if (chunkSplit) {
+          const newChunkNo = parseInt(chunkSplit[chunkSplit.length - 1].replace('C', '')) - 1
+          chunkSplit.pop()
+          const newChunkId = chunkSplit.join('_') + '_C' + newChunkNo.toString().padStart(4, '0')
+          await axios.post(indexMicroChunksUrl, {
+            id: documentId,
+            newChunkId
+          }, { timeout: 120000 }).catch(() => console.log('Failed to index microChunks for ' + documentId))
+          bestMicroChunk = await this.searchBestMicroChunks(documentId, embedding, newChunkId)
+        }
+      }
     }
     return bestMicroChunk
   }
