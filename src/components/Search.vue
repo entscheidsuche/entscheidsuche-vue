@@ -5,7 +5,10 @@
       <b-button variant="secondary" id="toggle-search" v-on:click="onSearch($event)">{{ $t('search') }}</b-button>
     </b-input-group-append>
     <div class="post-it" v-bind:class="$t('postitMessage') === '' ? 'empty' : ''">
-      <a class="post-inner" v-if="$t('postitMessage') !== ''" :href="$t('postitUrl')" target="_blank" v-b-tooltip.hover :title="$t('postitHover')">
+      <router-link class="post-inner" v-if="$t('postitMessage') !== '' && isInternalPostitUrl" :to="postitUrl" v-b-tooltip.hover :title="$t('postitHover')">
+        <span v-html="$t('postitMessage')"></span>
+      </router-link>
+      <a class="post-inner" v-else-if="$t('postitMessage') !== ''" :href="postitUrl" target="_blank" v-b-tooltip.hover :title="$t('postitHover')">
         <span v-html="$t('postitMessage')"></span>
       </a>
     </div>
@@ -133,6 +136,15 @@ export default class Search extends Vue {
 
   public get query () {
     return SearchModule.query
+  }
+
+  public get postitUrl (): string {
+    const url = this.$t('postitUrl')
+    return typeof url === 'string' ? url : ''
+  }
+
+  public get isInternalPostitUrl (): boolean {
+    return this.postitUrl.startsWith('/')
   }
 
   created () {
