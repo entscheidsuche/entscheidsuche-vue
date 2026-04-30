@@ -23,6 +23,7 @@
             <li><router-link :to="{ name: 'Upload' }" class="desktop-menu-item">{{ $t('upload') }}</router-link></li>
             <li><router-link :to="{ name: 'DataUsage' }" class="desktop-menu-item">{{ $t('dataUsage') }}</router-link></li>
             <li><router-link :to="{ name: 'Status' }" class="desktop-menu-item">{{ $t('status') }}</router-link></li>
+            <li><router-link :to="{ name: 'MCP' }" class="desktop-menu-item">{{ $t('mcp') }}</router-link></li>
             <li><router-link :to="{ name: 'Datenschutz' }" class="desktop-menu-item">{{ $t('datenschutz') }}</router-link></li>
           </ul>
         </nav>
