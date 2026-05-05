@@ -140,7 +140,9 @@ export default class App extends Vue {
   }
 
   public get inSearch () {
-    return store.state.route.path === '/search' || store.state.route.name === 'View'
+    return store.state.route.path === '/search' ||
+        store.state.route.name === 'View' ||
+        store.state.route.path === '/status'
   }
 }
 </script>
