@@ -69,5 +69,6 @@
   "tip_kein_lauf": "aucune exécution réussie dans les 90 derniers jours",
   "tip_bestand": "Stock",
   "tip_prozent_max": "% du maximum sur 90 jours",
-  "tip_einzelfehler": "erreurs dans la dernière exécution réussie"
+  "tip_einzelfehler": "erreurs dans la dernière exécution réussie",
+  "Statushinweis": "Le nombre de documents supplémentaires aux différentes dates ne signifie pas que le total des documents a augmenté d'autant depuis. Il indique uniquement combien de documents ont été récupérés depuis. La cause peut être de nouveaux documents, une exécution complète d'un scraper ou des documents modifiés."
 }

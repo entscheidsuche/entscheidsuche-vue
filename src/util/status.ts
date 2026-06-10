@@ -155,12 +155,28 @@ function tageZeit (zeit: string | null | undefined): number | null {
   return (Date.now() - d.getTime()) / 86400000
 }
 
-function ampelZeit (zeit: string | null | undefined): Color {
-  const t = tageZeit(zeit)
-  if (t === null) return 'red'
-  if (t < 2) return 'green'
-  if (t < 3) return 'yellow' // genau zwei Tage her = Gelb
-  if (t < 10) return 'orange'
+/**
+ * Ampel-Farbe für die Zeit-Achse:
+ *   A = Tage seit letztem erfolgreichen Lauf
+ *
+ *   A < 2 Tage                                   → grün
+ *   A < 4 Tage                                   → gelb
+ *   A < 32 Tage UND fehlversuche ≤ 3             → gelb
+ *     (Spider mit selteneren Lauf-Frequenzen wie monatlich; ein paar
+ *      Fehlversuche dazwischen sind tolerabel)
+ *   A < 10 Tage                                  → orange
+ *   sonst                                        → rot
+ */
+function ampelZeit (
+  letzterErfolg: string | null | undefined,
+  fehlversuche: number
+): Color {
+  const A = tageZeit(letzterErfolg)
+  if (A === null) return 'red'
+  if (A < 2) return 'green'
+  if (A < 4) return 'yellow'
+  if (A < 32 && fehlversuche <= 3) return 'yellow'
+  if (A < 10) return 'orange'
   return 'red'
 }
 
@@ -183,7 +199,10 @@ function ampelFehler (n: number): Color {
 export function spiderAmpel (s: SpiderStatus): Color {
   const e = s.letzter_erfolgreicher_lauf
   if (!e) return 'red'
-  const arr: Color[] = [ampelZeit(e.zeit), ampelFehler(e.anzahl_fehler)]
+  const arr: Color[] = [
+    ampelZeit(e.zeit, s.fehlversuche_seit_letzter_erfolg || 0),
+    ampelFehler(e.anzahl_fehler)
+  ]
   const ab = ampelBestand(e.gesamt, s.vergleich_90_tage_gesamt_max)
   if (ab) arr.push(ab)
   return maxColor(arr)
@@ -191,13 +210,17 @@ export function spiderAmpel (s: SpiderStatus): Color {
 
 /**
  * Farbe einer Hierarchieebene aus den Farben der beteiligten Spider.
- * Sonderfall: ein einzelner roter Scraper unter sonst gelben/grünen → orange.
+ * Sonderfall: ein einzelner roter Scraper unter mehreren, alle anderen
+ * gelb oder besser → orange. Greift nur bei mehreren Scrapern; bei
+ * genau einem Scraper schlägt die rohe Farbe durch (sonst würde ein
+ * roter Einzel-Spider im Detail als orange erscheinen, während die
+ * Total-Zeile ihn rot aggregiert — das wirkt inkonsistent).
  */
 export function aggregatAmpel (farben: Color[]): Color | null {
   if (farben.length === 0) return null
   const rot = farben.filter(f => f === 'red').length
   const orange = farben.filter(f => f === 'orange').length
-  if (rot === 1 && orange === 0) return 'orange'
+  if (farben.length > 1 && rot === 1 && orange === 0) return 'orange'
   return maxColor(farben)
 }
 
@@ -308,16 +331,15 @@ function spiderHatDatenInKammern (
   return false
 }
 
-/** Eine Hierarchie-Zeile gilt als leer, wenn nichts gefunden wurde. */
-function rowIstLeer (r: HierarchyRow, status: StatusData): boolean {
-  if (r.bestand > 0 || r.seit1d > 0 || r.seit7d > 0 || r.seit30d > 0) return false
-  // wenn ein zugehöriger Spider mal erfolgreich war: nicht leer
-  for (const sp of r.spiders) {
-    const s = status.spiders[sp]
-    const e = s && s.letzter_erfolgreicher_lauf
-    if (e && e.gesamt > 0) return false
-  }
-  return true
+/**
+ * Eine Hierarchie-Zeile gilt als leer, wenn unter ihrer Hierarchieebene weder
+ * im ES (Bestand/Neuzugänge) noch indirekt über behaltene Kinder etwas liegt.
+ * Wir prüfen NICHT mehr den globalen Bestand der zugeordneten Spider — das
+ * würde Fallback-Gerichte (z.B. <Kanton>_XX) sichtbar lassen, obwohl ihre
+ * Kammern leer sind, weil ihr Default-Spider zu einem anderen Gericht zählt.
+ */
+function rowIstLeer (r: HierarchyRow): boolean {
+  return r.bestand === 0 && r.seit1d === 0 && r.seit7d === 0 && r.seit30d === 0
 }
 
 export function buildHierarchyRows (
@@ -456,18 +478,18 @@ export function buildHierarchyRows (
   // Kammern weg sind), dann Kantone. Total bleibt immer.
   const behalten = new Set<string>()
   for (const r of rows) {
-    if (r.level === 3 && !rowIstLeer(r, status)) behalten.add(r.key)
+    if (r.level === 3 && !rowIstLeer(r)) behalten.add(r.key)
   }
   for (const r of rows) {
     if (r.level === 2) {
       const hatKind = rows.some(c => c.parent === r.key && behalten.has(c.key))
-      if (hatKind || !rowIstLeer(r, status)) behalten.add(r.key)
+      if (hatKind || !rowIstLeer(r)) behalten.add(r.key)
     }
   }
   for (const r of rows) {
     if (r.level === 1) {
       const hatKind = rows.some(c => c.parent === r.key && behalten.has(c.key))
-      if (hatKind || !rowIstLeer(r, status)) behalten.add(r.key)
+      if (hatKind || !rowIstLeer(r)) behalten.add(r.key)
     }
   }
   return rows.filter(r => r.level === 0 || behalten.has(r.key))
@@ -510,7 +532,11 @@ export function ampelGruende (s: SpiderStatus): AmpelGrund[] {
     return out
   }
   const t = tageZeit(e.zeit)
-  out.push({ achse: 'zeit', color: ampelZeit(e.zeit), wert: t === null ? null : Math.floor(t) })
+  out.push({
+    achse: 'zeit',
+    color: ampelZeit(e.zeit, s.fehlversuche_seit_letzter_erfolg || 0),
+    wert: t === null ? null : Math.floor(t)
+  })
   const max = s.vergleich_90_tage_gesamt_max
   if (max > 0) {
     const prozent = Math.round((e.gesamt / max) * 100)

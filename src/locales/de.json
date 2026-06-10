@@ -70,5 +70,6 @@
   "tip_kein_lauf": "kein erfolgreicher Lauf in den letzten 90 Tagen",
   "tip_bestand": "Bestand",
   "tip_prozent_max": "% des 90-Tage-Maximums",
-  "tip_einzelfehler": "Einzelfehler im letzten erfolgreichen Lauf"
+  "tip_einzelfehler": "Einzelfehler im letzten erfolgreichen Lauf",
+  "Statushinweis": "Der Eintrag der zusätzlichen Dokumente unter den verschiedenen Daten bedeutet nicht, dass seit dem die Dokumentzahl entsprechend gewachsen ist. Sie bedeutet nur, wie viele Dokumente seit dem neu gescraped wurden. Ursache können dafür neue Dokumente, ein komplett neuer Scraperlauf oder auch geänderte Dokumente sein."
 }

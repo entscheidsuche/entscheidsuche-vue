@@ -59,6 +59,7 @@
         </tr>
       </tbody>
     </table>
+    <p v-if="view === 'hierarchy' && !loading && !error" class="hinweis">{{ $t('Statushinweis') }}</p>
 
     <!-- Scraper-Ansicht -->
     <table v-else-if="view === 'scrapers'" class="status-table scrapers">
@@ -130,6 +131,7 @@
         </template>
       </tbody>
     </table>
+    <p v-if="view === 'scrapers' && !loading && !error" class="hinweis">{{ $t('Statushinweis') }}</p>
   </div>
 </template>
 
@@ -343,7 +345,7 @@ $color-green:  #2c6a3a;
 $color-yellow: #d4ad15;
 $color-orange: #c97816;
 $color-red:    #b00020;
-$bar-width:    4px;
+$bar-width:    8px;
 
 #status {
   text-align: left;
@@ -388,6 +390,16 @@ $bar-width:    4px;
 
   .info, .error { padding: 10px 0; }
   .error { color: #b00020; }
+
+  .hinweis {
+    margin-top: 16px;
+    padding: 10px 12px;
+    border-left: 3px solid #c9d6e0;
+    background: #f5f7fa;
+    font-size: 11px;
+    color: #555;
+    line-height: 1.45;
+  }
 }
 
 .status-table {
@@ -481,10 +493,10 @@ $bar-width:    4px;
   .lvl-2 { background: #fcfcfd; }
 
   // Hierarchie: Ampel als linker Balken am Letzter-Lauf-Feld
-  .ampel-green  td:last-child { box-shadow: inset 4px 0 0 $color-green; }
-  .ampel-yellow td:last-child { box-shadow: inset 4px 0 0 $color-yellow; }
-  .ampel-orange td:last-child { box-shadow: inset 4px 0 0 $color-orange; }
-  .ampel-red    td:last-child { box-shadow: inset 4px 0 0 $color-red; }
+  .ampel-green  td:last-child { box-shadow: inset $bar-width 0 0 $color-green; }
+  .ampel-yellow td:last-child { box-shadow: inset $bar-width 0 0 $color-yellow; }
+  .ampel-orange td:last-child { box-shadow: inset $bar-width 0 0 $color-orange; }
+  .ampel-red    td:last-child { box-shadow: inset $bar-width 0 0 $color-red; }
 }
 
 // Scraper-Ansicht: Balken durchgehend über Hauptzeile + aufgeklappte Detailzeile
