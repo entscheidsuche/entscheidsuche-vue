@@ -65,6 +65,9 @@ export interface ESCounts {
   d1: { [hierarchy: string]: number }
   d7: { [hierarchy: string]: number }
   d30: { [hierarchy: string]: number }
+  // Letzte 365 Tage; dient nur als Stagnations-Indikator
+  // (kein neues Dokument im letzten Jahr → mindestens orange).
+  d365: { [hierarchy: string]: number }
 }
 
 // =============================================================================
@@ -87,6 +90,10 @@ const ES_QUERY = {
     },
     since_30d: {
       filter: { range: { scrapedate: { gte: 'now-30d/d' } } },
+      aggs: { per_h: { terms: { field: 'hierarchy', size: 1000 } } }
+    },
+    since_365d: {
+      filter: { range: { scrapedate: { gte: 'now-365d/d' } } },
       aggs: { per_h: { terms: { field: 'hierarchy', size: 1000 } } }
     }
   }
@@ -117,7 +124,8 @@ export async function ladeAlles (): Promise<{
     total: bucketsToMap(aggs.total ? aggs.total.buckets : []),
     d1: bucketsToMap(aggs.since_1d ? aggs.since_1d.per_h.buckets : []),
     d7: bucketsToMap(aggs.since_7d ? aggs.since_7d.per_h.buckets : []),
-    d30: bucketsToMap(aggs.since_30d ? aggs.since_30d.per_h.buckets : [])
+    d30: bucketsToMap(aggs.since_30d ? aggs.since_30d.per_h.buckets : []),
+    d365: bucketsToMap(aggs.since_365d ? aggs.since_365d.per_h.buckets : [])
   }
   return {
     facetten: fResp.data,
@@ -195,6 +203,31 @@ function ampelFehler (n: number): Color {
   return 'orange' // mehr als 2 Fehler nie rot
 }
 
+/**
+ * Stagnation: ist Bestand vorhanden, aber im letzten Jahr kein einziges
+ * Dokument neu eingespielt worden, gilt die Hierarchie/der Scraper als
+ * stagnierend → mindestens orange.
+ */
+function istStagnation (bestand: number, seit365d: number): boolean {
+  return bestand > 0 && seit365d === 0
+}
+
+/**
+ * Hebt eine vorhandene Farbe bei Stagnation auf mindestens orange an
+ * (rot bleibt rot). Liefert ein {color, stagnation}-Paar für die Zeile.
+ */
+function farbeMitStagnation (
+  raw: Color | null, bestand: number, seit365d: number
+): { color: Color | null; stagnation: boolean } {
+  const stag = istStagnation(bestand, seit365d)
+  if (!stag) return { color: raw, stagnation: false }
+  if (!raw) return { color: 'orange', stagnation: true }
+  return {
+    color: ORDER[raw] > ORDER.orange ? raw : 'orange',
+    stagnation: true
+  }
+}
+
 /** Farbe eines einzelnen Spiders über die drei Achsen Zeit / Bestand / Fehler. */
 export function spiderAmpel (s: SpiderStatus): Color {
   const e = s.letzter_erfolgreicher_lauf
@@ -237,6 +270,10 @@ export interface HierarchyRow {
   seit1d: number
   seit7d: number
   seit30d: number
+  seit365d: number
+  /** Bestand > 0, aber kein einziges Dokument im letzten Jahr.
+   *  Triggert mindestens orange. */
+  stagnation: boolean
   spider: string | null // einzelner Spider (auf Kammer-Ebene)
   spiders: string[] // alle beteiligten Spider (Kanton/Gericht/Total)
   letzterLauf: string | null // Datum des jüngsten erfolgreichen Laufs
@@ -371,22 +408,30 @@ export function buildHierarchyRows (
       spiderHatDatenInKammern(sp, cSpiderToKammern[sp], status, es)
     )
     const cSpidersSortiert = sortSpiderNamen(cSpidersGefiltert)
-    rows.push({
-      key: cKey,
-      parent: '_total',
-      level: 1,
-      label: getName(c, lang),
-      bestand: es.total[cKey] || 0,
-      seit1d: es.d1[cKey] || 0,
-      seit7d: es.d7[cKey] || 0,
-      seit30d: es.d30[cKey] || 0,
-      spider: null,
-      spiders: cSpidersSortiert,
-      letzterLauf: jüngsterErfolg(cSpidersSortiert, status),
-      color: spidersAmpel(cSpidersSortiert, status),
-      searchFilter: cKey,
-      hatKinder: true
-    })
+    {
+      const bestand = es.total[cKey] || 0
+      const seit365 = es.d365[cKey] || 0
+      const raw = spidersAmpel(cSpidersSortiert, status)
+      const { color, stagnation } = farbeMitStagnation(raw, bestand, seit365)
+      rows.push({
+        key: cKey,
+        parent: '_total',
+        level: 1,
+        label: getName(c, lang),
+        bestand,
+        seit1d: es.d1[cKey] || 0,
+        seit7d: es.d7[cKey] || 0,
+        seit30d: es.d30[cKey] || 0,
+        seit365d: seit365,
+        stagnation,
+        spider: null,
+        spiders: cSpidersSortiert,
+        letzterLauf: jüngsterErfolg(cSpidersSortiert, status),
+        color,
+        searchFilter: cKey,
+        hatKinder: true
+      })
+    }
 
     for (const gKey of Object.keys(c.gerichte || {})) {
       const g = c.gerichte[gKey]
@@ -402,39 +447,53 @@ export function buildHierarchyRows (
         spiderHatDatenInKammern(sp, gSpiderToKammern[sp], status, es)
       )
       const gSpidersSortiert = sortSpiderNamen(gSpidersGefiltert)
-      rows.push({
-        key: gKey,
-        parent: cKey,
-        level: 2,
-        label: getName(g, lang),
-        bestand: es.total[gKey] || 0,
-        seit1d: es.d1[gKey] || 0,
-        seit7d: es.d7[gKey] || 0,
-        seit30d: es.d30[gKey] || 0,
-        spider: null,
-        spiders: gSpidersSortiert,
-        letzterLauf: jüngsterErfolg(gSpidersSortiert, status),
-        color: spidersAmpel(gSpidersSortiert, status),
-        searchFilter: gKey,
-        hatKinder: gKammern.length > 0
-      })
+      {
+        const bestand = es.total[gKey] || 0
+        const seit365 = es.d365[gKey] || 0
+        const raw = spidersAmpel(gSpidersSortiert, status)
+        const { color, stagnation } = farbeMitStagnation(raw, bestand, seit365)
+        rows.push({
+          key: gKey,
+          parent: cKey,
+          level: 2,
+          label: getName(g, lang),
+          bestand,
+          seit1d: es.d1[gKey] || 0,
+          seit7d: es.d7[gKey] || 0,
+          seit30d: es.d30[gKey] || 0,
+          seit365d: seit365,
+          stagnation,
+          spider: null,
+          spiders: gSpidersSortiert,
+          letzterLauf: jüngsterErfolg(gSpidersSortiert, status),
+          color,
+          searchFilter: gKey,
+          hatKinder: gKammern.length > 0
+        })
+      }
       for (const kKey of gKammern) {
         const k = g.kammern[kKey]
         const sp = k.spider
         const s = sp ? status.spiders[sp] : undefined
+        const bestand = es.total[kKey] || 0
+        const seit365 = es.d365[kKey] || 0
+        const raw = s ? spiderAmpel(s) : null
+        const { color, stagnation } = farbeMitStagnation(raw, bestand, seit365)
         rows.push({
           key: kKey,
           parent: gKey,
           level: 3,
           label: getName(k as any, lang),
-          bestand: es.total[kKey] || 0,
+          bestand,
           seit1d: es.d1[kKey] || 0,
           seit7d: es.d7[kKey] || 0,
           seit30d: es.d30[kKey] || 0,
+          seit365d: seit365,
+          stagnation,
           spider: sp,
           spiders: sp ? [sp] : [],
           letzterLauf: s && s.letzter_erfolgreicher_lauf ? s.letzter_erfolgreicher_lauf.zeit : null,
-          color: s ? spiderAmpel(s) : null,
+          color,
           searchFilter: kKey,
           hatKinder: false
         })
@@ -447,32 +506,40 @@ export function buildHierarchyRows (
   let totalD1 = 0
   let totalD7 = 0
   let totalD30 = 0
+  let totalD365 = 0
   for (const cKey of kantonKeys) {
     totalBestand += es.total[cKey] || 0
     totalD1 += es.d1[cKey] || 0
     totalD7 += es.d7[cKey] || 0
     totalD30 += es.d30[cKey] || 0
+    totalD365 += es.d365[cKey] || 0
   }
   const totalSpidersGefiltert = Object.keys(totalSpidersToKammern).filter(sp =>
     spiderHatDatenInKammern(sp, totalSpidersToKammern[sp], status, es)
   )
   const tSpiders = sortSpiderNamen(totalSpidersGefiltert)
-  rows.unshift({
-    key: '_total',
-    parent: null,
-    level: 0,
-    label: '', // wird im Template via $t('Schweiz') gesetzt
-    bestand: totalBestand,
-    seit1d: totalD1,
-    seit7d: totalD7,
-    seit30d: totalD30,
-    spider: null,
-    spiders: tSpiders,
-    letzterLauf: jüngsterErfolg(tSpiders, status),
-    color: spidersAmpel(tSpiders, status),
-    searchFilter: '',
-    hatKinder: true
-  })
+  {
+    const rawTotal = spidersAmpel(tSpiders, status)
+    const { color, stagnation } = farbeMitStagnation(rawTotal, totalBestand, totalD365)
+    rows.unshift({
+      key: '_total',
+      parent: null,
+      level: 0,
+      label: '', // wird im Template via $t('Schweiz') gesetzt
+      bestand: totalBestand,
+      seit1d: totalD1,
+      seit7d: totalD7,
+      seit30d: totalD30,
+      seit365d: totalD365,
+      stagnation,
+      spider: null,
+      spiders: tSpiders,
+      letzterLauf: jüngsterErfolg(tSpiders, status),
+      color,
+      searchFilter: '',
+      hatKinder: true
+    })
+  }
 
   // Leere Zeilen ausfiltern: erst Kammern, dann Gerichte (wenn alle ihre
   // Kammern weg sind), dann Kantone. Total bleibt immer.
@@ -509,6 +576,9 @@ export interface ScraperRow {
   seit1d: number // ES seit gestern, summiert über alle Kammern
   seit7d: number // ES seit Vorwoche, summiert über alle Kammern
   seit30d: number // ES seit Vormonat, summiert über alle Kammern
+  seit365d: number // ES seit Vorjahr, summiert über alle Kammern
+  /** Bestand > 0, aber im letzten Jahr nichts dazugekommen. */
+  stagnation: boolean
   fehlerlaeufe: number
   einzelfehler: number
   color: Color
@@ -517,18 +587,27 @@ export interface ScraperRow {
 }
 
 export interface AmpelGrund {
-  achse: 'zeit' | 'bestand' | 'fehler'
+  achse: 'zeit' | 'bestand' | 'fehler' | 'stagnation'
   color: Color
   /** {zeit_pre} <wert> {zeit_post}; bei zeit auch wert=null möglich (kein Lauf) */
   wert: number | null
 }
 
-/** Gibt eine Liste der Ampel-Gründe pro Achse zurück (auch grüne, für Tooltip). */
-export function ampelGruende (s: SpiderStatus): AmpelGrund[] {
+/**
+ * Gibt eine Liste der Ampel-Gründe pro Achse zurück (auch grüne, für Tooltip).
+ * Stagnation ist eine zeilenbezogene Eigenschaft (kein Spider-Status) und wird
+ * deshalb optional von der jeweiligen Build-Funktion mitgegeben.
+ */
+export function ampelGruende (
+  s: SpiderStatus, stagnation: boolean = false
+): AmpelGrund[] {
   const e = s.letzter_erfolgreicher_lauf
   const out: AmpelGrund[] = []
   if (!e) {
     out.push({ achse: 'zeit', color: 'red', wert: null })
+    if (stagnation) {
+      out.push({ achse: 'stagnation', color: 'orange', wert: null })
+    }
     return out
   }
   const t = tageZeit(e.zeit)
@@ -544,6 +623,9 @@ export function ampelGruende (s: SpiderStatus): AmpelGrund[] {
     if (c) out.push({ achse: 'bestand', color: c, wert: prozent })
   }
   out.push({ achse: 'fehler', color: ampelFehler(e.anzahl_fehler), wert: e.anzahl_fehler })
+  if (stagnation) {
+    out.push({ achse: 'stagnation', color: 'orange', wert: null })
+  }
   return out
 }
 
@@ -568,15 +650,19 @@ export function buildScraperRows (
         if (!sp) continue
         if (!kammerHatDaten(kKey, sp, status, es)) continue
         const label = `${getName(c, lang)} · ${getName(g, lang)} · ${getName(k as any, lang) || kKey}`
+        const bestand = es.total[kKey] || 0
+        const seit365 = es.d365[kKey] || 0
         const row: HierarchyRow = {
           key: kKey,
           parent: sp,
           level: 3,
           label,
-          bestand: es.total[kKey] || 0,
+          bestand,
           seit1d: es.d1[kKey] || 0,
           seit7d: es.d7[kKey] || 0,
           seit30d: es.d30[kKey] || 0,
+          seit365d: seit365,
+          stagnation: istStagnation(bestand, seit365),
           spider: sp,
           spiders: [sp],
           letzterLauf: null,
@@ -600,17 +686,24 @@ export function buildScraperRows (
     let seit1dES = 0
     let seit7dES = 0
     let seit30dES = 0
+    let seit365dES = 0
     for (const k of kammern) {
       bestandES += k.bestand
       seit1dES += k.seit1d
       seit7dES += k.seit7d
       seit30dES += k.seit30d
+      seit365dES += k.seit365d
     }
     const bestandLog = er ? er.gesamt : 0
     // leere Spider: nichts im ES, kein erfolgreicher Lauf-Bestand
     if (bestandES === 0 && bestandLog === 0 && seit1dES === 0 && seit7dES === 0 && seit30dES === 0) {
       continue
     }
+    const { color: rowColor, stagnation } =
+      farbeMitStagnation(spiderAmpel(s), bestandES, seit365dES)
+    // rowColor kann hier nur dann null sein, wenn spiderAmpel null liefert
+    // (passiert nicht). Defensiv casten.
+    const finalColor: Color = (rowColor || 'red') as Color
     rows.push({
       spider: sp,
       letzterLauf: er ? er.zeit : null,
@@ -621,10 +714,12 @@ export function buildScraperRows (
       seit1d: seit1dES,
       seit7d: seit7dES,
       seit30d: seit30dES,
+      seit365d: seit365dES,
+      stagnation,
       fehlerlaeufe: s.fehlversuche_seit_letzter_erfolg,
       einzelfehler: er ? er.anzahl_fehler : 0,
-      color: spiderAmpel(s),
-      ampelGruende: ampelGruende(s),
+      color: finalColor,
+      ampelGruende: ampelGruende(s, stagnation),
       kammern
     })
   }

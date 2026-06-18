@@ -23,6 +23,7 @@
           <th class="col-num">{{ $t('Seit') }} {{ datumGestern }}</th>
           <th class="col-num">{{ $t('Seit') }} {{ datumVorwoche }}</th>
           <th class="col-num">{{ $t('Seit') }} {{ datumVormonat }}</th>
+          <th class="col-num">{{ $t('Seit') }} {{ datumVorjahr }}</th>
           <th class="col-scraper">{{ $t('Scraper') }}</th>
           <th class="col-lauf">{{ $t('Letzter Lauf') }}</th>
         </tr>
@@ -43,6 +44,7 @@
           <td class="col-num"><span :class="signClass(row.seit1d)">{{ formatPlus(row.seit1d) }}</span></td>
           <td class="col-num"><span :class="signClass(row.seit7d)">{{ formatPlus(row.seit7d) }}</span></td>
           <td class="col-num"><span :class="signClass(row.seit30d)">{{ formatPlus(row.seit30d) }}</span></td>
+          <td class="col-num"><span :class="signClass(row.seit365d)">{{ formatPlus(row.seit365d) }}</span></td>
           <td class="col-scraper">
             <template v-if="row.level !== 0">
               <a v-if="row.spider" href="#" @click.prevent="zumScraper(row.spider)">{{ row.spider }}</a>
@@ -72,6 +74,7 @@
           <th class="col-num">{{ $t('Seit') }} {{ datumGestern }}</th>
           <th class="col-num">{{ $t('Seit') }} {{ datumVorwoche }}</th>
           <th class="col-num">{{ $t('Seit') }} {{ datumVormonat }}</th>
+          <th class="col-num">{{ $t('Seit') }} {{ datumVorjahr }}</th>
           <th class="col-num">{{ $t('Fehlversuche') }}</th>
           <th class="col-num">{{ $t('Fehler') }}</th>
         </tr>
@@ -97,12 +100,13 @@
             <td class="col-num"><span :class="signClass(row.seit1d)">{{ formatPlus(row.seit1d) }}</span></td>
             <td class="col-num"><span :class="signClass(row.seit7d)">{{ formatPlus(row.seit7d) }}</span></td>
             <td class="col-num"><span :class="signClass(row.seit30d)">{{ formatPlus(row.seit30d) }}</span></td>
+            <td class="col-num"><span :class="signClass(row.seit365d)">{{ formatPlus(row.seit365d) }}</span></td>
             <td class="col-num">{{ row.fehlerlaeufe > 0 ? row.fehlerlaeufe : '–' }}</td>
             <td class="col-num">{{ row.einzelfehler > 0 ? row.einzelfehler : '–' }}</td>
           </tr>
           <tr v-if="expandedScraper === row.spider" :key="row.spider + '-detail'"
               :class="['scraper-detail', 'ampel-' + row.color]">
-            <td colspan="9">
+            <td colspan="10">
               <table class="status-table inner">
                 <thead>
                   <tr>
@@ -111,6 +115,7 @@
                     <th class="col-num">{{ $t('Seit') }} {{ datumGestern }}</th>
                     <th class="col-num">{{ $t('Seit') }} {{ datumVorwoche }}</th>
                     <th class="col-num">{{ $t('Seit') }} {{ datumVormonat }}</th>
+                    <th class="col-num">{{ $t('Seit') }} {{ datumVorjahr }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -123,6 +128,7 @@
                     <td class="col-num"><span :class="signClass(kammer.seit1d)">{{ formatPlus(kammer.seit1d) }}</span></td>
                     <td class="col-num"><span :class="signClass(kammer.seit7d)">{{ formatPlus(kammer.seit7d) }}</span></td>
                     <td class="col-num"><span :class="signClass(kammer.seit30d)">{{ formatPlus(kammer.seit30d) }}</span></td>
+                    <td class="col-num"><span :class="signClass(kammer.seit365d)">{{ formatPlus(kammer.seit365d) }}</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -266,6 +272,10 @@ export default class Status extends Vue {
     return formatDatumDDMMYYYY(tageVorher(30))
   }
 
+  get datumVorjahr (): string {
+    return formatDatumDDMMYYYY(tageVorher(365))
+  }
+
   formatNumber (n: number): string {
     return new Intl.NumberFormat('de-CH').format(n)
   }
@@ -304,7 +314,8 @@ export default class Status extends Vue {
     return parts.filter(s => !!s).join('\n')
   }
 
-  /** Tooltip-Text einer Hierarchie-Zeile: pro beteiligtem Spider eine Zeile. */
+  /** Tooltip-Text einer Hierarchie-Zeile: pro beteiligtem Spider eine Zeile,
+   *  plus Stagnations-Hinweis auf Zeilenebene falls zutreffend. */
   hierarchyTooltip (row: HierarchyRow): string {
     const lines: string[] = []
     for (const sp of row.spiders) {
@@ -316,7 +327,12 @@ export default class Status extends Vue {
         .join(' · ')
       if (teil) lines.push(sp + ': ' + teil)
     }
-    return lines.join('\n')
+    if (row.stagnation) {
+      lines.push(this.beschreibeGrund({
+        achse: 'stagnation', color: 'orange', wert: null
+      }))
+    }
+    return lines.filter(s => !!s).join('\n')
   }
 
   beschreibeGrund (g: AmpelGrund): string {
@@ -334,6 +350,9 @@ export default class Status extends Vue {
       const n = g.wert || 0
       if (n === 0) return ''
       return n + ' ' + this.$t('tip_einzelfehler')
+    }
+    if (g.achse === 'stagnation') {
+      return String(this.$t('tip_stagnation'))
     }
     return ''
   }

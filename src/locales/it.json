@@ -70,5 +70,6 @@
   "tip_bestand": "Stock",
   "tip_prozent_max": "% del massimo su 90 giorni",
   "tip_einzelfehler": "errori nell'ultima esecuzione riuscita",
+  "tip_stagnation": "Stock invariato da oltre un anno",
   "Statushinweis": "Il numero di documenti aggiuntivi alle varie date non significa che il numero totale di documenti sia aumentato di altrettanto da allora. Indica solo quanti documenti sono stati nuovamente raccolti da quella data. Le cause possono essere nuovi documenti, un'esecuzione completa di uno scraper o documenti modificati."
 }
