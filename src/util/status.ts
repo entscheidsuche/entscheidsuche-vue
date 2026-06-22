@@ -10,6 +10,7 @@ const FACETTEN_URL = 'https://entscheidsuche.ch/docs/Facetten_alle.json'
 // als Antwort zurück.
 const STATUS_URL = 'https://entscheidsuche.ch/generate_status.php'
 const SEARCH_URL = 'https://entscheidsuche.ch/_searchV2.php'
+const SNAPSHOT_DIR_URL = 'https://entscheidsuche.ch/docs/Snapshots'
 
 // =============================================================================
 // Typen
@@ -60,15 +61,42 @@ export interface StatusData {
   spiders: { [spider: string]: SpiderStatus }
 }
 
+/**
+ * Snapshot-Map (Bestand pro hierarchy zu einem Zeitpunkt). null als ganzes,
+ * wenn für einen Stichtag kein Snapshot existiert.
+ */
+export type SnapshotMap = { [hierarchy: string]: number } | null
+
+/**
+ * Ein tatsächlich geladener Snapshot, ausgewählt durch die Slot-Logik.
+ * tageZurueck ≠ Slot-Ziel: der nächstkleinere verfügbare Wert.
+ */
+export interface SnapshotInfo {
+  /** 1–365 oder der Fallback-Wert. */
+  tageZurueck: number
+  /** 'YYYY-MM-DD' */
+  datum: string
+  total: { [hierarchy: string]: number }
+}
+
 export interface ESCounts {
   total: { [hierarchy: string]: number }
+  // 'neu gescraped seit'-Zähler (scrapedate-basiert, ES-Aggregation)
   d1: { [hierarchy: string]: number }
   d7: { [hierarchy: string]: number }
   d30: { [hierarchy: string]: number }
-  // Letzte 365 Tage; dient nur als Stagnations-Indikator
-  // (kein neues Dokument im letzten Jahr → mindestens orange).
   d365: { [hierarchy: string]: number }
+  /** 0–4 tatsächlich geladene Snapshots, aufsteigend nach tageZurueck.
+   *  Bestimmt die dynamischen 'Seit …'-Spalten in der Hierarchie-Tabelle
+   *  und in der 'Bestand-Differenz'-Gruppe der Scraper-Tabelle. */
+  snaps: SnapshotInfo[]
+  /** Snapshot mit tageZurueck ≥ 360 (ca. 1 Jahr), wenn vorhanden; sonst null.
+   *  Wird ausschliesslich von der Stagnations-Logik verwendet. */
+  snap365echt: SnapshotMap
 }
+
+const SLOT_ZIELE = [1, 7, 30, 365]
+const STAGNATION_MIN_TAGE = 360
 
 // =============================================================================
 // Loader (3 Calls parallel)
@@ -107,25 +135,139 @@ function bucketsToMap (buckets: any[]): { [k: string]: number } {
   return m
 }
 
+/** Heute als UTC-00:00-Date. */
+function heuteUTC (): Date {
+  const n = new Date()
+  return new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()))
+}
+
+/** Tage zwischen einem 'YYYY-MM-DD'-Datum und heute (UTC). */
+function tageZwischen (datum: string): number | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(datum)
+  if (!m) return null
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]))
+  return Math.round((heuteUTC().getTime() - d.getTime()) / 86400000)
+}
+
+/** 'YYYY-MM-DD' → 'DD.MM.YYYY' (für Spaltenüberschriften). */
+export function formatIsoDatum (datum: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(datum)
+  return m ? `${m[3]}.${m[2]}.${m[1]}` : datum
+}
+
+/**
+ * Wählt für die Slot-Ziele [1, 7, 30, 365] jeweils das grösste
+ * verfügbare Tage-zurück, das ≤ Slot ist. Duplikate werden zusammengeführt
+ * (kleinere Slots, die kein eigenes Datum mehr finden, fallen weg).
+ *
+ *  3 Tage Historie: [1, 3]            (d3 vertritt d7/d30/d365)
+ * 10 Tage Historie: [1, 7, 10]        (d10 vertritt d30/d365)
+ * 60 Tage Historie: [1, 7, 30, 60]    (d60 vertritt d365)
+ * ≥365 Tage:        [1, 7, 30, 365]
+ */
+export function waehleSlots (verfuegbareTage: number[]): number[] {
+  const ausgewaehlt: number[] = []
+  for (const slot of SLOT_ZIELE) {
+    let best: number | null = null
+    for (const x of verfuegbareTage) {
+      if (x <= slot && (best === null || x > best)) best = x
+    }
+    if (best !== null && !ausgewaehlt.includes(best)) ausgewaehlt.push(best)
+  }
+  return ausgewaehlt.sort((a, b) => a - b)
+}
+
+/** Lädt eine Snapshot-Datei; liefert null, wenn sie nicht (mehr) existiert. */
+async function ladeSnapshot (datum: string): Promise<{ [k: string]: number } | null> {
+  try {
+    const r = await axios.get(SNAPSHOT_DIR_URL + '/' + datum + '.json', {
+      validateStatus: s => s === 200
+    })
+    if (r.data && typeof r.data === 'object' && r.data.total &&
+        typeof r.data.total === 'object') {
+      return r.data.total as { [k: string]: number }
+    }
+    return null
+  } catch (_e) {
+    return null
+  }
+}
+
+/** Lädt index.json; liefert ein leeres Array, wenn nicht vorhanden. */
+async function ladeSnapshotIndex (): Promise<string[]> {
+  try {
+    const r = await axios.get(SNAPSHOT_DIR_URL + '/index.json', {
+      validateStatus: s => s === 200
+    })
+    if (r.data && Array.isArray(r.data.dates)) {
+      return r.data.dates.filter((d: any) => typeof d === 'string')
+    }
+    return []
+  } catch (_e) {
+    return []
+  }
+}
+
 export async function ladeAlles (): Promise<{
   facetten: Facetten
   status: StatusData
   es: ESCounts
 }> {
-  const [fResp, sResp, esResp] = await Promise.all([
+  // Reihenfolge:
+  //  1. Facetten, Status, ES und Snapshot-Index parallel laden.
+  //  2. Anhand der vorhandenen Snapshot-Daten die Slots berechnen.
+  //  3. Nur die gewählten Snapshots laden.
+  const [fResp, sResp, esResp, indexDaten] = await Promise.all([
     axios.get(FACETTEN_URL),
     axios.get(STATUS_URL),
     axios.post(SEARCH_URL, ES_QUERY, {
       headers: { 'Content-Type': 'application/json' }
-    })
+    }),
+    ladeSnapshotIndex()
   ])
+
+  // Datums in 'Tage-zurück' umrechnen (heutiger und zukünftige Werte ignorieren).
+  const tagToDatum = new Map<number, string>()
+  for (const d of indexDaten) {
+    const t = tageZwischen(d)
+    if (t === null || t < 1) continue
+    // bei mehreren Files am gleichen Tage-Versatz die jüngere Aufnahme behalten
+    if (!tagToDatum.has(t) || tagToDatum.get(t)! < d) tagToDatum.set(t, d)
+  }
+  const verfuegbareTage = Array.from(tagToDatum.keys())
+  const ausgewaehlt = waehleSlots(verfuegbareTage)
+
+  // Snapshots parallel laden
+  const snapsRoh = await Promise.all(
+    ausgewaehlt.map(async (t): Promise<SnapshotInfo | null> => {
+      const datum = tagToDatum.get(t)!
+      const total = await ladeSnapshot(datum)
+      return total === null ? null : { tageZurueck: t, datum, total }
+    })
+  )
+  const snaps: SnapshotInfo[] = snapsRoh
+    .filter((s): s is SnapshotInfo => s !== null)
+    .sort((a, b) => a.tageZurueck - b.tageZurueck)
+
+  // Stagnations-Quelle: ältester verfügbarer Snapshot mit tageZurueck ≥ ~ 1 Jahr.
+  let stagSnap: SnapshotInfo | null = null
+  for (const s of snaps) {
+    if (s.tageZurueck >= STAGNATION_MIN_TAGE &&
+        (stagSnap === null || s.tageZurueck > stagSnap.tageZurueck)) {
+      stagSnap = s
+    }
+  }
+  const snap365echt: SnapshotMap = stagSnap ? stagSnap.total : null
+
   const aggs = esResp.data.aggregations || {}
   const es: ESCounts = {
     total: bucketsToMap(aggs.total ? aggs.total.buckets : []),
     d1: bucketsToMap(aggs.since_1d ? aggs.since_1d.per_h.buckets : []),
     d7: bucketsToMap(aggs.since_7d ? aggs.since_7d.per_h.buckets : []),
     d30: bucketsToMap(aggs.since_30d ? aggs.since_30d.per_h.buckets : []),
-    d365: bucketsToMap(aggs.since_365d ? aggs.since_365d.per_h.buckets : [])
+    d365: bucketsToMap(aggs.since_365d ? aggs.since_365d.per_h.buckets : []),
+    snaps,
+    snap365echt
   }
   return {
     facetten: fResp.data,
@@ -204,12 +346,20 @@ function ampelFehler (n: number): Color {
 }
 
 /**
- * Stagnation: ist Bestand vorhanden, aber im letzten Jahr kein einziges
- * Dokument neu eingespielt worden, gilt die Hierarchie/der Scraper als
- * stagnierend → mindestens orange.
+ * Stagnation: hat sich der Bestand seit einem Jahr nicht vergrössert?
+ *
+ * Bevorzugt der exakte Snapshot-Vergleich: liegt ein Snapshot von vor 365
+ * Tagen vor (snap365 ≠ null), gilt Stagnation, sobald `bestand ≤ snap365`.
+ *
+ * Falls noch kein Snapshot existiert (Anlauf-Phase nach Deploy),
+ * Fallback auf die scrapedate-basierte Heuristik: `neu365 === 0`.
  */
-function istStagnation (bestand: number, seit365d: number): boolean {
-  return bestand > 0 && seit365d === 0
+function istStagnation (
+  bestand: number, snap365: number | null, neu365: number
+): boolean {
+  if (bestand <= 0) return false
+  if (snap365 !== null) return bestand <= snap365
+  return neu365 === 0
 }
 
 /**
@@ -217,15 +367,55 @@ function istStagnation (bestand: number, seit365d: number): boolean {
  * (rot bleibt rot). Liefert ein {color, stagnation}-Paar für die Zeile.
  */
 function farbeMitStagnation (
-  raw: Color | null, bestand: number, seit365d: number
+  raw: Color | null,
+  bestand: number,
+  snap365: number | null,
+  neu365: number
 ): { color: Color | null; stagnation: boolean } {
-  const stag = istStagnation(bestand, seit365d)
+  const stag = istStagnation(bestand, snap365, neu365)
   if (!stag) return { color: raw, stagnation: false }
   if (!raw) return { color: 'orange', stagnation: true }
   return {
     color: ORDER[raw] > ORDER.orange ? raw : 'orange',
     stagnation: true
   }
+}
+
+/**
+ * Bestand-Differenzen heute − Snapshot pro Schlüssel.
+ * Liefert ein Array gleicher Länge wie `snaps` mit den Differenzen für `key`.
+ * Fehlende Snapshot-Einträge zählen als 0 (Kammer existierte vor X Tagen noch
+ * nicht). Heutiger Wert == 0 (Kammer heute weg) liefert negative Differenz.
+ */
+function diffsProSchluessel (
+  snaps: SnapshotInfo[], heute: number, key: string
+): number[] {
+  return snaps.map(s => heute - (s.total[key] || 0))
+}
+
+/** Aggregierte Bestand-Differenzen über mehrere Schlüssel. */
+function diffsAggregat (
+  snaps: SnapshotInfo[], heuteWerte: { [k: string]: number }, keys: string[]
+): number[] {
+  return snaps.map(s => {
+    let sum = 0
+    for (const k of keys) sum += (heuteWerte[k] || 0) - (s.total[k] || 0)
+    return sum
+  })
+}
+
+/** Snap-Wert eines einzelnen Keys (oder null, wenn snap selbst null ist). */
+function snap365Wert (snap: SnapshotMap, key: string): number | null {
+  if (snap === null) return null
+  return snap[key] || 0
+}
+
+/** Summe eines Snapshot-Maps über mehrere Keys (null wenn Snapshot null). */
+function snap365Summe (snap: SnapshotMap, keys: string[]): number | null {
+  if (snap === null) return null
+  let s = 0
+  for (const k of keys) s += snap[k] || 0
+  return s
 }
 
 /** Farbe eines einzelnen Spiders über die drei Achsen Zeit / Bestand / Fehler. */
@@ -267,12 +457,11 @@ export interface HierarchyRow {
   level: 0 | 1 | 2 | 3 // Total / Kanton / Gericht / Kammer
   label: string
   bestand: number
-  seit1d: number
-  seit7d: number
-  seit30d: number
-  seit365d: number
-  /** Bestand > 0, aber kein einziges Dokument im letzten Jahr.
-   *  Triggert mindestens orange. */
+  /** Bestand-Differenzen heute − Snapshot pro Eintrag in es.snaps.
+   *  Gleiche Länge und gleicher Index wie es.snaps. Leeres Array, solange
+   *  noch keine Snapshots existieren. */
+  diffs: number[]
+  /** Bestand > 0, aber im letzten Jahr nicht gewachsen → mindestens orange. */
   stagnation: boolean
   spider: string | null // einzelner Spider (auf Kammer-Ebene)
   spiders: string[] // alle beteiligten Spider (Kanton/Gericht/Total)
@@ -369,14 +558,14 @@ function spiderHatDatenInKammern (
 }
 
 /**
- * Eine Hierarchie-Zeile gilt als leer, wenn unter ihrer Hierarchieebene weder
- * im ES (Bestand/Neuzugänge) noch indirekt über behaltene Kinder etwas liegt.
- * Wir prüfen NICHT mehr den globalen Bestand der zugeordneten Spider — das
- * würde Fallback-Gerichte (z.B. <Kanton>_XX) sichtbar lassen, obwohl ihre
- * Kammern leer sind, weil ihr Default-Spider zu einem anderen Gericht zählt.
+ * Eine Hierarchie-Zeile gilt als leer, wenn weder heute Bestand vorliegt noch
+ * in einem der Bestand-Vergleiche eine von 0 verschiedene Differenz steht.
+ * (Negative Differenzen — Kammer ist heute weg, war aber damals vorhanden —
+ * halten die Zeile sichtbar.)
  */
 function rowIstLeer (r: HierarchyRow): boolean {
-  return r.bestand === 0 && r.seit1d === 0 && r.seit7d === 0 && r.seit30d === 0
+  if (r.bestand !== 0) return false
+  return r.diffs.every(d => d === 0)
 }
 
 export function buildHierarchyRows (
@@ -410,19 +599,17 @@ export function buildHierarchyRows (
     const cSpidersSortiert = sortSpiderNamen(cSpidersGefiltert)
     {
       const bestand = es.total[cKey] || 0
-      const seit365 = es.d365[cKey] || 0
+      const sv365 = snap365Wert(es.snap365echt, cKey)
+      const neu365 = es.d365[cKey] || 0
       const raw = spidersAmpel(cSpidersSortiert, status)
-      const { color, stagnation } = farbeMitStagnation(raw, bestand, seit365)
+      const { color, stagnation } = farbeMitStagnation(raw, bestand, sv365, neu365)
       rows.push({
         key: cKey,
         parent: '_total',
         level: 1,
         label: getName(c, lang),
         bestand,
-        seit1d: es.d1[cKey] || 0,
-        seit7d: es.d7[cKey] || 0,
-        seit30d: es.d30[cKey] || 0,
-        seit365d: seit365,
+        diffs: diffsProSchluessel(es.snaps, bestand, cKey),
         stagnation,
         spider: null,
         spiders: cSpidersSortiert,
@@ -449,19 +636,17 @@ export function buildHierarchyRows (
       const gSpidersSortiert = sortSpiderNamen(gSpidersGefiltert)
       {
         const bestand = es.total[gKey] || 0
-        const seit365 = es.d365[gKey] || 0
+        const sv365 = snap365Wert(es.snap365echt, gKey)
+        const neu365 = es.d365[gKey] || 0
         const raw = spidersAmpel(gSpidersSortiert, status)
-        const { color, stagnation } = farbeMitStagnation(raw, bestand, seit365)
+        const { color, stagnation } = farbeMitStagnation(raw, bestand, sv365, neu365)
         rows.push({
           key: gKey,
           parent: cKey,
           level: 2,
           label: getName(g, lang),
           bestand,
-          seit1d: es.d1[gKey] || 0,
-          seit7d: es.d7[gKey] || 0,
-          seit30d: es.d30[gKey] || 0,
-          seit365d: seit365,
+          diffs: diffsProSchluessel(es.snaps, bestand, gKey),
           stagnation,
           spider: null,
           spiders: gSpidersSortiert,
@@ -476,19 +661,17 @@ export function buildHierarchyRows (
         const sp = k.spider
         const s = sp ? status.spiders[sp] : undefined
         const bestand = es.total[kKey] || 0
-        const seit365 = es.d365[kKey] || 0
+        const sv365 = snap365Wert(es.snap365echt, kKey)
+        const neu365 = es.d365[kKey] || 0
         const raw = s ? spiderAmpel(s) : null
-        const { color, stagnation } = farbeMitStagnation(raw, bestand, seit365)
+        const { color, stagnation } = farbeMitStagnation(raw, bestand, sv365, neu365)
         rows.push({
           key: kKey,
           parent: gKey,
           level: 3,
           label: getName(k as any, lang),
           bestand,
-          seit1d: es.d1[kKey] || 0,
-          seit7d: es.d7[kKey] || 0,
-          seit30d: es.d30[kKey] || 0,
-          seit365d: seit365,
+          diffs: diffsProSchluessel(es.snaps, bestand, kKey),
           stagnation,
           spider: sp,
           spiders: sp ? [sp] : [],
@@ -503,34 +686,27 @@ export function buildHierarchyRows (
 
   // 2) Total-Zeile als oberster Eintrag (über alle Kantone)
   let totalBestand = 0
-  let totalD1 = 0
-  let totalD7 = 0
-  let totalD30 = 0
-  let totalD365 = 0
+  let totalNeu365 = 0
   for (const cKey of kantonKeys) {
     totalBestand += es.total[cKey] || 0
-    totalD1 += es.d1[cKey] || 0
-    totalD7 += es.d7[cKey] || 0
-    totalD30 += es.d30[cKey] || 0
-    totalD365 += es.d365[cKey] || 0
+    totalNeu365 += es.d365[cKey] || 0
   }
+  const totalSnap365 = snap365Summe(es.snap365echt, kantonKeys)
   const totalSpidersGefiltert = Object.keys(totalSpidersToKammern).filter(sp =>
     spiderHatDatenInKammern(sp, totalSpidersToKammern[sp], status, es)
   )
   const tSpiders = sortSpiderNamen(totalSpidersGefiltert)
   {
     const rawTotal = spidersAmpel(tSpiders, status)
-    const { color, stagnation } = farbeMitStagnation(rawTotal, totalBestand, totalD365)
+    const { color, stagnation } =
+      farbeMitStagnation(rawTotal, totalBestand, totalSnap365, totalNeu365)
     rows.unshift({
       key: '_total',
       parent: null,
       level: 0,
       label: '', // wird im Template via $t('Schweiz') gesetzt
       bestand: totalBestand,
-      seit1d: totalD1,
-      seit7d: totalD7,
-      seit30d: totalD30,
-      seit365d: totalD365,
+      diffs: diffsAggregat(es.snaps, es.total, kantonKeys),
       stagnation,
       spider: null,
       spiders: tSpiders,
@@ -539,6 +715,76 @@ export function buildHierarchyRows (
       searchFilter: '',
       hatKinder: true
     })
+  }
+
+  // 3) Weggefallene Hierarchien — Schlüssel, die in einem Snapshot vorkamen,
+  //    in der heutigen Facetten-Struktur aber nicht mehr existieren und auch
+  //    heute kein ES-Bestand mehr haben. Erscheinen als eigener Sammelblock
+  //    '(weggefallen)' am Ende der Hierarchie-Tabelle, damit der Verlust nicht
+  //    stillschweigend untergeht.
+  const facettenKeys = new Set<string>()
+  for (const cKey of kantonKeys) {
+    facettenKeys.add(cKey)
+    const c = facetten[cKey]
+    for (const gKey of Object.keys(c.gerichte || {})) {
+      facettenKeys.add(gKey)
+      const g = c.gerichte[gKey]
+      for (const kKey of Object.keys(g.kammern || {})) {
+        facettenKeys.add(kKey)
+      }
+    }
+  }
+  const verschwundeneKeys: string[] = []
+  const gesehen = new Set<string>()
+  for (const snap of es.snaps) {
+    for (const k of Object.keys(snap.total)) {
+      if (facettenKeys.has(k)) continue
+      if (gesehen.has(k)) continue
+      // heute noch da → nicht wirklich weg
+      if ((es.total[k] || 0) > 0) continue
+      // war auch damals leer → uninteressant
+      if ((snap.total[k] || 0) <= 0) continue
+      gesehen.add(k)
+      verschwundeneKeys.push(k)
+    }
+  }
+  verschwundeneKeys.sort()
+
+  if (verschwundeneKeys.length > 0) {
+    // Sammelzeile: Diffs sind Σ über alle weggefallenen Keys.
+    // Label kommt im Template via $t('Weggefallen').
+    rows.push({
+      key: '_weggefallen',
+      parent: '_total',
+      level: 1,
+      label: '',
+      bestand: 0,
+      diffs: diffsAggregat(es.snaps, es.total, verschwundeneKeys),
+      stagnation: false,
+      spider: null,
+      spiders: [],
+      letzterLauf: null,
+      color: null,
+      searchFilter: '',
+      hatKinder: true
+    })
+    for (const k of verschwundeneKeys) {
+      rows.push({
+        key: k,
+        parent: '_weggefallen',
+        level: 2,
+        label: k,
+        bestand: 0,
+        diffs: diffsProSchluessel(es.snaps, 0, k),
+        stagnation: false,
+        spider: null,
+        spiders: [],
+        letzterLauf: null,
+        color: null,
+        searchFilter: k,
+        hatKinder: false
+      })
+    }
   }
 
   // Leere Zeilen ausfiltern: erst Kammern, dann Gerichte (wenn alle ihre
@@ -573,11 +819,16 @@ export interface ScraperRow {
   bestandES: number // ES-Bestand summiert über alle Kammern
   bestandLog: number // Bestand laut letztem erfolgreichen Lauf
   last: number // aktuell_neu im letzten erfolgreichen Lauf
-  seit1d: number // ES seit gestern, summiert über alle Kammern
-  seit7d: number // ES seit Vorwoche, summiert über alle Kammern
-  seit30d: number // ES seit Vormonat, summiert über alle Kammern
-  seit365d: number // ES seit Vorjahr, summiert über alle Kammern
-  /** Bestand > 0, aber im letzten Jahr nichts dazugekommen. */
+  // 'Neu gescraped seit ...': scrapedate-basierte ES-Aggregation,
+  // summiert über alle Kammern.
+  neu1d: number
+  neu7d: number
+  neu30d: number
+  neu365d: number
+  /** Bestand-Differenzen heute − Snapshot pro Eintrag in es.snaps,
+   *  summiert über alle Kammern. */
+  diffs: number[]
+  /** Bestand > 0, aber im letzten Jahr nicht gewachsen. */
   stagnation: boolean
   fehlerlaeufe: number
   einzelfehler: number
@@ -651,18 +902,16 @@ export function buildScraperRows (
         if (!kammerHatDaten(kKey, sp, status, es)) continue
         const label = `${getName(c, lang)} · ${getName(g, lang)} · ${getName(k as any, lang) || kKey}`
         const bestand = es.total[kKey] || 0
-        const seit365 = es.d365[kKey] || 0
+        const sv365 = snap365Wert(es.snap365echt, kKey)
+        const neu365 = es.d365[kKey] || 0
         const row: HierarchyRow = {
           key: kKey,
           parent: sp,
           level: 3,
           label,
           bestand,
-          seit1d: es.d1[kKey] || 0,
-          seit7d: es.d7[kKey] || 0,
-          seit30d: es.d30[kKey] || 0,
-          seit365d: seit365,
-          stagnation: istStagnation(bestand, seit365),
+          diffs: diffsProSchluessel(es.snaps, bestand, kKey),
+          stagnation: istStagnation(bestand, sv365, neu365),
           spider: sp,
           spiders: [sp],
           letzterLauf: null,
@@ -683,24 +932,28 @@ export function buildScraperRows (
     const ll = s.letzter_lauf
     const kammern = (sp2hier[sp] || []).sort((a, b) => a.key.localeCompare(b.key))
     let bestandES = 0
-    let seit1dES = 0
-    let seit7dES = 0
-    let seit30dES = 0
-    let seit365dES = 0
+    let neu1dES = 0
+    let neu7dES = 0
+    let neu30dES = 0
+    let neu365dES = 0
     for (const k of kammern) {
       bestandES += k.bestand
-      seit1dES += k.seit1d
-      seit7dES += k.seit7d
-      seit30dES += k.seit30d
-      seit365dES += k.seit365d
+      neu1dES += es.d1[k.key] || 0
+      neu7dES += es.d7[k.key] || 0
+      neu30dES += es.d30[k.key] || 0
+      neu365dES += es.d365[k.key] || 0
     }
     const bestandLog = er ? er.gesamt : 0
-    // leere Spider: nichts im ES, kein erfolgreicher Lauf-Bestand
-    if (bestandES === 0 && bestandLog === 0 && seit1dES === 0 && seit7dES === 0 && seit30dES === 0) {
+    // leere Spider: nichts im ES, kein erfolgreicher Lauf-Bestand,
+    // keine Aktivität in den scrapedate-Aggregaten
+    if (bestandES === 0 && bestandLog === 0 &&
+        neu1dES === 0 && neu7dES === 0 && neu30dES === 0) {
       continue
     }
+    const kammerKeys = kammern.map(k => k.key)
+    const snap365Spider = snap365Summe(es.snap365echt, kammerKeys)
     const { color: rowColor, stagnation } =
-      farbeMitStagnation(spiderAmpel(s), bestandES, seit365dES)
+      farbeMitStagnation(spiderAmpel(s), bestandES, snap365Spider, neu365dES)
     // rowColor kann hier nur dann null sein, wenn spiderAmpel null liefert
     // (passiert nicht). Defensiv casten.
     const finalColor: Color = (rowColor || 'red') as Color
@@ -711,10 +964,11 @@ export function buildScraperRows (
       bestandES,
       bestandLog,
       last: er ? er.aktuell_neu : 0,
-      seit1d: seit1dES,
-      seit7d: seit7dES,
-      seit30d: seit30dES,
-      seit365d: seit365dES,
+      neu1d: neu1dES,
+      neu7d: neu7dES,
+      neu30d: neu30dES,
+      neu365d: neu365dES,
+      diffs: diffsAggregat(es.snaps, es.total, kammerKeys),
       stagnation,
       fehlerlaeufe: s.fehlversuche_seit_letzter_erfolg,
       einzelfehler: er ? er.anzahl_fehler : 0,

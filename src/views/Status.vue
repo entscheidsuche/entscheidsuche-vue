@@ -20,31 +20,30 @@
         <tr>
           <th class="col-name">{{ $t('Hierarchie') }}</th>
           <th class="col-num">{{ $t('Bestand') }}</th>
-          <th class="col-num">{{ $t('Seit') }} {{ datumGestern }}</th>
-          <th class="col-num">{{ $t('Seit') }} {{ datumVorwoche }}</th>
-          <th class="col-num">{{ $t('Seit') }} {{ datumVormonat }}</th>
-          <th class="col-num">{{ $t('Seit') }} {{ datumVorjahr }}</th>
+          <th v-for="snap in snaps" :key="snap.datum" class="col-num">
+            {{ $t('Seit') }} {{ fmtSnapDatum(snap.datum) }}
+          </th>
           <th class="col-scraper">{{ $t('Scraper') }}</th>
           <th class="col-lauf">{{ $t('Letzter Lauf') }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="row in sichtbareHierarchyRows" :key="row.key"
-            :class="['lvl-' + row.level, row.color ? 'ampel-' + row.color : '']"
+            :class="['lvl-' + row.level, row.color ? 'ampel-' + row.color : '',
+                     istWeggefallen(row) ? 'weg' : '']"
             :title="hierarchyTooltip(row)">
           <td class="col-name" :style="{ paddingLeft: (row.level * 14 + 4) + 'px' }">
             <span v-if="row.hatKinder" class="caret" @click="toggle(row.key)">{{ expandedKeys[row.key] ? '▾' : '▸' }}</span><span v-else class="caret-empty"></span>
             <a v-if="row.searchFilter"
                :href="searchUrl(row.searchFilter)"
-               class="hierarchy-label">{{ row.level === 0 ? $t('Schweiz') : row.label || row.key }}</a>
-            <span v-else class="hierarchy-label">{{ row.level === 0 ? $t('Schweiz') : row.label || row.key }}</span>
-            <span v-if="row.level > 0 && row.level < 3" class="hierarchy-key">{{ row.key }}</span>
+               class="hierarchy-label">{{ labelFor(row) }}</a>
+            <span v-else class="hierarchy-label">{{ labelFor(row) }}</span>
+            <span v-if="row.level > 0 && row.level < 3 && row.key !== '_weggefallen'" class="hierarchy-key">{{ row.key }}</span>
           </td>
           <td class="col-num">{{ formatNumber(row.bestand) }}</td>
-          <td class="col-num"><span :class="signClass(row.seit1d)">{{ formatPlus(row.seit1d) }}</span></td>
-          <td class="col-num"><span :class="signClass(row.seit7d)">{{ formatPlus(row.seit7d) }}</span></td>
-          <td class="col-num"><span :class="signClass(row.seit30d)">{{ formatPlus(row.seit30d) }}</span></td>
-          <td class="col-num"><span :class="signClass(row.seit365d)">{{ formatPlus(row.seit365d) }}</span></td>
+          <td v-for="(d, i) in row.diffs" :key="i" class="col-num">
+            <span :class="signClass(d)">{{ formatDiff(d) }}</span>
+          </td>
           <td class="col-scraper">
             <template v-if="row.level !== 0">
               <a v-if="row.spider" href="#" @click.prevent="zumScraper(row.spider)">{{ row.spider }}</a>
@@ -67,16 +66,25 @@
     <table v-else-if="view === 'scrapers'" class="status-table scrapers">
       <thead>
         <tr>
-          <th class="col-scraper">{{ $t('Scraper') }}</th>
-          <th class="col-lauf">{{ $t('Letzter Lauf') }}</th>
-          <th class="col-num">{{ $t('Gesamt') }}</th>
-          <th class="col-num">{{ $t('Last') }}</th>
-          <th class="col-num">{{ $t('Seit') }} {{ datumGestern }}</th>
-          <th class="col-num">{{ $t('Seit') }} {{ datumVorwoche }}</th>
-          <th class="col-num">{{ $t('Seit') }} {{ datumVormonat }}</th>
-          <th class="col-num">{{ $t('Seit') }} {{ datumVorjahr }}</th>
-          <th class="col-num">{{ $t('Fehlversuche') }}</th>
-          <th class="col-num">{{ $t('Fehler') }}</th>
+          <th class="col-scraper" rowspan="2">{{ $t('Scraper') }}</th>
+          <th class="col-lauf" rowspan="2">{{ $t('Letzter Lauf') }}</th>
+          <th class="col-num" rowspan="2">{{ $t('Gesamt') }}</th>
+          <th class="col-num group-neu" colspan="5">{{ $t('Neu gescraped') }}</th>
+          <th v-if="snaps.length > 0" class="col-num group-diff" :colspan="snaps.length">
+            {{ $t('Bestand-Differenz') }}
+          </th>
+          <th class="col-num" rowspan="2">{{ $t('Fehlversuche') }}</th>
+          <th class="col-num" rowspan="2">{{ $t('Fehler') }}</th>
+        </tr>
+        <tr>
+          <th class="col-num group-neu">{{ $t('Last') }}</th>
+          <th class="col-num group-neu">{{ $t('Seit') }} {{ datumGestern }}</th>
+          <th class="col-num group-neu">{{ $t('Seit') }} {{ datumVorwoche }}</th>
+          <th class="col-num group-neu">{{ $t('Seit') }} {{ datumVormonat }}</th>
+          <th class="col-num group-neu">{{ $t('Seit') }} {{ datumVorjahr }}</th>
+          <th v-for="snap in snaps" :key="snap.datum" class="col-num group-diff">
+            {{ $t('Seit') }} {{ fmtSnapDatum(snap.datum) }}
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -96,26 +104,28 @@
               {{ formatNumber(row.bestandES) }}
               <span v-if="row.bestandLog > 0" :class="logClass(row.bestandES, row.bestandLog)">({{ formatNumber(row.bestandLog) }})</span>
             </td>
-            <td class="col-num"><span :class="signClass(row.last)">{{ formatPlus(row.last) }}</span></td>
-            <td class="col-num"><span :class="signClass(row.seit1d)">{{ formatPlus(row.seit1d) }}</span></td>
-            <td class="col-num"><span :class="signClass(row.seit7d)">{{ formatPlus(row.seit7d) }}</span></td>
-            <td class="col-num"><span :class="signClass(row.seit30d)">{{ formatPlus(row.seit30d) }}</span></td>
-            <td class="col-num"><span :class="signClass(row.seit365d)">{{ formatPlus(row.seit365d) }}</span></td>
+            <td class="col-num group-neu"><span :class="signClass(row.last)">{{ formatPlus(row.last) }}</span></td>
+            <td class="col-num group-neu"><span :class="signClass(row.neu1d)">{{ formatPlus(row.neu1d) }}</span></td>
+            <td class="col-num group-neu"><span :class="signClass(row.neu7d)">{{ formatPlus(row.neu7d) }}</span></td>
+            <td class="col-num group-neu"><span :class="signClass(row.neu30d)">{{ formatPlus(row.neu30d) }}</span></td>
+            <td class="col-num group-neu"><span :class="signClass(row.neu365d)">{{ formatPlus(row.neu365d) }}</span></td>
+            <td v-for="(d, i) in row.diffs" :key="i" class="col-num group-diff">
+              <span :class="signClass(d)">{{ formatDiff(d) }}</span>
+            </td>
             <td class="col-num">{{ row.fehlerlaeufe > 0 ? row.fehlerlaeufe : '–' }}</td>
             <td class="col-num">{{ row.einzelfehler > 0 ? row.einzelfehler : '–' }}</td>
           </tr>
           <tr v-if="expandedScraper === row.spider" :key="row.spider + '-detail'"
               :class="['scraper-detail', 'ampel-' + row.color]">
-            <td colspan="10">
+            <td :colspan="detailColspan">
               <table class="status-table inner">
                 <thead>
                   <tr>
                     <th class="col-name">{{ $t('Hierarchie') }}</th>
                     <th class="col-num">{{ $t('Bestand') }}</th>
-                    <th class="col-num">{{ $t('Seit') }} {{ datumGestern }}</th>
-                    <th class="col-num">{{ $t('Seit') }} {{ datumVorwoche }}</th>
-                    <th class="col-num">{{ $t('Seit') }} {{ datumVormonat }}</th>
-                    <th class="col-num">{{ $t('Seit') }} {{ datumVorjahr }}</th>
+                    <th v-for="snap in snaps" :key="snap.datum" class="col-num">
+                      {{ $t('Seit') }} {{ fmtSnapDatum(snap.datum) }}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -125,10 +135,9 @@
                       <span class="hierarchy-key">{{ kammer.key }}</span>
                     </td>
                     <td class="col-num">{{ formatNumber(kammer.bestand) }}</td>
-                    <td class="col-num"><span :class="signClass(kammer.seit1d)">{{ formatPlus(kammer.seit1d) }}</span></td>
-                    <td class="col-num"><span :class="signClass(kammer.seit7d)">{{ formatPlus(kammer.seit7d) }}</span></td>
-                    <td class="col-num"><span :class="signClass(kammer.seit30d)">{{ formatPlus(kammer.seit30d) }}</span></td>
-                    <td class="col-num"><span :class="signClass(kammer.seit365d)">{{ formatPlus(kammer.seit365d) }}</span></td>
+                    <td v-for="(d, i) in kammer.diffs" :key="i" class="col-num">
+                      <span :class="signClass(d)">{{ formatDiff(d) }}</span>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -147,8 +156,9 @@ import { Component, Watch } from 'vue-property-decorator'
 import { AppModule } from '@/store/modules/app'
 import {
   ladeAlles, buildHierarchyRows, buildScraperRows, ampelGruende,
-  formatLaufDatum, formatDatumDDMMYYYY, tageVorher,
-  HierarchyRow, ScraperRow, Facetten, StatusData, ESCounts, AmpelGrund
+  formatLaufDatum, formatDatumDDMMYYYY, formatIsoDatum, tageVorher,
+  HierarchyRow, ScraperRow, Facetten, StatusData, ESCounts, AmpelGrund,
+  SnapshotInfo
 } from '@/util/status'
 
 @Component({ name: 'Status' })
@@ -157,7 +167,15 @@ export default class Status extends Vue {
   error = ''
   facetten: Facetten = {}
   status: StatusData = { generated: '', spider_count: 0, spiders: {} }
-  es: ESCounts = { total: {}, d1: {}, d7: {}, d30: {} }
+  es: ESCounts = {
+    total: {},
+    d1: {},
+    d7: {},
+    d30: {},
+    d365: {},
+    snaps: [],
+    snap365echt: null
+  }
 
   expandedKeys: { [k: string]: boolean } = { _total: true }
   expandedScraper: string | null = null
@@ -276,6 +294,36 @@ export default class Status extends Vue {
     return formatDatumDDMMYYYY(tageVorher(365))
   }
 
+  /** Tatsächlich geladene Snapshots — 0–4 Einträge.
+   *  Hierarchie- und Detail-Tabelle iterieren darüber. */
+  get snaps (): SnapshotInfo[] {
+    return this.es.snaps
+  }
+
+  /** colspan der aufgeklappten Detailzeile:
+   *  3 (Scraper/Lauf/Gesamt) + 5 (Neu gescraped) + snaps.length + 2 (Fehler).
+   */
+  get detailColspan (): number {
+    return 10 + this.snaps.length
+  }
+
+  /** 'YYYY-MM-DD' → 'DD.MM.YYYY' für die Snapshot-Spaltenüberschriften. */
+  fmtSnapDatum (datum: string): string {
+    return formatIsoDatum(datum)
+  }
+
+  /** Label einer Hierarchie-Zeile inkl. Sonderbehandlung für Pseudo-Knoten. */
+  labelFor (row: HierarchyRow): string {
+    if (row.level === 0) return this.$t('Schweiz') as string
+    if (row.key === '_weggefallen') return this.$t('Weggefallen') as string
+    return row.label || row.key
+  }
+
+  /** Eine Zeile, die zum Weggefallen-Block gehört (Sammelzeile oder Detail). */
+  istWeggefallen (row: HierarchyRow): boolean {
+    return row.key === '_weggefallen' || row.parent === '_weggefallen'
+  }
+
   formatNumber (n: number): string {
     return new Intl.NumberFormat('de-CH').format(n)
   }
@@ -285,11 +333,18 @@ export default class Status extends Vue {
     return (n > 0 ? '+' : '') + this.formatNumber(n)
   }
 
+  /** Wie formatPlus, aber null = '–' (kein Snapshot vorhanden). */
+  formatDiff (n: number | null): string {
+    if (n === null || n === 0) return '–'
+    return (n > 0 ? '+' : '') + this.formatNumber(n)
+  }
+
   formatLauf (s: string | null): string {
     return formatLaufDatum(s)
   }
 
-  signClass (n: number): string {
+  signClass (n: number | null): string {
+    if (n === null) return 'zero'
     if (n < 0) return 'neg'
     if (n > 0) return 'plus'
     return 'zero'
@@ -504,12 +559,34 @@ $bar-width:    8px;
   .plus  { color: $color-green; }
   .neg   { color: $color-red; font-weight: 600; }
   .zero  { color: #999; }
+
+  // Spaltengruppen in der Scraper-Tabelle: leichte Hintergrundfärbung,
+  // damit die beiden Blöcke 'Neu gescraped' und 'Bestand-Differenz'
+  // sofort optisch erkennbar sind.
+  .group-neu  { background: #fafbfd; }
+  .group-diff { background: #f5f7fa; }
+
+  thead th.group-neu, thead th.group-diff {
+    text-align: center;
+    border-left: 1px solid #e5e5e7;
+  }
+  thead th.group-diff { border-right: 1px solid #e5e5e7; }
   .log-info { color: #999; }
   .log-warn { color: $color-red; font-weight: 600; }
 
   .lvl-0 { background: #f5f5f7; font-weight: 600; }
   .lvl-1 { background: #fafafa; font-weight: 600; }
   .lvl-2 { background: #fcfcfd; }
+
+  // Hierarchien, die in einem Snapshot vorkamen, aber heute nicht mehr in
+  // den Facetten stehen (Bestand 0). Visuell gedimmt, damit die Diff-Werte
+  // klar als Verlust erkennbar bleiben.
+  tr.weg {
+    color: #888;
+    font-style: italic;
+    background: #fafafa;
+    .hierarchy-label { color: #666; }
+  }
 
   // Hierarchie: Ampel als linker Balken am Letzter-Lauf-Feld
   .ampel-green  td:last-child { box-shadow: inset $bar-width 0 0 $color-green; }
