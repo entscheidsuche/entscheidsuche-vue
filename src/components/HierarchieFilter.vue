@@ -216,7 +216,7 @@ export default class HierarchieFilter extends Vue {
         if (facet.children.length > 0) {
           const childrenArray: Array<TreeModel> = []
           facet.children.forEach((child: Facet) => {
-            if (child.children !== null && child.children !== undefined) {
+            if (child.children !== null && child.children !== undefined && child.id !== 'AfA_Weitere') {
               if (child.children.length > 0) {
                 const grandChildrenArray: Array<TreeModel> = []
                 child.children.forEach((grandChild: Facet) => {

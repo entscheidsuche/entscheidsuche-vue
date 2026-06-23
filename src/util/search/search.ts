@@ -3,11 +3,11 @@ import axios, { AxiosResponse } from 'axios'
 
 // noch nicht der Reverse proxy
 // const searchUrl = 'https://entscheidsuche.ch/_search_AfA.php'
-const searchUrl = 'https://www.recherche.histoirerurale.ch/_search.php'
+const searchUrl = 'https://recherche2.histoirerurale.ch/_search.php'
 
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
-    return axios.get('https://www.recherche.histoirerurale.ch/Facetten.json')
+    return axios.get('https://recherche2.histoirerurale.ch/Facetten.json')
       .then(resp => SearchUtil.transformResultToFacets(resp))
   }
 
@@ -48,7 +48,7 @@ export class SearchUtil {
       },
       sort: [
         { [sortOrder === SortOrder.RELEVANCE ? '_score' : sortOrder === SortOrder.DATE ? 'date' : 'scrapedate']: 'desc' },
-        { id: 'desc' }
+        { 'title.en.keyword': 'asc' }
       ],
       highlight: {
         fields: {

@@ -55,6 +55,11 @@ const routes: Array<RouteConfig> = [
         next()
       }
     }
+  },
+  {
+    path: '/suchhilfe',
+    name: 'Suchhilfe',
+    component: () => import('../views/Suchhilfe.vue')
   }
 ]
 

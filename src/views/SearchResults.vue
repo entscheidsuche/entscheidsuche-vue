@@ -7,7 +7,8 @@
             <b-icon icon="caret-left-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
-        <p class="suchhilfe"><router-link :to="{ name: 'Home' }" >{{ $t('suchhilfe') }}</router-link></p>
+        <p class="suchhilfe"><router-link :to="{ name: 'Home' }" >{{ $t('about_portal') }}</router-link></p>
+        <p class="suchhilfe"><router-link :to="{ name: 'Suchhilfe' }" >{{ $t('suchhilfe') }}</router-link></p>
         <div class="total-hits">
           <div class="title-wrapper">
             <p class="title">
@@ -445,8 +446,7 @@
       .card-group-title {
         margin: 0;
         padding-bottom: 20px;
-        font-size: 20px;
-        font-style: italic;
+        font-size: 15px;
       }
       .card-group-title-h1{
         margin: 0;

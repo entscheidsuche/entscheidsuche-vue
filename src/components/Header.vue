@@ -4,6 +4,7 @@
       <router-link :to="{ name: 'Home' }" class="logo"></router-link>
       <!--<p>{{ $t('sub_logo') }}</p>-->
       <Search/>
+      <span id="MCP_head"><a href="https://mcp.histoirerurale.ch" target="_blank">MCP Interface</a></span>
       <div id="language-toggler" v-on:click="onLocaleChange()">
         <span id="current">{{locale.toUpperCase()}}</span>
          <a class="language-icon"></a>
@@ -57,11 +58,29 @@
       background-size: contain;
       flex-shrink: 0;
     }
+    #MCP_head{
+      border: 3px solid #fff;
+        padding: 3px 9px;
+        border-radius: 4px;
+        margin-right: 10px;
+        white-space: nowrap;
+        a {
+          color: #fff;
+          text-decoration: none;
+          font-size: 20px;
+        }
+    }
+    #MCP_head:hover {
+        background-color: #fff;
+        a {
+          color: #A00000;
+        }
+      }
 
     #language-toggler {
       flex-shrink: 0;
-      height: 40px;
-      width: 80px;
+      //height: 40px;
+      //width: 80px;
       margin-bottom: 0;
       margin-right: 20px;
       font-size: 20px;
@@ -72,10 +91,17 @@
       justify-content: space-between;
 
       #current {
-        padding-top: 3px;
+        border: 3px solid #fff;
+        padding: 3px 9px;
+        border-radius: 4px;
+      }
+      #current:hover {
+        background-color: #fff;
+        color: #A00000;
       }
 
       .language-icon {
+        display: none;
         position: absolute;
         top: 21px;
         right: 100px;
@@ -166,10 +192,20 @@
         max-width: 50%;
       }
 
+      #MCP_head {
+        position: absolute;
+        top: 15px;
+        right: 55px;
+        a{
+          font-size: 17px;
+        }
+      }
+
       #language-toggler {
         position: absolute;
         top: 15px;
-        right: 38px;
+        right: 0px;
+        font-size: 17px;
 
         .language-icon {
           top: 6px;
