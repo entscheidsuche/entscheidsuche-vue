@@ -20,7 +20,7 @@
       width:100%;
       flex-grow:1;
       flex-wrap: nowrap;
-      margin-right:45px;
+      margin-right:-28px;
       margin-left:20px;
       margin-top: 0;
       align-items: center;

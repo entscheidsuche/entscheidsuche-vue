@@ -10,6 +10,7 @@
       <h1 class="hometitle">{{$t('home-title')}}</h1>
       <p>{{$t('home-par1')}}</p>
       <p>{{$t('home-par2')}}</p>
+      <p>{{$t('home-par3')}} <span class="suchhilfe"><router-link :to="{ name: 'Suchhilfe' }" >{{ $t('suchhilfe') }}</router-link></span>.</p>
       <!--<b-card-group id='bcards' deck>
         <sponsor-card v-for="(sponsor, index) in this.sponsors" :key="index" :logo="sponsor.logo" :link="sponsor.link" :text="sponsor.text" :tooltip="sponsor.tooltip"/>
 
