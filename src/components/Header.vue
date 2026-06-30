@@ -4,7 +4,7 @@
       <router-link :to="{ name: 'Home' }" class="logo"></router-link>
       <!--<p>{{ $t('sub_logo') }}</p>-->
       <Search/>
-      <span id="MCP_head"><a href="https://mcp.histoirerurale.ch" target="_blank">MCP Interface</a></span>
+      <span id="MCP_head"><a href="https://mcp.histoirerurale.ch" target="_blank">MCP</a></span>
       <div id="language-toggler" v-on:click="onLocaleChange()">
         <span id="current">{{locale.toUpperCase()}}</span>
          <a class="language-icon"></a>
@@ -60,6 +60,7 @@
     }
     #MCP_head{
       border: 3px solid #fff;
+
         padding: 3px 9px;
         border-radius: 4px;
         margin-right: 10px;
@@ -196,6 +197,7 @@
         position: absolute;
         top: 15px;
         right: 55px;
+        padding: 3px 7px;
         a{
           font-size: 17px;
         }
@@ -206,6 +208,9 @@
         top: 15px;
         right: 0px;
         font-size: 17px;
+        #current{
+          padding: 3px 7px;
+        }
 
         .language-icon {
           top: 6px;
