@@ -11,6 +11,7 @@ const FACETTEN_URL = 'https://entscheidsuche.ch/docs/Facetten_alle.json'
 const STATUS_URL = 'https://entscheidsuche.ch/generate_status.php'
 const SEARCH_URL = 'https://entscheidsuche.ch/_searchV2.php'
 const SNAPSHOT_DIR_URL = 'https://entscheidsuche.ch/docs/Snapshots'
+const INDEXER_STATUS_URL = 'https://entscheidsuche.ch/docs/Indexer/status.json'
 
 // =============================================================================
 // Typen
@@ -59,6 +60,55 @@ export interface StatusData {
   generated: string
   spider_count: number
   spiders: { [spider: string]: SpiderStatus }
+}
+
+// =============================================================================
+// Indexer-Status (docs/Indexer/status.json — vom Konsolidator gepflegt)
+// =============================================================================
+
+// Schema (Konsolidator nach Umbau auf feeder_status.php):
+//
+//   {
+//     "letzte_aktualisierung": "…",
+//     "gesamt":  { "spider": N, "ok": A, "offen": B, "kritisch": C, "kaputt": D },
+//     "spiders": {
+//        "<name>": {
+//          "zustand":       "ok" | "offen" | "kritisch",
+//          "job":           string | null,
+//          "grund":         string | null,   // nur bei kritisch
+//          "seit":          string | null,   // ISO-Z: Zustand-Beginn
+//          "letzter_ok":    string | null,   // ISO-Z: letzter erfolgreicher Push
+//          "kaputt":        int,             // # Dokumente in Quarantäne
+//          "offene_reports": int             // # unverarbeitete Reports auf Cyon
+//        }
+//     }
+//   }
+
+export type IndexerZustand = 'ok' | 'offen' | 'kritisch'
+
+export interface IndexerSpiderStatus {
+  zustand: IndexerZustand
+  job: string | null
+  grund: string | null
+  seit: string | null
+  letzter_ok: string | null
+  kaputt: number
+  offene_reports: number
+}
+
+export interface IndexerGesamt {
+  spider: number
+  ok: number
+  offen: number
+  kritisch: number
+  kaputt: number
+}
+
+export interface IndexerStatus {
+  /** ISO-Z des letzten Schreib-Ticks (nicht der aktuelle Zeitpunkt). */
+  letzte_aktualisierung: string
+  gesamt: IndexerGesamt
+  spiders: { [spider: string]: IndexerSpiderStatus }
 }
 
 /**
@@ -208,22 +258,73 @@ async function ladeSnapshotIndex (): Promise<string[]> {
   }
 }
 
+/** Lädt den Indexer-Status; liefert null, wenn die Datei (noch) nicht
+ *  existiert. Defensiv geparst, sodass eine kaputte Datei die Statusseite
+ *  nicht zerschiesst. */
+async function ladeIndexerStatus (): Promise<IndexerStatus | null> {
+  try {
+    const r = await axios.get(INDEXER_STATUS_URL, {
+      validateStatus: s => s === 200
+    })
+    const d = r.data
+    if (!d || typeof d !== 'object' || typeof d.letzte_aktualisierung !== 'string') {
+      return null
+    }
+    const gesamt: IndexerGesamt = {
+      spider: Number(d.gesamt?.spider) || 0,
+      ok: Number(d.gesamt?.ok) || 0,
+      offen: Number(d.gesamt?.offen) || 0,
+      kritisch: Number(d.gesamt?.kritisch) || 0,
+      kaputt: Number(d.gesamt?.kaputt) || 0
+    }
+    const spiders: { [k: string]: IndexerSpiderStatus } = {}
+    const inSpiders = (d.spiders && typeof d.spiders === 'object') ? d.spiders : {}
+    for (const sp of Object.keys(inSpiders)) {
+      const s = inSpiders[sp]
+      if (!s || typeof s !== 'object') continue
+      const rohZustand = s.zustand
+      const zustand: IndexerZustand =
+        rohZustand === 'ok' || rohZustand === 'offen' || rohZustand === 'kritisch'
+          ? rohZustand
+          : 'ok'
+      spiders[sp] = {
+        zustand,
+        job: typeof s.job === 'string' ? s.job : null,
+        grund: typeof s.grund === 'string' ? s.grund : null,
+        seit: typeof s.seit === 'string' ? s.seit : null,
+        letzter_ok: typeof s.letzter_ok === 'string' ? s.letzter_ok : null,
+        kaputt: Number(s.kaputt) || 0,
+        offene_reports: Number(s.offene_reports) || 0
+      }
+    }
+    return {
+      letzte_aktualisierung: d.letzte_aktualisierung,
+      gesamt,
+      spiders
+    }
+  } catch (_e) {
+    return null
+  }
+}
+
 export async function ladeAlles (): Promise<{
   facetten: Facetten
   status: StatusData
   es: ESCounts
+  indexer: IndexerStatus | null
 }> {
   // Reihenfolge:
-  //  1. Facetten, Status, ES und Snapshot-Index parallel laden.
+  //  1. Facetten, Status, ES, Snapshot-Index und Indexer-Status parallel laden.
   //  2. Anhand der vorhandenen Snapshot-Daten die Slots berechnen.
   //  3. Nur die gewählten Snapshots laden.
-  const [fResp, sResp, esResp, indexDaten] = await Promise.all([
+  const [fResp, sResp, esResp, indexDaten, indexer] = await Promise.all([
     axios.get(FACETTEN_URL),
     axios.get(STATUS_URL),
     axios.post(SEARCH_URL, ES_QUERY, {
       headers: { 'Content-Type': 'application/json' }
     }),
-    ladeSnapshotIndex()
+    ladeSnapshotIndex(),
+    ladeIndexerStatus()
   ])
 
   // Datums in 'Tage-zurück' umrechnen (heutiger und zukünftige Werte ignorieren).
@@ -272,7 +373,8 @@ export async function ladeAlles (): Promise<{
   return {
     facetten: fResp.data,
     status: sResp.data,
-    es
+    es,
+    indexer
   }
 }
 
@@ -835,6 +937,9 @@ export interface ScraperRow {
   color: Color
   ampelGruende: AmpelGrund[] // für den Ampel-Tooltip
   kammern: HierarchyRow[] // Kammern aus Facetten dieses Spiders
+  /** Indexer-Status für diesen Spider; null, wenn kein Indexer-Status-File
+   *  vorhanden ist oder dieser Spider nicht erwähnt wird. */
+  indexer: IndexerSpiderStatus | null
 }
 
 export interface AmpelGrund {
@@ -884,7 +989,8 @@ export function buildScraperRows (
   facetten: Facetten,
   status: StatusData,
   es: ESCounts,
-  lang: string
+  lang: string,
+  indexer: IndexerStatus | null = null
 ): ScraperRow[] {
   // Spider → Liste der Kammer-Hierarchien sammeln. Kammern, die für diesen
   // Spider weder im ES Bestand haben noch im letzten erfolgreichen Lauf-Stand
@@ -974,7 +1080,8 @@ export function buildScraperRows (
       einzelfehler: er ? er.anzahl_fehler : 0,
       color: finalColor,
       ampelGruende: ampelGruende(s, stagnation),
-      kammern
+      kammern,
+      indexer: indexer && indexer.spiders[sp] ? indexer.spiders[sp] : null
     })
   }
   return rows
@@ -1001,4 +1108,21 @@ export function tageVorher (n: number): Date {
   d.setDate(d.getDate() - n)
   d.setHours(0, 0, 0, 0)
   return d
+}
+
+/**
+ * Formatiert einen ISO-Z-Zeitstempel (z.B. '2026-06-22T03:09:33Z') in
+ * 'HH:MM' wenn weniger als 24 Stunden zurück, sonst 'DD.MM.YYYY HH:MM'.
+ * Lokalzeit-Anzeige (Browser).
+ */
+export function formatIndexerZeit (iso: string | null | undefined): string {
+  if (!iso) return '–'
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return '–'
+  const pad = (n: number) => (n < 10 ? '0' + n : '' + n)
+  const hhmm = pad(d.getHours()) + ':' + pad(d.getMinutes())
+  const alterMs = Date.now() - d.getTime()
+  if (alterMs < 86400000) return hhmm
+  return pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + '.' +
+         d.getFullYear() + ' ' + hhmm
 }

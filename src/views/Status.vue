@@ -11,6 +11,27 @@
       </button>
     </div>
 
+    <div v-if="!loading && !error && indexer" class="indexer-banner">
+      <span class="ib-label">{{ $t('Indexer') }}:</span>
+      <span class="ib-zeit">{{ $t('Letzte Aktualisierung') }} {{ indexerLetzteAktualisierung }}</span>
+      <span class="ib-trenner">·</span>
+      <span class="ib-feld">{{ indexer.gesamt.spider }} {{ $t('Spider') }}</span>
+      <span class="ib-trenner">·</span>
+      <span class="ib-feld ib-ok">{{ indexer.gesamt.ok }} {{ $t('ok') }}</span>
+      <span v-if="indexer.gesamt.offen > 0" class="ib-feld ib-offen">
+        <span class="ib-trenner">·</span>
+        {{ indexer.gesamt.offen }} {{ $t('offen') }}
+      </span>
+      <span v-if="indexer.gesamt.kritisch > 0" class="ib-feld ib-kritisch">
+        <span class="ib-trenner">·</span>
+        {{ indexer.gesamt.kritisch }} {{ $t('kritisch') }}
+      </span>
+      <span v-if="indexer.gesamt.kaputt > 0" class="ib-feld ib-kaputt">
+        <span class="ib-trenner">·</span>
+        {{ indexer.gesamt.kaputt }} {{ $t('kaputt') }}
+      </span>
+    </div>
+
     <div v-if="loading" class="info">{{ $t('lädt') }}…</div>
     <div v-else-if="error" class="error">{{ error }}</div>
 
@@ -75,6 +96,9 @@
           </th>
           <th class="col-num" rowspan="2">{{ $t('Fehlversuche') }}</th>
           <th class="col-num" rowspan="2">{{ $t('Fehler') }}</th>
+          <th v-if="indexer" class="col-num" rowspan="2">{{ $t('Zustand') }}</th>
+          <th v-if="indexer" class="col-num" rowspan="2">{{ $t('kaputt') }}</th>
+          <th v-if="indexer" class="col-num" rowspan="2">{{ $t('Reports') }}</th>
         </tr>
         <tr>
           <th class="col-num group-neu">{{ $t('Last') }}</th>
@@ -88,6 +112,35 @@
         </tr>
       </thead>
       <tbody>
+        <!-- Gesamt-Zeile (Aggregat aller Scraper). Nicht klappbar, keine Ampel. -->
+        <tr class="scraper-gesamt">
+          <td class="col-scraper"><strong>{{ $t('Schweiz') }}</strong></td>
+          <td class="col-lauf">{{ formatLauf(scraperGesamt.letzterLauf) }}</td>
+          <td class="col-num">
+            <strong>{{ formatNumber(scraperGesamt.bestandES) }}</strong>
+          </td>
+          <td class="col-num group-neu"><span :class="signClass(scraperGesamt.last)">{{ formatPlus(scraperGesamt.last) }}</span></td>
+          <td class="col-num group-neu"><span :class="signClass(scraperGesamt.neu1d)">{{ formatPlus(scraperGesamt.neu1d) }}</span></td>
+          <td class="col-num group-neu"><span :class="signClass(scraperGesamt.neu7d)">{{ formatPlus(scraperGesamt.neu7d) }}</span></td>
+          <td class="col-num group-neu"><span :class="signClass(scraperGesamt.neu30d)">{{ formatPlus(scraperGesamt.neu30d) }}</span></td>
+          <td class="col-num group-neu"><span :class="signClass(scraperGesamt.neu365d)">{{ formatPlus(scraperGesamt.neu365d) }}</span></td>
+          <td v-for="(d, i) in scraperGesamt.diffs" :key="'g' + i" class="col-num group-diff">
+            <span :class="signClass(d)">{{ formatDiff(d) }}</span>
+          </td>
+          <td class="col-num">{{ scraperGesamt.fehlerlaeufe > 0 ? scraperGesamt.fehlerlaeufe : '–' }}</td>
+          <td class="col-num">{{ scraperGesamt.einzelfehler > 0 ? scraperGesamt.einzelfehler : '–' }}</td>
+          <td v-if="indexer" class="col-num zustand-zelle">
+            <span :class="gesamtZustandText().klasse">{{ gesamtZustandText().text }}</span>
+          </td>
+          <td v-if="indexer" class="col-num">
+            <span v-if="scraperGesamt.kaputt > 0" class="kaputt">{{ scraperGesamt.kaputt }}</span>
+            <span v-else>–</span>
+          </td>
+          <td v-if="indexer" class="col-num">
+            <span v-if="scraperGesamt.offene_reports > 0" class="reports">{{ scraperGesamt.offene_reports }}</span>
+            <span v-else>–</span>
+          </td>
+        </tr>
         <template v-for="row in scraperRows">
           <tr :key="row.spider"
               :class="['scraper-row', 'ampel-' + row.color, expandedScraper === row.spider ? 'expanded' : '',
@@ -114,6 +167,21 @@
             </td>
             <td class="col-num">{{ row.fehlerlaeufe > 0 ? row.fehlerlaeufe : '–' }}</td>
             <td class="col-num">{{ row.einzelfehler > 0 ? row.einzelfehler : '–' }}</td>
+            <td v-if="indexer" class="col-num zustand-zelle">
+              <span v-if="row.indexer" :class="'zustand-' + row.indexer.zustand"
+                    :title="zustandTooltip(row.indexer)">
+                {{ $t('zustand_' + row.indexer.zustand) }}
+              </span>
+              <span v-else>–</span>
+            </td>
+            <td v-if="indexer" class="col-num">
+              <span v-if="row.indexer && row.indexer.kaputt > 0" class="kaputt">{{ row.indexer.kaputt }}</span>
+              <span v-else>–</span>
+            </td>
+            <td v-if="indexer" class="col-num">
+              <span v-if="row.indexer && row.indexer.offene_reports > 0" class="reports">{{ row.indexer.offene_reports }}</span>
+              <span v-else>–</span>
+            </td>
           </tr>
           <tr v-if="expandedScraper === row.spider" :key="row.spider + '-detail'"
               :class="['scraper-detail', 'ampel-' + row.color]">
@@ -156,9 +224,10 @@ import { Component, Watch } from 'vue-property-decorator'
 import { AppModule } from '@/store/modules/app'
 import {
   ladeAlles, buildHierarchyRows, buildScraperRows, ampelGruende,
-  formatLaufDatum, formatDatumDDMMYYYY, formatIsoDatum, tageVorher,
+  formatLaufDatum, formatDatumDDMMYYYY, formatIsoDatum, formatIndexerZeit,
+  tageVorher,
   HierarchyRow, ScraperRow, Facetten, StatusData, ESCounts, AmpelGrund,
-  SnapshotInfo
+  SnapshotInfo, IndexerStatus, IndexerSpiderStatus
 } from '@/util/status'
 
 @Component({ name: 'Status' })
@@ -177,6 +246,8 @@ export default class Status extends Vue {
     snap365echt: null
   }
 
+  indexer: IndexerStatus | null = null
+
   expandedKeys: { [k: string]: boolean } = { _total: true }
   expandedScraper: string | null = null
   highlightedScraper: string | null = null
@@ -189,6 +260,7 @@ export default class Status extends Vue {
       this.facetten = r.facetten
       this.status = r.status
       this.es = r.es
+      this.indexer = r.indexer
     } catch (e: any) {
       this.error = (e && e.message) ? e.message : String(e)
     } finally {
@@ -251,7 +323,12 @@ export default class Status extends Vue {
 
   get scraperRows (): ScraperRow[] {
     if (this.loading) return []
-    return buildScraperRows(this.facetten, this.status, this.es, this.lang)
+    return buildScraperRows(this.facetten, this.status, this.es, this.lang, this.indexer)
+  }
+
+  /** Aktualisierungs-Zeit des Indexer-Status, formatiert nach 24h-Regel. */
+  get indexerLetzteAktualisierung (): string {
+    return this.indexer ? formatIndexerZeit(this.indexer.letzte_aktualisierung) : ''
   }
 
   get sichtbareHierarchyRows (): HierarchyRow[] {
@@ -301,10 +378,111 @@ export default class Status extends Vue {
   }
 
   /** colspan der aufgeklappten Detailzeile:
-   *  3 (Scraper/Lauf/Gesamt) + 5 (Neu gescraped) + snaps.length + 2 (Fehler).
+   *  3 (Scraper/Lauf/Gesamt) + 5 (Neu gescraped) + snaps.length + 2 (Fehler)
+   *  + 3 (Zustand/Kaputt/Reports, sofern Indexer-Status geladen).
    */
   get detailColspan (): number {
-    return 10 + this.snaps.length
+    return 10 + this.snaps.length + (this.indexer ? 3 : 0)
+  }
+
+  /** Aggregat aller Scraper-Zeilen für die Gesamt-Kopfzeile. */
+  get scraperGesamt (): {
+      letzterLauf: string | null;
+      bestandES: number;
+      bestandLog: number;
+      last: number;
+      neu1d: number;
+      neu7d: number;
+      neu30d: number;
+      neu365d: number;
+      diffs: number[];
+      fehlerlaeufe: number;
+      einzelfehler: number;
+      kaputt: number;
+      offene_reports: number;
+      kritisch: number;
+      offen: number;
+      } {
+    const g = {
+      letzterLauf: null as string | null,
+      bestandES: 0,
+      bestandLog: 0,
+      last: 0,
+      neu1d: 0,
+      neu7d: 0,
+      neu30d: 0,
+      neu365d: 0,
+      diffs: this.snaps.map(() => 0),
+      fehlerlaeufe: 0,
+      einzelfehler: 0,
+      kaputt: 0,
+      offene_reports: 0,
+      kritisch: 0,
+      offen: 0
+    }
+    for (const r of this.scraperRows) {
+      if (r.letzterLauf && (g.letzterLauf === null || r.letzterLauf > g.letzterLauf)) {
+        g.letzterLauf = r.letzterLauf
+      }
+      g.bestandES += r.bestandES
+      g.bestandLog += r.bestandLog
+      g.last += r.last
+      g.neu1d += r.neu1d
+      g.neu7d += r.neu7d
+      g.neu30d += r.neu30d
+      g.neu365d += r.neu365d
+      for (let i = 0; i < g.diffs.length; i++) g.diffs[i] += r.diffs[i] || 0
+      g.fehlerlaeufe += r.fehlerlaeufe
+      g.einzelfehler += r.einzelfehler
+      if (r.indexer) {
+        g.kaputt += r.indexer.kaputt
+        g.offene_reports += r.indexer.offene_reports
+        if (r.indexer.zustand === 'kritisch') g.kritisch++
+        else if (r.indexer.zustand === 'offen') g.offen++
+      }
+    }
+    return g
+  }
+
+  /** Wortlaut in der Zustand-Zelle der Gesamtzeile.
+   *  - mind. 1 kritisch  → 'Indexierungsfehler'  (rot)
+   *  - mind. 1 offen     → 'indexiert…'          (normal)
+   *  - kaputt > 0         → 'X Fehler'            (rot)
+   *  - sonst              → 'ok'                  (dezent) */
+  gesamtZustandText (): { text: string; klasse: string } {
+    const g = this.scraperGesamt
+    if (g.kritisch > 0) return { text: this.$t('zustand_kritisch') as string, klasse: 'zustand-kritisch' }
+    if (g.offen > 0) return { text: this.$t('zustand_offen') as string, klasse: 'zustand-offen' }
+    if (g.kaputt > 0) {
+      return {
+        text: g.kaputt + ' ' + (this.$t('Fehler_plural') as string),
+        klasse: 'zustand-fehler'
+      }
+    }
+    return { text: this.$t('zustand_ok') as string, klasse: 'zustand-ok' }
+  }
+
+  /** Tooltip-Text für die Zustands-Zelle (hover). */
+  zustandTooltip (s: IndexerSpiderStatus): string {
+    const zeilen: string[] = []
+    if (s.zustand === 'kritisch') {
+      if (s.grund) zeilen.push(this.$t('Grund') + ': ' + s.grund)
+      if (s.seit) zeilen.push(this.$t('seit') + ' ' + this.fmtZeit(s.seit))
+      if (s.job) zeilen.push('Job ' + s.job)
+      if (s.letzter_ok) zeilen.push(this.$t('letzter ok') + ': ' + this.fmtZeit(s.letzter_ok))
+    } else if (s.zustand === 'offen') {
+      if (s.job) zeilen.push('Job ' + s.job)
+      if (s.seit) zeilen.push(this.$t('seit') + ' ' + this.fmtZeit(s.seit))
+    } else {
+      if (s.letzter_ok) zeilen.push(this.$t('letzter ok') + ': ' + this.fmtZeit(s.letzter_ok))
+      if (s.job) zeilen.push('Job ' + s.job)
+    }
+    return zeilen.join('\n')
+  }
+
+  /** ISO-Z → 'HH:MM' bzw. 'DD.MM.YYYY HH:MM' für Tooltips. */
+  fmtZeit (iso: string | null): string {
+    return formatIndexerZeit(iso)
   }
 
   /** 'YYYY-MM-DD' → 'DD.MM.YYYY' für die Snapshot-Spaltenüberschriften. */
@@ -474,6 +652,30 @@ $bar-width:    8px;
     color: #555;
     line-height: 1.45;
   }
+
+  // Status-Banner unter den Tabs, zeigt Indexer-Aktualisierung und Aggregate.
+  .indexer-banner {
+    margin: 4px 0 12px;
+    padding: 8px 12px;
+    background: #f5f7fa;
+    border: 1px solid #e1e6ee;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #555;
+    line-height: 1.4;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+
+    .ib-label { font-weight: 600; color: #1d1d1f; }
+    .ib-trenner { color: #bbb; }
+    .ib-feld { font-variant-numeric: tabular-nums; }
+    .ib-ok       { color: $color-green; font-weight: 600; }
+    .ib-offen    { color: $color-orange; font-weight: 600; }
+    .ib-kritisch { color: $color-red; font-weight: 600; }
+    .ib-kaputt   { color: $color-red; font-weight: 600; }
+  }
 }
 
 .status-table {
@@ -560,6 +762,19 @@ $bar-width:    8px;
   .neg   { color: $color-red; font-weight: 600; }
   .zero  { color: #999; }
 
+  // Zustand-Zelle: Text-Anzeige mit Detail-Tooltip (title-Attribut).
+  // 'ok' und 'indexiert…' laufen in normaler Textfarbe,
+  // nur 'Indexierungsfehler' wird rot fett hervorgehoben.
+  .zustand-zelle {
+    cursor: default;
+    .zustand-ok       { color: #555; }
+    .zustand-offen    { color: #1d1d1f; }
+    .zustand-kritisch { color: $color-red; font-weight: 600; }
+    .zustand-fehler   { color: $color-red; font-weight: 600; }
+  }
+  .kaputt  { color: $color-red; font-weight: 600; }
+  .reports { color: $color-orange; font-weight: 600; }
+
   // Spaltengruppen in der Scraper-Tabelle: leichte Hintergrundfärbung,
   // damit die beiden Blöcke 'Neu gescraped' und 'Bestand-Differenz'
   // sofort optisch erkennbar sind.
@@ -577,6 +792,13 @@ $bar-width:    8px;
   .lvl-0 { background: #f5f5f7; font-weight: 600; }
   .lvl-1 { background: #fafafa; font-weight: 600; }
   .lvl-2 { background: #fcfcfd; }
+
+  // Gesamt-Zeile über den Scraper-Rows (Summen aller Spider).
+  .scraper-gesamt {
+    background: #f5f5f7;
+    font-weight: 600;
+    border-bottom: 2px solid #1d1d1f;
+  }
 
   // Hierarchien, die in einem Snapshot vorkamen, aber heute nicht mehr in
   // den Facetten stehen (Bestand 0). Visuell gedimmt, damit die Diff-Werte
