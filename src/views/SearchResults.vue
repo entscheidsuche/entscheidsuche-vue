@@ -126,7 +126,11 @@
             <b-icon icon="caret-right-fill" aria-hidden="true"></b-icon>
           </div>
         </div>
-        <div v-if="!pristine && results.length === 0" class="no-results">
+        <div v-if="documentNotFound" class="no-results">
+          <h3 class="hint">404 &ndash; {{ $t('documentNotFound') }}</h3>
+          <p>{{ $t('documentNotFoundHint') }}</p>
+        </div>
+        <div v-else-if="!pristine && results.length === 0" class="no-results">
           <h3 class="hint">Ihre Suche nach "{{ query }}" ergab leider keine Treffer</h3>
         </div>
         <div v-for="(result, index) in results" :key="result.id" v-bind:class="['result-item', isSelected(result) ? 'selected' : '']" v-bind:id="isSelected(result) ? 'selectedRes' : ''" v-on:click="[onOpenPreview(), onSelectResult(result)]">
@@ -1002,7 +1006,7 @@
 import Vue from 'vue'
 import { Component, Watch } from 'vue-property-decorator'
 import { AppModule, MessageState, Sponsor } from '@/store/modules/app'
-import { Filters, FilterType, SearchModule, SearchResult } from '@/store/modules/search'
+import { Filters, FilterType, isSearchResult, SearchModule, SearchResult } from '@/store/modules/search'
 import DateFilter from '@/components/DateFilter.vue'
 import ScrapeDateFilter from '@/components/ScrapeDateFilter.vue'
 import HierarchieFilter from '@/components/HierarchieFilter.vue'
@@ -1079,6 +1083,10 @@ export default class SearchResults extends Vue {
 
   get resultsPending () {
     return SearchModule.resultsPending
+  }
+
+  get documentNotFound () {
+    return SearchModule.documentNotFound
   }
 
   get resultsTotal () {
@@ -1166,7 +1174,7 @@ export default class SearchResults extends Vue {
   public onResultsChanged () {
     const selectedId = this.$route.query.selected
     const preview = this.$route.query.preview
-    if (selectedId && !('id' in this.selectedResult)) {
+    if (selectedId && !isSearchResult(this.selectedResult)) {
       const oldSelectedResult = this.getResultbyId(selectedId.toString())
       if (oldSelectedResult) {
         SearchModule.Select(oldSelectedResult)
@@ -1179,7 +1187,7 @@ export default class SearchResults extends Vue {
 
   @Watch('selectedResult')
   public onSelectedResultChanged (selectedResult: SearchResult) {
-    if (!('id' in selectedResult)) {
+    if (!isSearchResult(selectedResult)) {
       this.previewVisible = false
       this.fullScreen = false
       return
@@ -1213,7 +1221,7 @@ export default class SearchResults extends Vue {
   onRouteChange (from: Route, to: Route) {
     const name = this.$route.name
     if (name === 'View') {
-      if ('url' in this.selectedResult) {
+      if (isSearchResult(this.selectedResult)) {
         if (!this.previewVisible) {
           this.previewVisible = true
           this.fullScreen = true
@@ -1242,7 +1250,7 @@ export default class SearchResults extends Vue {
   }
 
   created () {
-    this.fullScreen = SearchModule.document !== '' && Object.prototype.hasOwnProperty.call(SearchModule.selectedResult, 'id')
+    this.fullScreen = SearchModule.document !== '' && isSearchResult(SearchModule.selectedResult)
     if (this.fullScreen) {
       this.previewVisible = true
     }
@@ -1292,7 +1300,7 @@ export default class SearchResults extends Vue {
       SearchModule.ResetQuery(query.toString())
       return
     }
-    if ('id' in this.selectedResult) {
+    if (isSearchResult(this.selectedResult)) {
       if (this.selectedResult.id !== selectedId) {
         if (selectedId) {
           const oldSelectedResult = this.getResultbyId(selectedId.toString())
@@ -1539,7 +1547,7 @@ export default class SearchResults extends Vue {
     const name = this.$route.name
     if (name !== 'View') {
       if (!this.fullScreen) {
-        if ('id' in SearchModule.selectedResult) {
+        if (isSearchResult(SearchModule.selectedResult)) {
           SearchModule.SetFullScreen('true')
           this.fullScreen = true
         }
@@ -1562,7 +1570,7 @@ export default class SearchResults extends Vue {
 
   public onNewTab (): void {
     // if (!this.fullScreen) {
-    if ('id' in SearchModule.selectedResult) {
+    if (isSearchResult(SearchModule.selectedResult)) {
       window.open('/view/' + SearchModule.selectedResult.id, '_blank')
       self.focus()
     }

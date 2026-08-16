@@ -12,6 +12,8 @@
   "filterPlaceholder": "filtrer",
   "hit": "Résultat",
   "of": "de",
+  "documentNotFound": "Document introuvable",
+  "documentNotFoundHint": "Le document ne se trouve ni dans l'index de recherche ni sur le serveur.",
   "about": "À propos de nous",
   "upload": "Téléverser des arrêts",
   "dataUsage": "Données / API",

@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from 'axios'
 
 // const searchUrl = 'https://entscheidsuche.pansoft.de:9200/entscheidsuche.v2-*/_search'
 const searchUrl = 'https://entscheidsuche.ch/_searchV2.php'
+const docsUrl = 'https://entscheidsuche.ch/docs/'
 
 export class SearchUtil {
   public static async facets (): Promise<Facets> {
@@ -248,8 +249,59 @@ export class SearchUtil {
         maxBodyLength: Infinity
       }).then(resp => {
       const [searchResults] = SearchUtil.extractSearchResults(resp, lang)
-      return searchResults[0]
+      if (searchResults.length > 0) {
+        return searchResults[0]
+      }
+      // Nicht (mehr) im Index: Dokument direkt vom Server holen, falls es dort liegt.
+      return SearchUtil.documentFromFile(document, lang)
     })
+  }
+
+  // Metadaten aus der JSON-Datei zum Dokument; der Server löst die ID ohne
+  // Verzeichnis auf. Liefert undefined, wenn das Dokument auch auf dem Server fehlt.
+  private static async documentFromFile (document: string, lang: string): Promise<SearchResult | undefined> {
+    const meta = await axios.get(`${docsUrl}${encodeURIComponent(document)}.json`)
+      .then(resp => resp.data)
+      .catch(() => undefined)
+    if (meta === undefined) {
+      return undefined
+    }
+    return SearchUtil.transformMetaToResult(document, meta, lang)
+  }
+
+  private static transformMetaToResult (document: string, meta: any, lang: string): SearchResult | undefined {
+    const file = meta.PDF !== undefined ? meta.PDF : meta.HTML
+    if (file === undefined || file.Datei === undefined) {
+      return undefined
+    }
+    const match = document.match(/^([^_]*_[^_]*)/)
+    const gericht = match ? match[1] : document
+    return {
+      id: document,
+      text: '',
+      title: SearchUtil.getMetaText(meta.Kopfzeile, lang),
+      abstract: SearchUtil.getMetaText(meta.Abstract, lang),
+      date: typeof meta.Datum === 'string' && meta.Datum.length === 10 ? SearchUtil.formatDate(meta.Datum) : '',
+      scrapedate: typeof meta.Scrapedate === 'string' && meta.Scrapedate.length === 10 ? SearchUtil.formatDate(meta.Scrapedate) : undefined,
+      canton: document.split('_')[0].toUpperCase(),
+      gericht: gericht.toUpperCase(),
+      pdf: meta.PDF !== undefined,
+      url: docsUrl + file.Datei,
+      sort: []
+    }
+  }
+
+  // Kopfzeile/Abstract sind Listen mit den Sprachen, für die der Text gilt.
+  private static getMetaText (entries: any, lang: string): string {
+    if (!Array.isArray(entries)) {
+      return ''
+    }
+    for (const entry of entries) {
+      if (Array.isArray(entry.Sprachen) && entry.Sprachen.includes(lang) && entry.Text !== undefined) {
+        return entry.Text
+      }
+    }
+    return entries.length > 0 && entries[0].Text !== undefined ? entries[0].Text : ''
   }
 
   private static searchAggs (searches: Array<any>, searchResults: Array<SearchResult>, total: number, aggregations: Aggregations | undefined): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {

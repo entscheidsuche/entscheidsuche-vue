@@ -12,6 +12,8 @@
   "filterPlaceholder": "Filtern",
   "hit": "Treffer",
   "of": "von",
+  "documentNotFound": "Dokument nicht gefunden",
+  "documentNotFoundHint": "Das Dokument ist weder im Suchindex noch auf dem Server vorhanden.",
   "about": "Über uns",
   "organization": "Suchhilfe",
   "upload": "Upload",

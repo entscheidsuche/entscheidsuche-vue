@@ -145,6 +145,13 @@ export interface SearchResult {
   sort: Array<string | number>;
 }
 
+// Ein Dokument, das nicht (mehr) im Index ist, liefert kein Resultat. Damit ein solcher
+// Fall nicht zu Fehlern wie "Cannot use 'in' operator" führt, wird überall diese Prüfung
+// statt eines direkten `'id' in result` verwendet.
+export function isSearchResult (result?: SearchResult | {}): result is SearchResult {
+  return typeof result === 'object' && result !== null && 'id' in result
+}
+
 export interface Aggregation {
   key: string | number;
   count: number;
@@ -167,6 +174,7 @@ export interface SearchState {
   allResultsLoaded: boolean;
   aggregations: Aggregations;
   facets: Facets;
+  documentNotFound: boolean;
 }
 
 @Module({ dynamic: true, store, name: 'search' })
@@ -185,6 +193,7 @@ export class Search extends VuexModule implements SearchState {
   private sort = SortOrder.RELEVANCE
   private preview = ''
   private fullscreen = ''
+  private docNotFound = false
 
   public get pristine () {
     return this.prist
@@ -194,6 +203,7 @@ export class Search extends VuexModule implements SearchState {
   public SET_QUERY (query: string) {
     this.queryString = query
     this.doc = ''
+    this.docNotFound = false
     if (query === '') {
       this.filt = {}
     }
@@ -260,7 +270,7 @@ export class Search extends VuexModule implements SearchState {
     if (doc !== this.doc) {
       this.context.commit('SET_DOCUMENT', doc)
       if (doc !== '') {
-        if ('id' in this.selectedRes && this.selectedRes.id === doc) {
+        if (isSearchResult(this.selectedRes) && this.selectedRes.id === doc) {
           updateViewRoute(this.doc)
         } else {
           return this.context.dispatch('SetDocumentResult').then(() => {
@@ -276,14 +286,14 @@ export class Search extends VuexModule implements SearchState {
   @Mutation
   public SET_FULLSCREEN (fullscreen: string) {
     if (fullscreen !== '') {
-      if ('id' in this.selectedRes) {
+      if (isSearchResult(this.selectedRes)) {
         this.fullscreen = fullscreen
         updateRoute(this.queryString, this.filt, this.sort, this.selectedRes.id, this.preview, this.fullscreen)
       } else {
         router.push({ name: 'Home', query: { ...router.currentRoute.query } })
       }
     } else {
-      if ('id' in this.selectedRes) {
+      if (isSearchResult(this.selectedRes)) {
         this.fullscreen = ''
         updateRoute(this.queryString, this.filt, this.sort, this.selectedRes.id, this.preview)
       }
@@ -426,9 +436,10 @@ export class Search extends VuexModule implements SearchState {
     if (this.prist) {
       this.prist = false
     }
+    this.docNotFound = false
     this.results = results[0]
     this.allResLoaded = false
-    if ('id' in this.selectedRes) {
+    if (isSearchResult(this.selectedRes)) {
       const id = this.selectedRes.id
       let found = false
       for (const result of results[0]) {
@@ -459,15 +470,25 @@ export class Search extends VuexModule implements SearchState {
   }
 
   @Mutation
-  public SET_DOCUMENT_RESULT (result: SearchResult) {
+  public SET_DOCUMENT_RESULT (result?: SearchResult) {
     if (this.prist) {
       this.prist = false
     }
-    this.results = [result]
-    this.selectedRes = result
-    this.total = 1
     this.aggs = {}
     this.allResLoaded = true
+    if (result === undefined) {
+      // Das Dokument ist weder im Index noch auf dem Server. Trefferliste und Auswahl
+      // müssen leer bleiben, sonst steht `undefined` im State.
+      this.docNotFound = true
+      this.results = []
+      this.selectedRes = {}
+      this.total = 0
+    } else {
+      this.docNotFound = false
+      this.results = [result]
+      this.selectedRes = result
+      this.total = 1
+    }
   }
 
   @Mutation
@@ -525,7 +546,7 @@ export class Search extends VuexModule implements SearchState {
       const query = { ...router.currentRoute.query }
       const selectedId = query.selected
       const preview = query.preview
-      if ('id' in this.selectedRes) {
+      if (isSearchResult(this.selectedRes)) {
         if (selectedResult.id && preview === undefined && selectedId === selectedResult.id && selectedId === this.selectedRes.id) {
           this.preview = 'true'
           updateRoute(this.queryString, this.filt, this.sort, selectedResult.id, this.preview)
@@ -543,7 +564,7 @@ export class Search extends VuexModule implements SearchState {
 
   @Mutation
   public SET_PREVIEW (visible: boolean) {
-    if (!visible && 'id' in this.selectedRes) {
+    if (!visible && isSearchResult(this.selectedRes)) {
       this.preview = ''
       updateRoute(this.queryString, this.filt, this.sort, this.selectedRes.id, this.preview)
     }
@@ -578,6 +599,10 @@ export class Search extends VuexModule implements SearchState {
 
   public get aggregations (): Aggregations {
     return this.aggs
+  }
+
+  public get documentNotFound (): boolean {
+    return this.docNotFound
   }
 }
 
