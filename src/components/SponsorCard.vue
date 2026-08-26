@@ -1,15 +1,16 @@
 <template>
   <b-card>
-    <div class="card-img-wapper">
-      <a :href="this.link" target="_blank">
-        <b-card-img :src="getCardImgUrl()" alt="Image" top></b-card-img>
-      </a>
-    </div>
-    <div class="card-footer" v-b-tooltip.hover :title="getTooltipText()">
-      <div class="card-text-wrapper">
-        <b-card-text v-html="this.text"></b-card-text>
+    <!-- Link und Tooltip umfassen Logo und Text gemeinsam -->
+    <a class="sponsor-link" :href="link" target="_blank" v-b-tooltip.hover :title="tooltipText">
+      <div class="card-img-wapper">
+        <b-card-img :src="cardImgUrl" alt="Image" top></b-card-img>
       </div>
-    </div>
+      <div class="card-footer">
+        <div class="card-text-wrapper">
+          <b-card-text v-html="text"></b-card-text>
+        </div>
+      </div>
+    </a>
   </b-card>
 </template>
 
@@ -17,6 +18,18 @@
 .card {
   .card-body {
     padding: 0;
+
+    .sponsor-link {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+
+      &:hover,
+      &:focus {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
 
     .card-img-wapper {
       height: 100px;
@@ -71,21 +84,49 @@
 }
 </style>
 <script>
+// Reihenfolge fuer den Fallback, wenn fuer die aktive Sprache kein Wert gesetzt ist.
+const LANGUAGES = ['de', 'fr', 'it']
+
+/**
+ * Liefert den ersten nicht leeren Wert aus:
+ * <field>_<aktive Sprache>, <field>, <field>_de, <field>_fr, <field>_it
+ */
+function localizedField (sponsor, field, locale) {
+  if (!sponsor) {
+    return ''
+  }
+  const keys = [field + '_' + locale, field]
+  LANGUAGES.forEach(lang => keys.push(field + '_' + lang))
+  for (let i = 0; i < keys.length; i++) {
+    const value = sponsor[keys[i]]
+    if (typeof value === 'string' && value.trim() !== '') {
+      return value
+    }
+  }
+  return ''
+}
+
 export default {
   name: 'sponsor-card',
   props: {
-    logo: String,
-    link: String,
-    text: String,
-    tooltip: String,
-    active: Boolean
+    sponsor: {
+      type: Object,
+      required: true
+    }
   },
-  methods: {
-    getCardImgUrl () {
-      return require('@/assets/sponsors/' + this.logo)
+  computed: {
+    link () {
+      return localizedField(this.sponsor, 'link', this.$i18n.locale)
     },
-    getTooltipText () {
-      return this.tooltip !== '' ? this.tooltip.replace('&amp;', '&') : this.text.replace('&amp;', '&')
+    cardImgUrl () {
+      return require('@/assets/sponsors/' + this.sponsor.logo)
+    },
+    text () {
+      return localizedField(this.sponsor, 'text', this.$i18n.locale)
+    },
+    tooltipText () {
+      const tooltip = localizedField(this.sponsor, 'tooltip', this.$i18n.locale)
+      return (tooltip !== '' ? tooltip : this.text).replace('&amp;', '&')
     }
   }
 }

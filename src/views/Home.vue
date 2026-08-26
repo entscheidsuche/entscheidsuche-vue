@@ -9,7 +9,7 @@
       </a>-->
       <h1>{{$t('support')}}</h1>
       <b-card-group id='bcards' deck>
-        <sponsor-card v-for="(sponsor, index) in this.sponsors" :key="index" :logo="sponsor.logo" :link="sponsor.link" :text="sponsor.text" :tooltip="sponsor.tooltip"/>
+        <sponsor-card v-for="(sponsor, index) in this.sponsors" :key="index" :sponsor="sponsor"/>
 
         <div class="search-placeholder"></div>
         <div class="search-placeholder"></div>
@@ -378,7 +378,7 @@ Johannes <b>Wagner</b>, Appenzell;
 <script lang="ts">
 import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
-import { AppModule } from '@/store/modules/app'
+import { AppModule, Sponsor } from '@/store/modules/app'
 import SponsorCard from '@/components/SponsorCard.vue'
 import data from '../data/sponsors.json'
 
@@ -390,7 +390,7 @@ import data from '../data/sponsors.json'
 })
 
 export default class Home extends Vue {
-  public sponsors = data.filter(s => s.active)
+  public sponsors: Sponsor[] = data.filter(s => s.active)
 
   mounted () {
     const bcards = document.getElementById('bcards')

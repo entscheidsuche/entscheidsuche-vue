@@ -119,7 +119,7 @@
       <div v-bind:class="['results', this.fullScreen ? 'hidden' : '']" @scroll="handleScroll" id="results">
         <h1 class="card-group-title">{{$t('also support')}}</h1>
         <b-card-group id='bcardsResults' deck>
-          <sponsor-card v-for="(sponsor, index) in this.randomSponsors" :key="index" :logo="sponsor.logo" :link="sponsor.link" :text="sponsor.text" :tooltip="sponsor.tooltip"/>
+          <sponsor-card v-for="(sponsor, index) in this.randomSponsors" :key="index" :sponsor="sponsor"/>
         </b-card-group>
         <div v-bind:class="['button-wrapper', this.showMessage ? 'messageOffset' : '']">
           <div v-on:click="onToggleFilter()" v-bind:class="['show-filter', this.filterVisible ? '' : 'visible', this.fullScreen ? 'fullScreen' : '']">
@@ -1055,8 +1055,8 @@ export default class SearchResults extends Vue {
   public overlayVisible = false
   public overlayFrom = ''
   public overlayTo = ''
-  public sponsors = data.filter(s => s.active)
-  public randomSponsors = data.filter(s => s.active)
+  public sponsors: Sponsor[] = data.filter(s => s.active)
+  public randomSponsors: Sponsor[] = data.filter(s => s.active)
 
   data () {
     return {

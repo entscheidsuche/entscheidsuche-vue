@@ -343,10 +343,22 @@
         "active": true
     }, 
     {
+        "logo": "walderwyss_blu_rgb_8x6_300dpi.jpg",
+        "link_de": "https://www.walderwyss.com/de",
+        "link_fr": "https://www.walderwyss.com/fr",
+        "link_it": "https://www.walderwyss.com/it",
+        "text": "Walder Wyss",
+        "tooltip_de": "Walder Wyss Rechtsanwälte",
+        "tooltip_fr": "Walder Wyss Avocats",
+        "tooltip_it": "Walder Wyss studio legale",
+        "active": true
+    },
+    {
         "logo": "prime-ai.svg",
         "link": "https://prime-ai.eu/",
         "text": "Prime AI GmbH",
         "tooltip": "Prime AI GmbH",
         "active": false
     }
+    
 ]

@@ -32,10 +32,20 @@ export interface AppState {
 
 export interface Sponsor {
   logo: string;
-  link: string;
-  text: string;
-  tooltip: string;
   active: boolean;
+  // link/text/tooltip entweder sprachneutral oder sprachspezifisch; siehe SponsorCard.vue
+  link?: string;
+  link_de?: string;
+  link_fr?: string;
+  link_it?: string;
+  text?: string;
+  text_de?: string;
+  text_fr?: string;
+  text_it?: string;
+  tooltip?: string;
+  tooltip_de?: string;
+  tooltip_fr?: string;
+  tooltip_it?: string;
 }
 
 @Module({ dynamic: true, store, name: 'app' })
