@@ -9,7 +9,8 @@
     {
         "logo": "sponsor2.png",
         "link": "https://www3.unifr.ch/ius/de/",
-        "text": "Université de Fribourg Universität Freiburg",
+        "text_de": "Universität Freiburg",
+        "text_fr": "Université de Fribourg",
         "tooltip": "",
         "active": false
     },
@@ -30,7 +31,8 @@
     {
         "logo": "sponsor6.png",
         "link": "https://www.bav-aab.ch/de/",
-        "text": "Bernischer Anwaltsverband Association des avocats bernois",
+        "text_de": "Bernischer Anwaltsverband",
+        "text_fr": "Association des avocats bernois",
         "tooltip": "",
         "active": true
     },
@@ -58,7 +60,8 @@
     {
         "logo": "sponsor11.jpg",
         "link": "https://www3.unifr.ch/federalism/en/",
-        "text": "Institut für Föderalismus, Universität Freiburg Institut du Fédéralisme, Université de Fribourg",
+        "text_de": "Institut für Föderalismus, Universität Freiburg",
+        "text_fr": "Institut du Fédéralisme, Université de Fribourg",
         "tooltip": "",
         "active": true
     },
@@ -72,7 +75,8 @@
     {
         "logo": "sponsor13.jpg",
         "link": "https://www.schkg-vereinigung.ch/",
-        "text": "SchKG-Vereinigung Association LP",
+        "text_de": "SchKG-Vereinigung",
+        "text_fr": "Association LP",
         "tooltip": "",
         "active": true
     },
