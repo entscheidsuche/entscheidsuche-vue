@@ -1,7 +1,7 @@
 <template>
   <b-card>
     <!-- Link und Tooltip umfassen Logo und Text gemeinsam -->
-    <a class="sponsor-link" :href="link" target="_blank" v-b-tooltip.hover :title="tooltipText">
+    <a class="tile-link" :href="link" target="_blank" v-b-tooltip.hover :title="tooltipText">
       <div class="card-img-wapper">
         <b-card-img :src="cardImgUrl" alt="Image" top></b-card-img>
       </div>
@@ -19,7 +19,7 @@
   .card-body {
     padding: 0;
 
-    .sponsor-link {
+    .tile-link {
       display: block;
       color: inherit;
       text-decoration: none;
