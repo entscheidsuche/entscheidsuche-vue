@@ -1,0 +1,38 @@
+# systemd unit for the entscheidsuche frontend, served by Caddy (deploy/Caddyfile).
+#
+# Install (after `npm ci && npm run build`, and creating deploy/caddy.env):
+#   sudo cp deploy/systemd/entscheidsuche-frontend.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now entscheidsuche-frontend
+# Reload the Caddyfile without downtime:
+#   sudo systemctl reload entscheidsuche-frontend
+# Logs:
+#   journalctl -u entscheidsuche-frontend -f
+#
+# If Caddy was installed from a distro package, its own caddy.service also
+# uses the admin port localhost:2019 and must be disabled first:
+#   sudo systemctl disable --now caddy
+# A rebuild of dist/ needs no restart; Caddy serves the new files directly.
+
+[Unit]
+Description=entscheidsuche frontend (Caddy)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=notify
+User=piribauer
+WorkingDirectory=/home/piribauer/entscheidsuche-vue
+# Provides ES_BASIC_AUTH. Plain KEY=value lines, see deploy/caddy.env.example.
+EnvironmentFile=/home/piribauer/entscheidsuche-vue/deploy/caddy.env
+ExecStart=/usr/bin/caddy run --config deploy/Caddyfile --adapter caddyfile
+ExecReload=/usr/bin/caddy reload --config deploy/Caddyfile --adapter caddyfile --force
+TimeoutStopSec=5s
+LimitNOFILE=1048576
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

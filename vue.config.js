@@ -60,6 +60,15 @@ module.exports = {
           proxyReq.removeHeader('origin')
         }
       },
+      // Query embeddings (vLLM) via the server's Caddy, which forwards them to the vLLM servers on localhost.
+      '/api/embed': {
+        target: 'http://192.168.99.235:8080',
+        changeOrigin: true,
+        onProxyReq (proxyReq) {
+          // Remove Origin header
+          proxyReq.removeHeader('origin')
+        }
+      },
       '/api/llm': {
         target: 'http://192.168.99.235:1234',
         changeOrigin: true,

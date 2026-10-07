@@ -28,3 +28,6 @@ src/views/Datenschutz.vue.alt
 src/views/Suchhilfe.vue.alt
 package-lock.json
 package-lock.json
+
+# Server secrets for Caddy (see deploy/caddy.env.example)
+deploy/caddy.env

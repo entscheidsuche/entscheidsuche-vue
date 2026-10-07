@@ -1,0 +1,90 @@
+# Caddy config for the entscheidsuche frontend on the server.
+#
+# Serves the built frontend (dist/) and proxies the APIs it uses, so the browser
+# only ever talks to this one origin. Elasticsearch, the feeder and the vLLM
+# embedding servers stay bound to localhost.
+#
+# Run from the repository root (see systemd/entscheidsuche-frontend.service):
+#   caddy run --config deploy/Caddyfile --adapter caddyfile
+# Secrets come from the environment (deploy/caddy.env, see caddy.env.example).
+
+:8080
+
+# Serve static files from ./dist (relative to the working directory)
+root * ./dist
+file_server
+
+# Elasticsearch: only search requests, authenticated by the proxy.
+@es_search {
+	path_regexp ^/api/elasticsearch/.*_search$
+}
+
+route @es_search {
+	uri strip_prefix /api/elasticsearch
+	reverse_proxy https://localhost:9200 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+		header_up Authorization "Basic {$ES_BASIC_AUTH}"
+		header_up -WWW-Authenticate
+		header_down -WWW-Authenticate
+	}
+}
+
+# Query embeddings for AI search. Only the embeddings endpoint of each vLLM
+# server is reachable; the frontend calls <VUE_APP_EMBED_*_API_URL>/v1/embeddings.
+@embed_big {
+	method POST
+	path /api/embed/big/v1/embeddings
+}
+
+route @embed_big {
+	request_body {
+		max_size 1MB
+	}
+	uri strip_prefix /api/embed/big
+	reverse_proxy 127.0.0.1:8001
+}
+
+@embed_micro {
+	method POST
+	path /api/embed/micro/v1/embeddings
+}
+
+route @embed_micro {
+	request_body {
+		max_size 1MB
+	}
+	uri strip_prefix /api/embed/micro
+	reverse_proxy 127.0.0.1:8002
+}
+
+route /api/docs/* {
+	uri strip_prefix /api
+	reverse_proxy https://entscheidsuche.ch {
+		header_up Host {upstream_hostport}
+	}
+}
+
+# Indexes micro chunks of a document on demand when a search result has none yet.
+route /api/indexMicroChunk* {
+	uri strip_prefix /api
+	reverse_proxy http://localhost:8000 {
+		header_up Host {upstream_hostport}
+	}
+}
+
+# Full feeder API (spider updates, /import, /import/status, index creation).
+# Anyone who can reach this port can start an import. To limit it to the local
+# network, replace the route below with:
+#   @feeder {
+#   	path /feeder*
+#   	remote_ip private_ranges
+#   }
+#   route @feeder { ... }
+route /feeder* {
+	uri strip_prefix /feeder
+	reverse_proxy http://localhost:8000 {
+		header_up Host {upstream_hostport}
+	}
+}
