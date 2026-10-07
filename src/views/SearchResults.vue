@@ -220,8 +220,8 @@
             </div>
           </div>
           <div id="outer-pdf" style="-webkit-overflow-scrolling: touch; overflow: auto;">
-            <iframe v-on:load="highlightByOffset(selectedResult, true)" ref="desktopResultIframe" v-if="this.windowWidth > 1024" frameborder="0" id="result-iframe" class="desktop-pdf" scrolling="auto" :src="this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
-            <iframe v-on:load="highlightByOffset(selectedResult, false)" ref="mobileResultIframe" v-if="this.windowWidth <= 1024" class="mobile-pdf" id="mobile-result-iframe" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+            <iframe v-on:load="highlightChunk(selectedResult, true)" ref="desktopResultIframe" v-if="this.windowWidth > 1024" frameborder="0" id="result-iframe" class="desktop-pdf" scrolling="auto" :src="this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
+            <iframe v-on:load="highlightChunk(selectedResult, false)" ref="mobileResultIframe" v-if="this.windowWidth <= 1024" class="mobile-pdf" id="mobile-result-iframe" scrolling="auto" :src="selectedResult.pdf ? getMobileDocUrl(selectedResult.url) : this.iframeUrl" width="100%" height="100%" :type="selectedResult.pdf ? 'application/pdf' : 'text/html'" title="Title"></iframe>
           </div>
         </div>
       </div>
@@ -1079,6 +1079,7 @@ import i18n from '@/i18n'
 import SponsorCard from '@/components/SponsorCard.vue'
 import data from '../data/sponsors.json'
 import { SearchUtil } from '@/util/search/search'
+import { highlightText } from '@/util/search/highlight'
 
 @Component({
   name: 'SearchResult',
@@ -1335,8 +1336,9 @@ export default class SearchResults extends Vue {
   }
 
   handleResize () {
-    this.getFilterInnerWidth()
+    // Update the width first: getFilterInnerWidth depends on it.
     this.windowWidth = window.innerWidth
+    this.getFilterInnerWidth()
     this.filterVisible = this.windowWidth > 1024
     this.setRandomSponsors()
   }
@@ -1655,199 +1657,24 @@ export default class SearchResults extends Vue {
     }
   }
 
-  public async highlightByOffset (result, desktop : boolean) {
-    if (result.pdf) return
+  // Finds the best micro chunk's text in the document shown in the iframe, highlights it and scrolls
+  // to it. Matches by text rather than by offset: the offsets refer to the text the chunk API extracted
+  // on the server, which does not line up with the rendered document.
+  public async highlightChunk (result, desktop : boolean) {
+    if (result.pdf || !result.text) return
     await nextTick()
-    console.log('loaded Iframe for ' + result)
-    const start = result.textOffset
-    const length = result.textLength
     const iframe = desktop ? this.$refs.desktopResultIframe as HTMLIFrameElement : this.$refs.mobileResultIframe as HTMLIFrameElement
-
-    const root = iframe.contentDocument?.body
-
+    const root = iframe?.contentDocument?.body
     if (!root) {
       console.error('Iframe not ready or cross-origin')
       return
     }
-    const walker = document.createTreeWalker(
-      root,
-      NodeFilter.SHOW_TEXT,
-      {
-        acceptNode (node) {
-          // Skip if inside a <table>
-          let el = node.parentElement
-          while (el) {
-            if (el.tagName === 'TABLE') {
-              return NodeFilter.FILTER_REJECT
-            }
-            el = el.parentElement
-          }
-          return NodeFilter.FILTER_ACCEPT
-        }
-      }
-    )
-
-    let currentOffset = 0
-    let startNode : any = null
-    let startOffset = 0
-    let endNode : any = null
-    let endOffset = 0
-    // let text = ''
-    let prevNodeEndsWithWhitespace = true
-
-    while (walker.nextNode()) {
-      const node = walker.currentNode
-      if (node.nodeName === 'TABLE') continue
-      let textContent = node.textContent ? node.textContent.replaceAll(/\s+/g, ' ') : ''
-      textContent = prevNodeEndsWithWhitespace ? textContent.trimStart() : textContent
-      const textLength = textContent.length
-      // text += textContent
-      // Find start
-      if (!startNode && currentOffset + textLength >= start) {
-        startNode = node
-        startOffset = start - currentOffset
-      }
-
-      // Find end
-      if (!endNode && currentOffset + textLength >= start + length) {
-        endNode = node
-        endOffset = start + length - currentOffset
-        break
-      }
-      if (textContent.endsWith(' ') || textContent === '') {
-        prevNodeEndsWithWhitespace = true
-      } else {
-        prevNodeEndsWithWhitespace = false
-      }
-
-      currentOffset += textLength
-    }
-
-    // console.log(text)
-
-    this.highlightRange(startNode, startOffset, endNode, endOffset)
-  }
-
-  private highlightRange (
-    startNode: Node,
-    startOffset: number,
-    endNode: Node,
-    endOffset: number
-  ): void {
-    const range = document.createRange()
-    range.setStart(startNode, startOffset)
-    range.setEnd(endNode, endOffset)
-
-    const commonAncestor = range.commonAncestorContainer
-
-    const startContainer: Node = range.startContainer
-    const endContainer: Node = range.endContainer
-
-    if (
-      startContainer === endContainer &&
-      startContainer.nodeType === Node.TEXT_NODE
-    ) {
-      const textNode = startContainer as Text
-      const parent = textNode.parentNode
-      if (!parent) return
-
-      const text = textNode.nodeValue ?? ''
-      const beforeText = text.slice(0, range.startOffset)
-      const selectedText = text.slice(range.startOffset, range.endOffset)
-      const afterText = text.slice(range.endOffset)
-
-      const beforeNode = beforeText ? document.createTextNode(beforeText) : null
-      const mark = document.createElement('mark')
-      mark.textContent = selectedText
-      const afterNode = afterText ? document.createTextNode(afterText) : null
-
-      if (beforeNode) {
-        parent.insertBefore(beforeNode, textNode)
-      }
-      parent.insertBefore(mark, textNode)
-      if (afterNode) {
-        parent.insertBefore(afterNode, textNode)
-      }
-      parent.removeChild(textNode)
+    const marks = highlightText(root, result.text)
+    if (marks.length === 0) {
+      console.log(`micro chunk text not found in document ${result.id}`)
       return
     }
-
-    if (startContainer.nodeType === Node.TEXT_NODE) {
-      this.splitTextNode(startContainer as Text, range.startOffset)
-    }
-
-    if (endContainer.nodeType === Node.TEXT_NODE) {
-      this.splitTextNode(endContainer as Text, range.endOffset)
-    }
-
-    const selectedNodes: Text[] = []
-
-    const walkerRoot =
-      commonAncestor.nodeType === Node.TEXT_NODE
-        ? commonAncestor.parentNode
-        : commonAncestor
-
-    if (!walkerRoot) return
-
-    const walker = document.createTreeWalker(
-      walkerRoot,
-      NodeFilter.SHOW_TEXT,
-      {
-        acceptNode: (node: Node): number => {
-          if (node.nodeType !== Node.TEXT_NODE) {
-            return NodeFilter.FILTER_REJECT
-          }
-
-          const textNode = node as Text
-          const value = textNode.nodeValue ?? ''
-
-          if (!value.trim()) {
-            return NodeFilter.FILTER_REJECT
-          }
-
-          try {
-            return range.intersectsNode(textNode)
-              ? NodeFilter.FILTER_ACCEPT
-              : NodeFilter.FILTER_REJECT
-          } catch {
-            return NodeFilter.FILTER_REJECT
-          }
-        }
-      }
-    )
-
-    let currentNode: Node | null = walker.nextNode()
-    while (currentNode) {
-      if (currentNode.nodeType === Node.TEXT_NODE) {
-        selectedNodes.push(currentNode as Text)
-      }
-      currentNode = walker.nextNode()
-    }
-
-    selectedNodes.forEach((node: Text) => {
-      const parent = node.parentNode
-      if (!parent) return
-
-      const text = node.textContent ?? ''
-      if (!text.trim()) return
-
-      const mark = document.createElement('mark')
-      mark.textContent = text
-      parent.replaceChild(mark, node)
-    })
-  }
-
-  private splitTextNode (textNode, startOffset) {
-    const parent = textNode.parentNode
-    const beforeText = textNode.nodeValue.slice(0, startOffset)
-    const afterText = textNode.nodeValue.slice(startOffset)
-
-    const beforeNode = beforeText ? document.createTextNode(beforeText) : null
-    const afterNode = afterText ? document.createTextNode(afterText) : null
-
-    if (beforeNode) textNode.before(beforeNode)
-    if (afterNode) textNode.after(afterNode)
-    parent.removeChild(textNode)
+    marks[0].scrollIntoView({ block: 'center' })
   }
 
   public get showMessage () {
@@ -1969,7 +1796,7 @@ export default class SearchResults extends Vue {
     } else if (this.windowWidth > 534) {
       this.sliderWidth = 258
     } else {
-      this.sliderWidth = (this.windowWidth - 90)
+      this.sliderWidth = Math.max(0, this.windowWidth - 90)
     }
   }
 
