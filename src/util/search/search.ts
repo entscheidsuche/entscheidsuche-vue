@@ -2,7 +2,13 @@ import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult, SortO
 import axios, { AxiosResponse } from 'axios'
 
 const searchUrl = `${process.env.VUE_APP_SEARCH_URL}`
-const llmUrl = `${process.env.VUE_APP_LLM_API_URL}`
+// Big chunks and micro chunks are embedded with different models, so a query needs one embedding per model.
+const embedBigUrl = `${process.env.VUE_APP_EMBED_BIG_API_URL}`
+const embedBigModel = `${process.env.VUE_APP_EMBED_BIG_MODEL}`
+const embedMicroUrl = `${process.env.VUE_APP_EMBED_MICRO_API_URL}`
+const embedMicroModel = `${process.env.VUE_APP_EMBED_MICRO_MODEL}`
+// Qwen3-Embedding expects an instruction on the query side only (documents are embedded without one).
+const queryInstruction = 'Given a legal search query, retrieve relevant passages of court decisions that answer the query'
 const embeddingSearchUrl = `${process.env.VUE_APP_EMBEDDING_SEARCH_URL}`
 const embeddingMicroSearchUrl = `${process.env.VUE_APP_EMBEDDING_MICRO_SEARCH_URL}`
 const indexMicroChunksUrl = `${process.env.VUE_APP_INDEX_MICRO_CHUNK_URL}`
@@ -243,7 +249,10 @@ export class SearchUtil {
   }
 
   public static async aiSearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, totalSize: number, pageSize: number): Promise<any> {
-    const embedding = await this.getEmbedding(query)
+    const [embedding, microEmbedding] = await Promise.all([
+      this.getEmbedding(query, embedBigUrl, embedBigModel),
+      this.getEmbedding(query, embedMicroUrl, embedMicroModel)
+    ])
     const embeddingSearch = this.buildEmbeddingSearch(embedding, totalSize, filters)
     const matches = new Map<string, Array<string>>()
     const chunkScores = new Map<string, number>()
@@ -281,7 +290,7 @@ export class SearchUtil {
 
     for (let i = 0; i < pageSize; i++) {
       const sr = searchResults[i]
-      const bestMicroChunks = await this.getBestMicroChunks(sr.id, embedding, sr.bigChunkId)
+      const bestMicroChunks = await this.getBestMicroChunks(sr.id, microEmbedding, sr.bigChunkId)
       if (bestMicroChunks !== undefined && bestMicroChunks !== null && bestMicroChunks.length > 0) {
         sr.text = bestMicroChunks[0]._source.chunkText
         sr.textOffset = bestMicroChunks[0]._source.offset
@@ -301,9 +310,9 @@ export class SearchUtil {
     } else {
       newResults[0] = []
     }
-    const embedding = await this.getEmbedding(queryString)
+    const microEmbedding = await this.getEmbedding(queryString, embedMicroUrl, embedMicroModel)
     for (const sr of newResults[0]) {
-      const bestMicroChunks = await this.getBestMicroChunks(sr.id, embedding, sr.bigChunkId)
+      const bestMicroChunks = await this.getBestMicroChunks(sr.id, microEmbedding, sr.bigChunkId)
       if (bestMicroChunks[0] !== undefined && bestMicroChunks[0] !== null && bestMicroChunks.length > 0) {
         sr.text = bestMicroChunks[0]._source.chunkText
         sr.textOffset = bestMicroChunks[0]._source.offset
@@ -443,10 +452,11 @@ export class SearchUtil {
     return dot / (Math.sqrt(normA) * Math.sqrt(normB))
   }
 
-  private static async getEmbedding (query: string): Promise<any> {
-    return axios.post(llmUrl, { model: 'qwen3-embedding', input: query })
+  private static async getEmbedding (query: string, url: string, model: string): Promise<any> {
+    const input = `Instruct: ${queryInstruction}\nQuery: ${query}`
+    return axios.post(url + '/v1/embeddings', { model, input, encoding_format: 'float' })
       .then(resp => {
-        return resp.data.embeddings[0]
+        return resp.data.data[0].embedding
       })
       .catch(err => console.log(err))
   }
@@ -458,7 +468,7 @@ export class SearchUtil {
         field: 'embedding',
         query_vector: embedding,
         k: size * 1.5,
-        num_candidates: size * 6
+        num_candidates: size * 5
       },
       fields: [
         'documentId',
