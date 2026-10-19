@@ -1,6 +1,34 @@
 const fs = require('fs')
 const path = require('path')
 
+// Direct Elasticsearch proxy for development inside the Pansoft LAN only. It needs the ES CA
+// certificate (certs/http_ca.crt) and ELASTICSEARCH_USER/PASSWORD. Without the certificate the
+// proxy is skipped, so `serve`/`build` still work with absolute VUE_APP_* URLs (.env.development.local).
+const esCaFile = path.resolve(__dirname, 'certs/http_ca.crt')
+const esProxy = fs.existsSync(esCaFile)
+  ? {
+      '/api/elasticsearch': {
+        target: 'https://192.168.99.235:9200',
+        changeOrigin: true,
+        secure: true, // we want SSL verification
+        headers: {
+          // Basic Auth header
+          Authorization: 'Basic ' + Buffer.from(
+            `${process.env.ELASTICSEARCH_USER}:${process.env.ELASTICSEARCH_PASSWORD}`
+          ).toString('base64')
+        },
+        agent: new (require('https').Agent)({
+          ca: fs.readFileSync(esCaFile)
+        }),
+        pathRewrite: { '^/api/elasticsearch': '' },
+        onProxyReq (proxyReq) {
+          // Remove Origin header
+          proxyReq.removeHeader('origin')
+        }
+      }
+    }
+  : {}
+
 module.exports = {
   chainWebpack: config => {
     config.module
@@ -41,25 +69,7 @@ module.exports = {
       'localhost:8080'
     ],
     proxy: {
-      '/api/elasticsearch': {
-        target: 'https://192.168.99.235:9200',
-        changeOrigin: true,
-        secure: true, // we want SSL verification
-        headers: {
-          // Basic Auth header
-          Authorization: 'Basic ' + Buffer.from(
-            `${process.env.ELASTICSEARCH_USER}:${process.env.ELASTICSEARCH_PASSWORD}`
-          ).toString('base64')
-        },
-        agent: new (require('https').Agent)({
-          ca: fs.readFileSync(path.resolve(__dirname, 'certs/http_ca.crt'))
-        }),
-        pathRewrite: { '^/api/elasticsearch': '' },
-        onProxyReq (proxyReq) {
-          // Remove Origin header
-          proxyReq.removeHeader('origin')
-        }
-      },
+      ...esProxy,
       // Query embeddings (vLLM) via the server's Caddy, which forwards them to the vLLM servers on localhost.
       '/api/embed': {
         target: 'http://192.168.99.235:8080',

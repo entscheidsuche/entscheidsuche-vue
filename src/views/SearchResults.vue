@@ -1259,7 +1259,7 @@ export default class SearchResults extends Vue {
     if (iFrame && iFrameParent && selectedResult.url) {
       let newUrl = selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
       if (!selectedResult.pdf) {
-        newUrl = newUrl.replace('https://entscheidsuche.ch/docs/', '/api/docs/')
+        newUrl = newUrl.replace('https://entscheidsuche.ch/docs/', process.env.VUE_APP_DOCS_URL || '/api/docs/')
       }
       const url = iFrame.getAttribute('src')
       if (url !== newUrl) {
@@ -1290,7 +1290,7 @@ export default class SearchResults extends Vue {
         }
         let newUrl = this.selectedResult.url + (this.fullScreen ? '' : '#view=FitH')
         if (!this.selectedResult.pdf) {
-          newUrl = newUrl.replace('https://entscheidsuche.ch/docs/', '/api/docs/')
+          newUrl = newUrl.replace('https://entscheidsuche.ch/docs/', process.env.VUE_APP_DOCS_URL || '/api/docs/')
         }
         this.iframeUrl = newUrl
       }
