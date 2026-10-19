@@ -13,11 +13,11 @@
       :disableFuzzyMatching="true"
       :searchable="this.getSearchable()">
       @input="onHierarchieChanged"
-      <label slot="option-label" slot-scope="{ node, labelClassName, countClassName}" v-bind:class="[labelClassName, node.raw.count === 0 ? 'empty' : '']">
+      <label slot="option-label" slot-scope="{ node, labelClassName, countClassName}" v-bind:class="[labelClassName, node.raw.count === 0 && !countsIncomplete ? 'empty' : '']">
         <div class="text-wrapper">
           <span>{{ node.label }}</span>
         </div>
-        <span :class="countClassName">({{ node.raw.count }})</span>
+        <span v-if="node.raw.count > 0 || !countsIncomplete" :class="countClassName">({{ node.raw.count }})</span>
       </label>
     </treeselect>
   </b-form-group>
@@ -106,6 +106,11 @@ export default class HierarchieFilter extends Vue {
 
   get locale () {
     return AppModule.locale
+  }
+
+  // AI search with filters: entries outside the filtered results show no count instead of (0).
+  get countsIncomplete () {
+    return SearchModule.aiCountsIncomplete
   }
 
   get facets () {

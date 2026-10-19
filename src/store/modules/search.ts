@@ -7,6 +7,10 @@ import { AppModule } from '@/store/modules/app'
 
 const FILTER_DELIMITER = '@'
 
+// AI search: a filter change is applied in the browser as long as at least this many documents remain;
+// otherwise the AI search is repeated with the filter.
+const AI_MIN_STATIC_RESULTS = 15
+
 export type Facets = Array<Facet>
 
 export enum FilterType {
@@ -156,6 +160,11 @@ export interface SearchResult {
   bigChunkText: string;
   bigChunkId: string;
   microChunks: Array<any>;
+  // Lean metadata used to filter AI search results in the browser.
+  hierarchy?: Array<string>;
+  language?: string;
+  dateMs?: number;
+  scrapedateMs?: number;
 }
 
 export interface Aggregation {
@@ -202,6 +211,11 @@ export class Search extends VuexModule implements SearchState {
   private fullscreen = ''
   private aiPageSize = 10
   private aiAllResults: [Array<SearchResult>, number, any] = [[], 0, 0]
+  // Results and filters of the last AI search request; filter changes are applied to these in the browser.
+  private aiBaseResults: Array<SearchResult> = []
+  private aiBaseFilters: Filters = {}
+  // i18n key of the notice shown while the AI search is repeated because of a filter change ('' = none)
+  private aiRefilter = ''
 
   public get pristine () {
     return this.prist
@@ -403,7 +417,7 @@ export class Search extends VuexModule implements SearchState {
     if (!(filters.length === 0 && Object.keys(this.filt).length === 0)) {
       this.context.commit('SET_FILTERS', filters)
       if (this.queryString !== '') {
-        return this.context.dispatch('SetResults')
+        return this.context.dispatch(this.aiSearch ? 'ApplyAiFilters' : 'SetResults')
       }
     }
   }
@@ -412,7 +426,7 @@ export class Search extends VuexModule implements SearchState {
   public AddFilter (filter: Filter) {
     this.context.commit('ADD_FILTER', filter)
     if (this.queryString !== '') {
-      return this.context.dispatch('SetResults')
+      return this.context.dispatch(this.aiSearch ? 'ApplyAiFilters' : 'SetResults')
     }
   }
 
@@ -420,8 +434,75 @@ export class Search extends VuexModule implements SearchState {
   public RemoveFilter (type: FilterType) {
     this.context.commit('REMOVE_FILTER', type)
     if (this.queryString !== '') {
-      return this.context.dispatch('SetResults')
+      return this.context.dispatch(this.aiSearch ? 'ApplyAiFilters' : 'SetResults')
     }
+  }
+
+  // AI search: apply the current filters to the loaded results in the browser if enough documents remain,
+  // otherwise repeat the AI search with the filters.
+  @Action
+  public async ApplyAiFilters () {
+    const filters = this.filt
+    if (SearchUtil.isNarrowerOrEqual(filters, this.aiBaseFilters)) {
+      const subset = this.aiBaseResults.filter(sr => SearchUtil.matchesFilters(sr, filters))
+      if (subset.length >= AI_MIN_STATIC_RESULTS) {
+        const allResults = [subset, subset.length, SearchUtil.computeAggregations(this.aiBaseResults, filters)]
+        this.context.commit('RESULTS_PENDING', true)
+        try {
+          const firstPage = await SearchUtil.aiGetMoreResults(allResults, 1, this.aiPageSize, this.queryString, AppModule.locale)
+          this.context.commit('SET_AI_STATIC_RESULTS', { allResults, firstPage: firstPage[0] })
+        } finally {
+          this.context.commit('RESULTS_PENDING', false)
+        }
+        return
+      }
+    }
+    const notice = Object.keys(filters).length === 0
+      ? 'aiRefilterNone'
+      : Object.keys(this.aiBaseFilters).length > 0 ? 'aiRefilterChanged' : 'aiRefilter'
+    this.context.commit('SET_AI_REFILTER', notice)
+    try {
+      await this.context.dispatch('SetResults')
+    } finally {
+      this.context.commit('SET_AI_REFILTER', '')
+    }
+  }
+
+  @Mutation
+  public SET_AI_STATIC_RESULTS (payload: { allResults: [Array<SearchResult>, number, Aggregations], firstPage: Array<SearchResult> }) {
+    this.aiAllResults = payload.allResults
+    this.results = payload.firstPage
+    this.total = payload.allResults[1]
+    this.aggs = payload.allResults[2]
+    this.allResLoaded = false
+    if ('id' in this.selectedRes) {
+      const id = this.selectedRes.id
+      this.selectedRes = payload.firstPage.find(sr => sr.id === id) || payload.allResults[0].find(sr => sr.id === id) || {}
+    }
+  }
+
+  @Mutation
+  public SET_AI_BASE (payload: { results: Array<SearchResult>, filters: Filters }) {
+    this.aiBaseResults = payload.results
+    this.aiBaseFilters = payload.filters
+  }
+
+  @Mutation
+  public SET_AI_REFILTER (notice: string) {
+    this.aiRefilter = notice
+  }
+
+  public get aiRefiltering (): boolean {
+    return this.aiRefilter !== ''
+  }
+
+  public get aiRefilterNotice (): string {
+    return this.aiRefilter
+  }
+
+  // After an AI search with filters, a count of 0 only means "not among the filtered results".
+  public get aiCountsIncomplete (): boolean {
+    return this.aiSearch && Object.keys(this.aiBaseFilters).length > 0
   }
 
   public get filters (): Filters {
@@ -507,11 +588,15 @@ export class Search extends VuexModule implements SearchState {
   public async SetResults () {
     this.context.commit('RESULTS_PENDING', true)
     this.context.commit('SET_RESULTS', [[], 0, []])
-    return this.aiSearch
-      ? SearchUtil.aiSearch(this.query, AppModule.locale, this.filters, this.sortOrder, 100, this.aiPageSize)
+    if (this.aiSearch) {
+      const filters = this.filters
+      const results = await SearchUtil.aiSearch(this.query, AppModule.locale, filters, this.sortOrder, 100, this.aiPageSize)
         .finally(() => this.context.commit('RESULTS_PENDING', false))
-      : SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort)
-        .finally(() => this.context.commit('RESULTS_PENDING', false))
+      this.context.commit('SET_AI_BASE', { results: results[0], filters })
+      return [results[0], results[0].length, SearchUtil.computeAggregations(results[0], filters)]
+    }
+    return SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort)
+      .finally(() => this.context.commit('RESULTS_PENDING', false))
   }
 
   @Action({ commit: 'SET_DOCUMENT_RESULT' })
@@ -528,7 +613,7 @@ export class Search extends VuexModule implements SearchState {
       const pageNumber = this.results.length / this.aiPageSize + 1
       this.context.commit('RESULTS_PENDING', true)
       return this.aiSearch
-        ? SearchUtil.aiGetMoreResults(this.aiAllResults, pageNumber, this.aiPageSize, this.queryString)
+        ? SearchUtil.aiGetMoreResults(this.aiAllResults, pageNumber, this.aiPageSize, this.queryString, AppModule.locale)
           .finally(() => this.context.commit('RESULTS_PENDING', false))
         : SearchUtil.search(this.queryString, AppModule.locale, this.filt, this.sort, sortAfter)
           .finally(() => this.context.commit('RESULTS_PENDING', false))

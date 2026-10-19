@@ -1,5 +1,6 @@
-import { Aggregation, Aggregations, Facets, Filter, Filters, SearchResult, SortOrder } from '@/store/modules/search'
+import { Aggregation, Aggregations, Facets, Filter, Filters, FilterType, SearchResult, SortOrder } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
+import _ from 'lodash'
 
 const searchUrl = `${process.env.VUE_APP_SEARCH_URL}`
 // Big chunks and micro chunks are embedded with different models, so a query needs one embedding per model.
@@ -13,7 +14,15 @@ const embeddingSearchUrl = `${process.env.VUE_APP_EMBEDDING_SEARCH_URL}`
 const embeddingMicroSearchUrl = `${process.env.VUE_APP_EMBEDDING_MICRO_SEARCH_URL}`
 const indexMicroChunksUrl = `${process.env.VUE_APP_INDEX_MICRO_CHUNK_URL}`
 
+// Fields copied from the per-page detail requests of the AI search (see addPageDetails).
+const PAGE_DETAIL_FIELDS = ['title', 'abstract', 'bigChunkText', 'text', 'textOffset', 'textLength', 'microChunks']
+
 export class SearchUtil {
+  // Page details already loaded for the current AI search (by document id), so that paging and
+  // static filtering do not load them again. Reset by every new AI search.
+  private static pageDetails = new Map<string, any>()
+  private static microEmbeddingCache: { query: string, embedding: number[] } | undefined
+
   public static async facets (): Promise<Facets> {
     return axios.get('https://entscheidsuche.ch/docs/Facetten.json')
       .then(resp => SearchUtil.transformResultToFacets(resp))
@@ -249,21 +258,27 @@ export class SearchUtil {
   }
 
   public static async aiSearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, totalSize: number, pageSize: number): Promise<any> {
+    this.pageDetails = new Map<string, any>()
     const [embedding, microEmbedding] = await Promise.all([
       this.getEmbedding(query, embedBigUrl, embedBigModel),
       this.getEmbedding(query, embedMicroUrl, embedMicroModel)
     ])
+    this.microEmbeddingCache = { query, embedding: microEmbedding }
     const embeddingSearch = this.buildEmbeddingSearch(embedding, totalSize, filters)
-    const matches = new Map<string, Array<string>>()
+    const matches = new Map<string, string>()
     const chunkScores = new Map<string, number>()
     await axios.post(embeddingSearchUrl, embeddingSearch, {
       maxContentLength: Infinity,
       maxBodyLength: Infinity
     }).then(resp => {
       if (resp.data !== undefined && resp.data.hits !== undefined && resp.data.hits.hits !== undefined) {
+        // Hits are sorted by score (descending): keep the first, i.e. best, chunk per document.
         resp.data.hits.hits.forEach(hit => {
-          matches.set(hit.fields.documentId[0], [hit._id, hit.fields.chunkText[0]])
-          chunkScores.set(hit.fields.documentId[0], hit._score)
+          const documentId = hit.fields.documentId[0]
+          if (!matches.has(documentId)) {
+            matches.set(documentId, hit._id)
+            chunkScores.set(documentId, hit._score)
+          }
         })
       }
     })
@@ -282,26 +297,16 @@ export class SearchUtil {
     for (const sr of searchResults) {
       const score = <number>chunkScores.get(sr.id)
       sr.score = score
-      sr.bigChunkText = matches.get(sr.id)?.at(1)
-      sr.bigChunkId = matches.get(sr.id)?.at(0)
+      sr.bigChunkId = <string>matches.get(sr.id)
     }
 
     searchResults = searchResults.sort((sr1, sr2) => sr2.score - sr1.score)
 
-    for (let i = 0; i < pageSize; i++) {
-      const sr = searchResults[i]
-      const bestMicroChunks = await this.getBestMicroChunks(sr.id, microEmbedding, sr.bigChunkId)
-      if (bestMicroChunks !== undefined && bestMicroChunks !== null && bestMicroChunks.length > 0) {
-        sr.text = bestMicroChunks[0]._source.chunkText
-        sr.textOffset = bestMicroChunks[0]._source.offset
-        sr.textLength = bestMicroChunks[0]._source.len
-        sr.microChunks = bestMicroChunks
-      }
-    }
+    await this.addPageDetails(searchResults.slice(0, pageSize), query, lang)
     return [searchResults, total, aggregations]
   }
 
-  public static async aiGetMoreResults (allResults: Array<any>, pageNumber, pageSize, queryString): Promise<any> {
+  public static async aiGetMoreResults (allResults: Array<any>, pageNumber, pageSize, queryString, lang: string): Promise<any> {
     const newResults = [allResults[0].map(sr => ({ ...sr })), allResults[1], allResults[2]]
     if (pageNumber * pageSize < newResults[0].length) {
       newResults[0] = newResults[0].slice((pageNumber - 1) * pageSize, pageNumber * pageSize)
@@ -310,17 +315,141 @@ export class SearchUtil {
     } else {
       newResults[0] = []
     }
-    const microEmbedding = await this.getEmbedding(queryString, embedMicroUrl, embedMicroModel)
-    for (const sr of newResults[0]) {
+    await this.addPageDetails(newResults[0], queryString, lang)
+    return newResults
+  }
+
+  // The AI search loads only lean data for all results (ranking, filter tree). The details needed to
+  // display a page (title, abstract, big chunk text, micro chunks) are loaded per page.
+  private static async addPageDetails (pageResults: Array<SearchResult>, query: string, lang: string): Promise<void> {
+    for (const sr of pageResults) {
+      const cached = this.pageDetails.get(sr.id)
+      if (cached !== undefined) {
+        Object.assign(sr, cached)
+      }
+    }
+    const results = pageResults.filter(sr => !this.pageDetails.has(sr.id))
+    if (results.length === 0) return
+    const documentDetails = axios.post(searchUrl, {
+      size: results.length,
+      _source: { includes: ['title', 'abstract'] },
+      query: { ids: { values: results.map(sr => sr.id) } }
+    }).then(resp => {
+      const byId = new Map<string, any>(resp.data.hits.hits.map(hit => [hit._id, hit._source]))
+      for (const sr of results) {
+        const source = byId.get(sr.id)
+        if (source !== undefined) {
+          sr.title = source.title !== undefined ? source.title[lang] : ''
+          sr.abstract = source.abstract !== undefined ? source.abstract[lang] : ''
+        }
+      }
+    })
+    const bigChunkTexts = axios.post(embeddingSearchUrl, {
+      size: results.length,
+      _source: false,
+      fields: ['chunkText'],
+      query: { ids: { values: results.map(sr => sr.bigChunkId).filter(id => id) } }
+    }).then(resp => {
+      const byId = new Map<string, string>(resp.data.hits.hits.map(hit => [hit._id, hit.fields.chunkText[0]]))
+      for (const sr of results) {
+        sr.bigChunkText = byId.get(sr.bigChunkId) || ''
+      }
+    })
+    const microChunks = this.getMicroEmbedding(query).then(microEmbedding => this.addBestMicroChunks(results, microEmbedding))
+    await Promise.all([documentDetails, bigChunkTexts, microChunks])
+    for (const sr of results) {
+      this.pageDetails.set(sr.id, _.pick(sr, PAGE_DETAIL_FIELDS))
+    }
+  }
+
+  private static async getMicroEmbedding (query: string): Promise<number[]> {
+    if (this.microEmbeddingCache === undefined || this.microEmbeddingCache.query !== query) {
+      this.microEmbeddingCache = { query, embedding: await this.getEmbedding(query, embedMicroUrl, embedMicroModel) }
+    }
+    return this.microEmbeddingCache.embedding
+  }
+
+  // --- Static filtering of AI search results in the browser ---
+
+  // True if the document matches all filters (optionally ignoring one filter type).
+  public static matchesFilters (sr: SearchResult, filters: Filters, ignoreType?: string): boolean {
+    for (const type in filters) {
+      if (type === ignoreType) continue
+      const filter = filters[type]
+      if (filter.type === FilterType.HIERARCHY) {
+        if (!filter.payload.some((id: string) => (sr.hierarchy || []).includes(id))) return false
+      } else if (filter.type === FilterType.LANGUAGE) {
+        if (!filter.payload.includes(sr.language)) return false
+      } else if (filter.type === FilterType.DATE || filter.type === FilterType.SCRAPEDATE) {
+        const value = filter.type === FilterType.DATE ? sr.dateMs : sr.scrapedateMs
+        if (value === undefined) return false
+        if (filter.payload.from !== undefined && value < filter.payload.from) return false
+        if (filter.payload.to !== undefined && value > filter.payload.to) return false
+      }
+    }
+    return true
+  }
+
+  // True if every document matching `filters` also matches `baseFilters`, i.e. the results of a search
+  // with `baseFilters` contain all candidates and `filters` can be applied in the browser.
+  public static isNarrowerOrEqual (filters: Filters, baseFilters: Filters): boolean {
+    for (const type in baseFilters) {
+      const base = baseFilters[type]
+      const filter = filters[type]
+      if (filter === undefined) return false
+      if (base.type === FilterType.HIERARCHY) {
+        const covered = (id: string) => base.payload.some((baseId: string) => id === baseId || id.startsWith(baseId + '_'))
+        if (!filter.payload.every(covered)) return false
+      } else if (base.type === FilterType.LANGUAGE) {
+        if (!filter.payload.every((lang: string) => base.payload.includes(lang))) return false
+      } else if (base.type === FilterType.DATE || base.type === FilterType.SCRAPEDATE) {
+        if (base.payload.from !== undefined && (filter.payload.from === undefined || filter.payload.from < base.payload.from)) return false
+        if (base.payload.to !== undefined && (filter.payload.to === undefined || filter.payload.to > base.payload.to)) return false
+      }
+    }
+    return true
+  }
+
+  // Aggregations for the filter tree, computed from the loaded AI results. Like the classic search, each
+  // facet is counted with all filters except its own, so that alternatives within a facet stay visible.
+  public static computeAggregations (results: Array<SearchResult>, filters: Filters): Aggregations {
+    const countBy = (type: string, keys: (sr: SearchResult) => Array<string | number | undefined>): Array<Aggregation> => {
+      const counts = new Map<string | number, number>()
+      for (const sr of results) {
+        if (!SearchUtil.matchesFilters(sr, filters, type)) continue
+        for (const key of keys(sr)) {
+          if (key !== undefined) counts.set(key, (counts.get(key) || 0) + 1)
+        }
+      }
+      return Array.from(counts, ([key, count]) => ({ key, count }))
+    }
+    const aggregations: Aggregations = {
+      hierarchie: countBy(FilterType.HIERARCHY, sr => sr.hierarchy || []),
+      language: countBy(FilterType.LANGUAGE, sr => [sr.language]),
+      edatum: countBy(FilterType.DATE, sr => [sr.dateMs]).sort((a, b) => <number>a.key - <number>b.key),
+      scrapedate: countBy(FilterType.SCRAPEDATE, sr => [sr.scrapedateMs]).sort((a, b) => <number>a.key - <number>b.key)
+    }
+    for (const name of ['edatum', 'scrapedate']) {
+      const buckets = <Array<Aggregation>>aggregations[name]
+      if (buckets.length > 0) {
+        aggregations['min_' + name] = [{ key: buckets[0].key, count: 1 }]
+        aggregations['max_' + name] = [{ key: buckets[buckets.length - 1].key, count: 1 }]
+      }
+    }
+    return aggregations
+  }
+
+  // Fetches the best micro chunks for all given results in parallel and attaches the best one as text.
+  private static async addBestMicroChunks (results: Array<any>, microEmbedding: number[]): Promise<void> {
+    await Promise.all(results.map(async sr => {
       const bestMicroChunks = await this.getBestMicroChunks(sr.id, microEmbedding, sr.bigChunkId)
-      if (bestMicroChunks[0] !== undefined && bestMicroChunks[0] !== null && bestMicroChunks.length > 0) {
+      if (bestMicroChunks !== undefined && bestMicroChunks !== null && bestMicroChunks.length > 0) {
         sr.text = bestMicroChunks[0]._source.chunkText
         sr.textOffset = bestMicroChunks[0]._source.offset
         sr.textLength = bestMicroChunks[0]._source.len
         sr.microChunks = bestMicroChunks
       }
-    }
-    return newResults
+    }))
   }
 
   private static async getBestMicroChunks (documentId: string, embedding: number[], chunkId?: string): Promise<any> {
@@ -472,12 +601,14 @@ export class SearchUtil {
       },
       fields: [
         'documentId',
-        '_id',
-        'chunkText'
+        '_id'
       ]
     }
-    if (Object.keys(filters).length > 0) {
-      search.knn.filter = SearchUtil.buildEmbeddingSearchFilters(filters)
+    // In the chunk index only hierarchy and date are reliable (language is missing on about half of the
+    // chunks, scrapedate entirely). Language and scrapedate are applied by the term search on the main index.
+    const knnFilters = _.pick(filters, [FilterType.HIERARCHY, FilterType.DATE])
+    if (Object.keys(knnFilters).length > 0) {
+      search.knn.filter = SearchUtil.buildEmbeddingSearchFilters(knnFilters)
     }
     return search
   }
@@ -485,8 +616,9 @@ export class SearchUtil {
   private static buildTermSearch (ids: string[], lang: string, filters: Filters, sortOrder: SortOrder, size: number, searchAfter?: Array<any>): any {
     const search : any = {
       size: size,
+      // Only what ranking, the result list and the filter tree need; title and abstract are loaded per page.
       _source: {
-        excludes: ['attachment.content']
+        includes: ['date', 'scrapedate', 'canton', 'hierarchy', 'attachment.content_type', 'attachment.content_url', 'attachment.language']
       },
       track_total_hits: true,
       query: {
@@ -862,12 +994,21 @@ export class SearchUtil {
           score: hit._source.score,
           bigChunkText: '',
           bigChunkId: '',
-          microChunks: []
+          microChunks: [],
+          hierarchy: hit._source.hierarchy,
+          language: hit._source.attachment.language,
+          dateMs: SearchUtil.parseDateMs(hit._source.date),
+          scrapedateMs: SearchUtil.parseDateMs(hit._source.scrapedate)
         })
       }
       aggregations = SearchUtil.extractAggregations(resp)
     }
     return [results, total, aggregations]
+  }
+
+  private static parseDateMs (date: string | undefined): number | undefined {
+    const ms = date !== undefined ? Date.parse(date) : NaN
+    return isNaN(ms) ? undefined : ms
   }
 
   private static extractAggregations (resp: AxiosResponse<any>): Aggregations | undefined {

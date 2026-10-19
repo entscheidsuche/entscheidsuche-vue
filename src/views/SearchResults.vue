@@ -1,5 +1,5 @@
 <template>
-  <div id="searchResults">
+  <div id="searchResults" v-bind:class="{ 'ai-refiltering': aiRefiltering }">
     <div class="flex-row">
       <div v-bind:class="['filter', this.filterVisible ? '' : 'hidden', this.fullScreen ? 'hidden' : '']">
         <div v-bind:class="['button-wrapper', this.showMessage ? 'messageOffset' : '']">
@@ -164,8 +164,9 @@
             </div>
           </div>
         </div>
-        <div v-if="this.resultsPending" id="spinner-wrapper" class="d-flex justify-content-center mb-3">
+        <div v-if="this.resultsPending" id="spinner-wrapper" v-bind:class="['d-flex', 'justify-content-center', 'mb-3', aiRefiltering ? 'ai-refilter' : '']">
           <b-spinner variant="primary" label="Loading..."></b-spinner>
+          <p v-if="aiRefiltering" class="ai-refilter-text" role="status">{{ $t(aiRefilterNotice) }}</p>
         </div>
       </div>
       <div v-if="this.previewVisible" v-bind:class="['preview', this.previewVisible ? 'visible' : '', this.fullScreen ? 'fullScreen' : '']">
@@ -1059,6 +1060,30 @@
     }
   }
 }
+
+#searchResults.ai-refiltering, #searchResults.ai-refiltering * {
+  cursor: wait !important;
+}
+#spinner-wrapper.ai-refilter {
+  flex-direction: column;
+  align-items: center;
+  width: fit-content;
+  margin: 20px auto;
+  padding: 24px 40px;
+  background-color: #fff;
+  border: 1px solid #6183ec;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  .spinner-border {
+    width: 4rem;
+    height: 4rem;
+    border-width: 0.4em;
+  }
+  .ai-refilter-text {
+    margin-top: 12px;
+    font-weight: bold;
+  }
+}
 </style>
 
 <script lang="ts">
@@ -1144,6 +1169,14 @@ export default class SearchResults extends Vue {
 
   get selectedResult () {
     return SearchModule.selectedResult
+  }
+
+  get aiRefiltering () {
+    return SearchModule.aiRefiltering
+  }
+
+  get aiRefilterNotice () {
+    return SearchModule.aiRefilterNotice
   }
 
   get resultsPending () {

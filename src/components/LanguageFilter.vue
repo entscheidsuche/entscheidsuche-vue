@@ -6,9 +6,9 @@
       :key="option.value"
       :value="option.value"
       name="flavour-3a">
-      <div v-bind:class="['option-wrapper', option.count === 0 ? 'empty' : '']">
+      <div v-bind:class="['option-wrapper', option.count === 0 && !countsIncomplete ? 'empty' : '']">
         <span>{{ option.text }}</span>
-        <span class="language-count">({{ option.count }})</span>
+        <span v-if="option.count > 0 || !countsIncomplete" class="language-count">({{ option.count }})</span>
       </div>
     </b-form-checkbox>
   </b-form-group>
@@ -42,6 +42,11 @@ export default class LanguageFilter extends Vue {
     { text: 'FR', value: 'fr', count: 0 },
     { text: 'IT', value: 'it', count: 0 }
   ]
+
+  // AI search with filters: entries outside the filtered results show no count instead of (0).
+  get countsIncomplete () {
+    return SearchModule.aiCountsIncomplete
+  }
 
   get aggregations () {
     return SearchModule.aggregations

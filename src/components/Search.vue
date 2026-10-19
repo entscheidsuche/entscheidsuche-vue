@@ -1,6 +1,6 @@
 <template>
   <b-input-group ref="headerSearch" id="header-search" class="mt">
-    <b-form-textarea ref="searchTextarea" v-on:keyup.enter.exact="onSearch($event)" @input="autoResize" is-text v-model="searchterm" :placeholder="$t('searchterm')" v-bind:class="$t('postitMessage') !== '' ? 'hasPostit' : ''"/>
+    <b-form-textarea ref="searchTextarea" v-on:keydown.enter.exact.prevent="onSearch($event)" @input="autoResize" is-text v-model="searchterm" :placeholder="$t('searchterm')" v-bind:class="$t('postitMessage') !== '' ? 'hasPostit' : ''"/>
     <b-input-group-append>
       <b-button variant="secondary" id="toggle-search" v-on:click="onSearch($event)">{{ $t('search') }}</b-button>
       <b-button variant="warning" id="toggle-ai-search" v-on:click="onAiSearch($event)">{{ $t('aiSearch') }} <span class="superscript">Beta</span></b-button>
@@ -97,6 +97,7 @@
         border-bottom-right-radius: 0.25rem;
         resize: none;
         padding-top: 10px;
+        padding-bottom: 10px;
       }
       input:focus{
         border:none;
@@ -171,7 +172,9 @@ import { SearchModule } from '@/store/modules/search'
 @Component
 export default class Search extends Vue {
   private searchterm = ''
-  private textAreaMaxHeight: number = 100
+  // The search field grows with its content up to this height (about 7 lines), then scrolls.
+  private textAreaMinHeight: number = 40
+  private textAreaMaxHeight: number = 160
 
   mounted (): void {
     this.$nextTick(() => {
@@ -187,18 +190,12 @@ export default class Search extends Vue {
     const el = wrapper.$el as HTMLTextAreaElement | null
     if (!el) return
 
-    // Reset height so scrollHeight recalculates correctly
-    el.style.height = 'auto'
-
-    if (el.scrollHeight > this.textAreaMaxHeight) {
-      el.style.height = this.textAreaMaxHeight + 'px'
-      el.style.overflowY = 'auto'
-      // el.style.marginTop = (this.textAreaMaxHeight - 40) + 'px'
-    } else {
-      el.style.height = (el.scrollHeight - 10) + 'px'
-      el.style.overflowY = 'hidden'
-      // el.style.marginTop = (el.scrollHeight - 40) + 'px'
-    }
+    // Measure the content height: with height 0, scrollHeight is content plus padding (independent of the
+    // minimum of two rows that BootstrapVue enforces). One line plus padding = 40px.
+    el.style.height = '0px'
+    const height = Math.max(this.textAreaMinHeight, Math.min(el.scrollHeight, this.textAreaMaxHeight))
+    el.style.height = height + 'px'
+    el.style.overflowY = el.scrollHeight > this.textAreaMaxHeight ? 'auto' : 'hidden'
   }
 
   @Watch('searchterm')
