@@ -98,6 +98,11 @@ const routes: Array<RouteConfig> = [
     path: '/altsystem',
     name: 'Altsystem',
     component: () => import('../views/Altsystem.vue')
+  },
+  {
+    path: '/mcp',
+    name: 'MCP',
+    component: () => import('../views/MCP.vue')
   }
 ]
 
