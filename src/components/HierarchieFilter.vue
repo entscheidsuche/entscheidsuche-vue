@@ -14,7 +14,7 @@
       :searchable="this.getSearchable()">
       @input="onHierarchieChanged"
       <label slot="option-label" slot-scope="{ node, labelClassName, countClassName}" v-bind:class="[labelClassName, node.raw.count === 0 && !countsIncomplete ? 'empty' : '']">
-        <div class="text-wrapper">
+        <div class="text-wrapper" v-on:mouseenter="setTitleIfTruncated($event, node.label)">
           <span>{{ node.label }}</span>
         </div>
         <span v-if="node.raw.count > 0 || !countsIncomplete" :class="countClassName">({{ node.raw.count }})</span>
@@ -240,6 +240,16 @@ export default class HierarchieFilter extends Vue {
       }
     })
     return tree
+  }
+
+  // Shows the full label as tooltip only if it is cut off (ellipsis), checked when the mouse enters.
+  public setTitleIfTruncated (event: MouseEvent, label: string): void {
+    const el = event.currentTarget as HTMLElement
+    if (el.scrollWidth > el.clientWidth) {
+      el.title = label
+    } else {
+      el.removeAttribute('title')
+    }
   }
 
   public getSearchable (): boolean {
