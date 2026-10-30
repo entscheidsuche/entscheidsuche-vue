@@ -9,7 +9,10 @@ const FACETTEN_URL = 'https://entscheidsuche.ch/docs/Facetten_alle.json'
 // ein neuer Job-Lauf vorliegt, und liefert anschließend die aktuelle status.json
 // als Antwort zurück.
 const STATUS_URL = 'https://entscheidsuche.ch/generate_status.php'
-const SEARCH_URL = 'https://entscheidsuche.ch/_searchV2.php'
+// ES-Zahlen von derselben Instanz beziehen wie die Suche (alte Instanz:
+// _searchV2.php, KI-Instanz: _search_KI.php/elasticsearch/_search) statt
+// hartcodiert von der alten Instanz.
+const SEARCH_URL = `${process.env.VUE_APP_SEARCH_URL}`
 
 // =============================================================================
 // Typen
