@@ -238,6 +238,64 @@ export class SearchUtil {
     return { query: search.query, sort: search.sort, label: query, lang: lang.toLowerCase() }
   }
 
+  // Beschreibung der gesetzten Filter für die Anzeige im Downloader und in dessen Trefferliste:
+  // Namen statt IDs für Kanton/Gericht/Abteilung, Datumsgrenzen als JJJJ-MM-TT, Sprachcodes.
+  // Die Suche selbst läuft weiter über die Query; die Sortierung liest der Downloader aus `sort`.
+  public static buildDownloadCriteria (filters: Filters, facets: Array<any>, lang: string): any {
+    const criteria: any = {}
+    const locale = lang.toLowerCase()
+    const hierarchie = filters.hierarchie
+    if (hierarchie !== undefined && Array.isArray(hierarchie.payload) && hierarchie.payload.length > 0) {
+      criteria.hierarchy = hierarchie.payload.map((id: string) => SearchUtil.facetPath(id, facets, locale) || id)
+    }
+    const isoDate = (milliseconds: number): string => {
+      const date = new Date(Number(milliseconds))
+      return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+    }
+    const range = (filter: Filter | undefined): any => {
+      const result: any = {}
+      if (filter !== undefined && filter.payload !== undefined) {
+        if (filter.payload.from !== undefined) {
+          result.from = isoDate(filter.payload.from)
+        }
+        if (filter.payload.to !== undefined) {
+          result.to = isoDate(filter.payload.to)
+        }
+      }
+      return Object.keys(result).length > 0 ? result : undefined
+    }
+    const date = range(filters.edatum)
+    if (date !== undefined) {
+      criteria.date = date
+    }
+    const scrapedate = range(filters.scrapedate)
+    if (scrapedate !== undefined) {
+      criteria.scrapedate = scrapedate
+    }
+    const language = filters.language
+    if (language !== undefined && Array.isArray(language.payload) && language.payload.length > 0) {
+      criteria.languages = language.payload
+    }
+    return criteria
+  }
+
+  // Namen vom Kanton bis zum gewählten Knoten, z. B. «Eidgenossenschaft › Bundesgericht › II. Zivilrechtliche Abteilung»
+  private static facetPath (id: string, facets: Array<any>, locale: string, prefix = ''): string | undefined {
+    for (const facet of facets || []) {
+      const name = prefix + ((facet.label && (facet.label[locale] || facet.label.de)) || facet.id)
+      if (facet.id === id) {
+        return name
+      }
+      if (Array.isArray(facet.children)) {
+        const found = SearchUtil.facetPath(id, facet.children, locale, name + ' › ')
+        if (found !== undefined) {
+          return found
+        }
+      }
+    }
+    return undefined
+  }
+
   public static async search (query: string, lang: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
     const primarySearch = this.buildPrimarySearch(query, lang, filters, sortOrder, searchAfter)
     const searches: Array<any> = []

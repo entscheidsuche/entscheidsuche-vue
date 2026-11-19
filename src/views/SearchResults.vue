@@ -1468,9 +1468,10 @@ export default class SearchResults extends Vue {
     if (SearchModule.searchTotal === 0) {
       return
     }
+    const criteria = SearchUtil.buildDownloadCriteria(SearchModule.filters, SearchModule.facets, AppModule.locale)
     const request = SearchModule.isAiSearch
-      ? { ids: SearchModule.aiResultIds, label: SearchModule.query, lang: AppModule.locale.toLowerCase() }
-      : SearchUtil.buildDownloadRequest(SearchModule.query, AppModule.locale, SearchModule.filters, SearchModule.sortOrder)
+      ? { ids: SearchModule.aiResultIds, label: SearchModule.query, lang: AppModule.locale.toLowerCase(), criteria }
+      : { ...SearchUtil.buildDownloadRequest(SearchModule.query, AppModule.locale, SearchModule.filters, SearchModule.sortOrder), criteria }
     const form = document.createElement('form')
     form.method = 'post'
     form.action = process.env.VUE_APP_DOWNLOADER_URL || 'https://downloader.entscheidsuche.ch/'
