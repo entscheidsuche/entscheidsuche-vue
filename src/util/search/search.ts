@@ -231,6 +231,13 @@ export class SearchUtil {
     return search
   }
 
+  // Anfrage für den Downloader: dieselbe Query und Sortierung wie die Trefferliste, damit der
+  // Download genau die angezeigten Treffer in derselben Reihenfolge liefert.
+  public static buildDownloadRequest (query: string, lang: string, filters: Filters, sortOrder: SortOrder): any {
+    const search = this.buildPrimarySearch(query, lang, filters, sortOrder)
+    return { query: search.query, sort: search.sort, label: query, lang: lang.toLowerCase() }
+  }
+
   public static async search (query: string, lang: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): Promise<[Array<SearchResult>, number, Aggregations | undefined]> {
     const primarySearch = this.buildPrimarySearch(query, lang, filters, sortOrder, searchAfter)
     const searches: Array<any> = []

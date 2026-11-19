@@ -10,12 +10,10 @@
         <div class="total-hits">
           <div class="title-wrapper">
             <p class="title">
-              <span v-if="!this.aiSearch" style="">
-                <a :href="this.getDownloadUrl()" target="_blank">
-                  <b-button variant="primary" id="result-download-btn" :title="$t('downloadHover')">
-                    <b-icon id="download" icon="cloud-download" scale="5" font-scale=".2" height="20"></b-icon>
-                  </b-button>
-                </a>
+              <span>
+                <b-button variant="primary" id="result-download-btn" :title="$t('downloadHover')" v-on:click="startDownload()">
+                  <b-icon id="download" icon="cloud-download" scale="5" font-scale=".2" height="20"></b-icon>
+                </b-button>
               </span>
               {{ $t('allHits') }}: {{ resultsTotal }}
             </p>
@@ -1464,11 +1462,28 @@ export default class SearchResults extends Vue {
     this.removeScrapeGuardListeners()
   }
 
-  public getDownloadUrl () {
-    const url1 = 'http://v2202109132150164038.luckysrv.de/api/search?{%22collection%22:%22entscheidsuche%22,%20%22query%22:%22'
-    const url2 = '%22,%20%22filter%22:%22'
-    const url3 = '%22,%20%22getDocs%22:true,%22getZIP%22:true,%20%22getCSV%22:false,%20%22getHTML%22:true,%20%22getNiceHTML%22:false,%20%22getJSON%22:false,%20%22ui%22:true}'
-    return url1 + SearchModule.query + url2 + JSON.stringify(SearchUtil.buildFilters(SearchModule.filters)).replaceAll('"', '@') + url3
+  // Öffnet den Downloader in einem neuen Tab. Die Anfrage geht per Formular (POST) hinüber, weil
+  // Query und Filter bzw. die ID-Liste der KI-Suche für eine URL zu lang werden können.
+  public startDownload (): void {
+    if (SearchModule.searchTotal === 0) {
+      return
+    }
+    const request = SearchModule.isAiSearch
+      ? { ids: SearchModule.aiResultIds, label: SearchModule.query, lang: AppModule.locale.toLowerCase() }
+      : SearchUtil.buildDownloadRequest(SearchModule.query, AppModule.locale, SearchModule.filters, SearchModule.sortOrder)
+    const form = document.createElement('form')
+    form.method = 'post'
+    form.action = process.env.VUE_APP_DOWNLOADER_URL || 'https://downloader.entscheidsuche.ch/'
+    form.target = '_blank'
+    form.setAttribute('rel', 'noopener')
+    const field = document.createElement('input')
+    field.type = 'hidden'
+    field.name = 'request'
+    field.value = JSON.stringify(request)
+    form.appendChild(field)
+    document.body.appendChild(form)
+    form.submit()
+    document.body.removeChild(form)
   }
 
   public onConfirmDateOverlay (): void {

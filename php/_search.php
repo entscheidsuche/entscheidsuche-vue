@@ -142,13 +142,14 @@ $valid_url_regex = '/.*/';
 
 // ############################################################################
 
-$url = "https://entscheidsuche.pansoft.de/entscheidsuche-*/_search";
+$url = "https://entscheidsuche.pansoft.de/entscheidsuche.v2-*/_search";
 
 $ch = curl_init( $url );
 
   curl_setopt( $ch,  CURLOPT_PORT, 9200);
   
   curl_setopt( $ch, CURLOPT_POST, true );
+  curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false );
   curl_setopt( $ch, CURLOPT_POSTFIELDS, file_get_contents('php://input'));
   curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
   
@@ -156,19 +157,35 @@ $ch = curl_init( $url );
   curl_setopt( $ch, CURLOPT_HEADER, true );
   curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
   
-  curl_setopt( $ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT'] );
+  curl_setopt( $ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT'] ?? '' );
+
+  // Timeouts, damit ein haengender Elasticsearch-Server keine PHP-FPM-Prozesse blockiert
+  curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, 5 );
+  curl_setopt( $ch, CURLOPT_TIMEOUT, 55 );
   
-  list( $header, $contents ) = preg_split( '/([\r\n][\r\n])\\1/', curl_exec( $ch ), 2 );
-  
+  $response = curl_exec( $ch );
+  $curl_error = curl_error( $ch );
+
   $status = curl_getinfo( $ch );
-  
+
   curl_close( $ch );
+
+  // Elasticsearch nicht erreichbar oder Timeout: sauberer Fehler statt leerer Antwort
+  if ( $response === false ) {
+    error_log( '_search.php: ' . $curl_error );
+    http_response_code( 502 );
+    header( 'Content-type: application/json' );
+    print json_encode( array( 'error' => 'Suchserver nicht erreichbar' ) );
+    exit;
+  }
+
+  list( $header, $contents ) = array_pad( preg_split( '/([\r\n][\r\n])\\1/', $response, 2 ), 2, '' );
 
 
 // Split header text into an array.
 $header_text = preg_split( '/[\r\n]+/', $header );
 
-if ( $_GET['mode'] == 'native' ) {
+if ( ( $_GET['mode'] ?? '' ) == 'native' ) {
   if ( !$enable_native ) {
     $contents = 'ERROR: invalid mode';
     $status = array( 'http_code' => 'ERROR' );
@@ -187,7 +204,7 @@ if ( $_GET['mode'] == 'native' ) {
   $data = array();
   
   // Propagate all HTTP headers into the JSON data object.
-  if ( $_GET['full_headers'] ) {
+  if ( !empty( $_GET['full_headers'] ) ) {
     $data['headers'] = array();
     
     foreach ( $header_text as $header ) {
@@ -199,7 +216,7 @@ if ( $_GET['mode'] == 'native' ) {
   }
   
   // Propagate all cURL request / response info to the JSON data object.
-  if ( $_GET['full_status'] ) {
+  if ( !empty( $_GET['full_status'] ) ) {
     $data['status'] = $status;
   } else {
     $data['status'] = array();
@@ -212,7 +229,7 @@ if ( $_GET['mode'] == 'native' ) {
   $realdata = $decoded_json ? $decoded_json : $contents;
   
   // Generate appropriate content-type header.
-  $is_xhr = strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+  $is_xhr = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') == 'xmlhttprequest';
   header( 'Content-type: application/' . ( $is_xhr ? 'json' : 'x-javascript' ) );
   
   // Get JSONP callback.

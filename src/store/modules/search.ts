@@ -713,6 +713,11 @@ export class Search extends VuexModule implements SearchState {
   public get isAiSearch (): boolean {
     return this.aiSearch
   }
+
+  // IDs aller Treffer der KI-Suche in Rangfolge (für den Downloader)
+  public get aiResultIds (): Array<string> {
+    return this.aiAllResults[0].map(sr => sr.id)
+  }
 }
 
 export const SearchModule = getModule(Search)
