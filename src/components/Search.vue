@@ -108,7 +108,7 @@
         height:40px;
         width:100px;
         padding:0;
-        font-size: 16px;
+        font-size: 13px;
         font-weight: bold;
         position:relative;
       }
@@ -117,7 +117,7 @@
         height:40px;
         width:100px;
         padding:0;
-        font-size: 16px;
+        font-size: 13px;
         font-weight: bold;
         position:relative;
       }
