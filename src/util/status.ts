@@ -74,10 +74,17 @@ export interface ESCounts {
 // Loader (3 Calls parallel)
 // =============================================================================
 
+// Entspricht DECISION_INDEX_FILTER in util/search/search.ts (hier eigenständig,
+// damit die Statusseite das Such-Modul nicht laden muss).
+const DECISION_INDEX_FILTER = { prefix: { _index: 'entscheidsuche.v2-' } }
+
 const ES_QUERY = {
   size: 0,
   track_total_hits: true,
-  query: { match_all: {} },
+  // Nur die Entscheid-Indizes zählen: Der Such-Endpunkt läuft über alle Indizes,
+  // auch über die Chunk-Indizes der KI-Suche, deren Dokumente ebenfalls ein
+  // Feld `hierarchy` haben.
+  query: { bool: { filter: [DECISION_INDEX_FILTER] } },
   aggs: {
     total: { terms: { field: 'hierarchy', size: 1000 } },
     since_1d: {

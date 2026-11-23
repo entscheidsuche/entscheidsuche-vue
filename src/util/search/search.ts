@@ -14,6 +14,12 @@ const embeddingSearchUrl = `${process.env.VUE_APP_EMBEDDING_SEARCH_URL}`
 const embeddingMicroSearchUrl = `${process.env.VUE_APP_EMBEDDING_MICRO_SEARCH_URL}`
 const indexMicroChunksUrl = `${process.env.VUE_APP_INDEX_MICRO_CHUNK_URL}`
 
+// The search endpoint (VUE_APP_SEARCH_URL) queries ALL indices of the cluster, including the chunk and
+// embedding indices of the AI search. Their documents also have `hierarchy`, `date` and `abstract.*`
+// fields, so without this filter they are returned as hits and counted in the filter tree. The court
+// decisions live in the indices with this prefix.
+export const DECISION_INDEX_FILTER = { prefix: { _index: 'entscheidsuche.v2-' } }
+
 // Fields copied from the per-page detail requests of the AI search (see addPageDetails).
 const PAGE_DETAIL_FIELDS = ['title', 'abstract', 'bigChunkText', 'text', 'textOffset', 'textLength', 'microChunks']
 
@@ -79,9 +85,7 @@ export class SearchUtil {
         }
       }
     }
-    if (Object.keys(filters).length > 0) {
-      search.query.bool.filter = SearchUtil.buildFilters(filters)
-    }
+    search.query.bool.filter = SearchUtil.buildDecisionFilters(filters)
     if (searchAfter !== undefined) {
       search.search_after = searchAfter
     } else {
@@ -175,9 +179,7 @@ export class SearchUtil {
         }
       }
     }
-    if (Object.keys(filters).length > 0) {
-      search.query.bool.filter = SearchUtil.buildFilters(filters)
-    }
+    search.query.bool.filter = SearchUtil.buildDecisionFilters(filters)
     search.aggs = {}
     if (filter.type === 'hierarchie') {
       search.aggs.hierarchie = {
@@ -702,9 +704,7 @@ export class SearchUtil {
         { id: 'desc' }
       ]
     }
-    if (Object.keys(filters).length > 0) {
-      search.query.bool.filter = SearchUtil.buildFilters(filters)
-    }
+    search.query.bool.filter = SearchUtil.buildDecisionFilters(filters)
     if (searchAfter !== undefined) {
       search.search_after = searchAfter
     } else {
@@ -833,6 +833,16 @@ export class SearchUtil {
       }
     }
     return 'quarter'
+  }
+
+  // Filters for a search on the court decisions: always restricted to the decision indices
+  // (see DECISION_INDEX_FILTER), plus the filters chosen by the user.
+  public static buildDecisionFilters (filters: Filters): Array<any> {
+    const filterArray: Array<any> = [DECISION_INDEX_FILTER]
+    for (const type in filters) {
+      filterArray.push(SearchUtil.buildFilter(filters[type]))
+    }
+    return filterArray
   }
 
   public static buildFilters (filters: Filters): any {
