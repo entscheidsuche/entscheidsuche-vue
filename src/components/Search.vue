@@ -3,7 +3,7 @@
     <b-form-textarea ref="searchTextarea" v-on:keydown.enter.exact.prevent="onSearch($event)" @input="autoResize" is-text v-model="searchterm" :placeholder="$t('searchterm')" v-bind:class="$t('postitMessage') !== '' ? 'hasPostit' : ''"/>
     <b-input-group-append>
       <b-button variant="secondary" id="toggle-search" v-on:click="onSearch($event)">{{ $t('search') }}</b-button>
-      <b-button variant="warning" id="toggle-ai-search" v-on:click="onAiSearch($event)">{{ $t('aiSearch') }} <span class="superscript">Beta</span></b-button>
+      <b-button variant="warning" id="toggle-ai-search" v-on:click="onAiSearch($event)">{{ $t('aiSearch') }} <span class="superscript">{{ $t('aiSearchBadge') }}</span></b-button>
       <b-button variant="warning" id="ai-search-info"><router-link :to="{ name: 'Suchhilfe' }"><b-icon id="info" icon="question-circle"></b-icon></router-link></b-button>
     </b-input-group-append>
     <div class="post-it" v-bind:class="$t('postitMessage') === '' ? 'empty' : ''">
