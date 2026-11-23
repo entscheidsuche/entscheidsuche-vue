@@ -35,10 +35,17 @@ export class SearchUtil {
   }
 
   private static buildDocumentSearch (document: string): any {
+    // The technical index chunk_queue holds documents with the same ids as the decisions, so the
+    // ids query needs the index filter as well.
     return {
       query: {
-        ids: {
-          values: [document]
+        bool: {
+          must: {
+            ids: {
+              values: [document]
+            }
+          },
+          filter: [DECISION_INDEX_FILTER]
         }
       }
     }
@@ -400,7 +407,8 @@ export class SearchUtil {
     const documentDetails = axios.post(searchUrl, {
       size: results.length,
       _source: { includes: ['title', 'abstract'] },
-      query: { ids: { values: results.map(sr => sr.id) } }
+      // Index filter: chunk_queue holds documents with the same ids and would take up result slots.
+      query: { bool: { must: { ids: { values: results.map(sr => sr.id) } }, filter: [DECISION_INDEX_FILTER] } }
     }).then(resp => {
       const byId = new Map<string, any>(resp.data.hits.hits.map(hit => [hit._id, hit._source]))
       for (const sr of results) {
