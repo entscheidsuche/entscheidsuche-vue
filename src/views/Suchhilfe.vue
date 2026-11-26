@@ -268,6 +268,99 @@
       <h2>Aggiornamenti</h2>
       <p>Alla voce <b-link href="status">Stato dei dati</b-link> trovate una panoramica delle nostre fonti con la data dell'ultimo aggiornamento.</p>
     </template>
+    <template v-if="locale==='en'">
+      <h1>Search help</h1>
+      <p>entscheidsuche.ch offers two kinds of search: the text search («Search» button) and the new AI search («AI search» button). Both can be
+         combined with metadata. You can enter any search terms in the search field. Upper and lower case do not matter.
+      </p>
+      <div class="help-columns">
+        <div class="help-col-left" ref="leftCol">
+          <h2>Text search <small>(«Search» button)</small></h2>
+          <h3>How it works</h3>
+          <p>The text search is a full-text search: it finds decisions in which your search terms occur literally, in the spelling and in the language in which you
+             enter them. The decisions are written in German, French or Italian, so enter your terms in one of these languages. You can refine the search with the following operators.
+          </p>
+          <h3>Truncation</h3>
+          <p>If you search for <i>Eigentümer</i>, for example, you only get documents in which the term occurs in exactly this form. Documents containing <i>Eigentümerin</i> or
+             <i>Eigentümers</i> are not found. <i>Eigentümer*</i>, however, finds all words that begin this way. You can also truncate on the left:
+             <i>*Eigentümer</i> also finds terms such as <i>Grundeigentümer</i>. Left and right truncation can be combined:
+             <i>*Eigentümer*</i> also finds <i>Grundeigentümerin</i>, for example. Single letters can be replaced by a placeholder as well: <i>?udex</i>
+             finds both <i>judex</i> and <i>iudex</i>.
+          </p>
+          <h3>Fuzzy search</h3>
+          <p>You can also search for terms in a similar spelling by appending a tilde (<i>~</i>). This uses a <a href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein distance</a>
+             of 2. <i>Eigentümer~</i> therefore also finds <i>Eigentümerin</i>. Smaller or larger deviations can be found with <i>Eigentümer~1</i> or <i>Eigentümer~3</i>.
+             Within one search term, the fuzzy search cannot be combined with truncation.
+          </p>
+          <h3>Logical operators</h3>
+          <p>If you search with two terms, they are automatically linked with <i>AND</i>: both terms must occur in the document.
+             If you want to find documents that contain at least one of the terms, use <i>OR</i>. The operators must be written in
+             capital letters; otherwise they are treated as ordinary search terms. You can also combine <i>AND</i> and <i>OR</i>.
+             <i>(Mord OR Totschlag) AND Alkohol</i> finds all documents that contain <i>Mord</i> or <i>Totschlag</i> and also <i>Alkohol</i>. In this case brackets are <b>MANDATORY</b>.
+             Without brackets, the search term <i>Mord</i> would be ignored.
+          </p>
+          <p>You can also search for all documents that do not contain a term. <i>NOT Mord</i> finds all documents in which the term <i>Mord</i> does not occur.
+          </p>
+          <h3>Phrase search</h3>
+          <p>Use quotation marks to search for a fixed sequence of words. <i>"droit des obligations"</i> finds the words in exactly this order. This is also recommended
+             when searching for case numbers: <i>"4C.296/2003"</i>.
+          </p>
+          <h3>Proximity search</h3>
+          <p>To find terms that occur in the same context, use the proximity search: <i>"Enteignung Verkehrswert"~5</i> finds the two terms at a distance of at most
+             5 words.
+          </p>
+        </div>
+        <div class="help-col-right" ref="rightCol">
+          <h2>AI search <small>(«AI search» button)</small></h2>
+          <h3>How it works</h3>
+          <p>The AI search does not look for words but for meaning. It is based on embeddings: a language model converts every passage of the decisions
+             into a numerical vector that represents the content of the passage. Your query is converted in the same way; the search returns the passages whose
+             vectors are closest to that of your query. The AI search therefore also finds decisions that describe a situation in different words.
+          </p>
+          <h3>Search across languages</h3>
+          <p>The embeddings represent meaning independently of language. A query written in English therefore finds decisions written in German, French
+             or Italian. You do not need to translate your query into the national languages.
+             Decisions in the language of your query often rank higher in the list of hits, however.
+          </p>
+          <h3>Wording your query</h3>
+          <p>The AI search works best when you describe your question in one or more sentences instead of entering keywords only. Instead of
+             <i>liability black ice</i>, write for example <i>In winter, a pedestrian slips on the icy pavement in front of a shop and is injured.
+             Who is liable?</i> This finds decisions on the liability of the owner of a structure (Art. 58 CO), although this term does not occur in the query,
+             in German as well as in French and Italian.
+          </p>
+          <h3>A list of hits, not an answer</h3>
+          <p>Unlike a chatbot, the AI search does not write an answer to your question. You still receive a list of decisions that you review and
+             assess yourself. The list is ordered by how close the content is to your query; no other sort order is available for the AI search.
+          </p>
+          <p>If you would like a written answer, you can have entscheidsuche.ch used by an AI assistant such as ChatGPT or Claude. The
+             MCP interface at <a href="https://mcp.entscheidsuche.ch">https://mcp.entscheidsuche.ch</a> is available for this purpose. MCP (Model Context Protocol) is an open
+             standard through which AI applications access external data sources. The MCP interface offers both the text search and the AI search. When
+             entscheidsuche.ch is connected in this way, the AI assistant runs the search itself, reads the decisions found and writes an answer on this basis,
+             with references to the decisions.
+          </p>
+          <p>In this case the answer comes from the AI assistant, not from entscheidsuche.ch. You should therefore check it against the decisions cited.
+          </p>
+          <h3>Number of hits</h3>
+          <p>The AI search determines the 100 passages that best match your query. If several of these passages belong to the same decision, the decision appears only
+             once in the list of hits. The list therefore usually contains fewer than 100 decisions.
+          </p>
+          <p>If a metadata filter is already set when the AI search starts, the 100 best-matching passages are determined within this restriction only.
+             If you set or change a filter after the search, it is first applied to the hits already found, which shortens the list.
+             If too few decisions remain, the AI search is run again automatically with the filter, so that you again receive the best hits within the chosen
+             restriction. Meanwhile the notice «Searching again with filter» is shown.
+          </p>
+        </div>
+      </div>
+      <h2>Metadata</h2>
+      <p>Both kinds of search can be combined with metadata. The available metadata are the decision date (if it is missing, the publication date is used), the canton,
+         the court and, in some cases, the chamber.</p>
+      <p>You can restrict the date range with the date slider.</p>
+      <p>The search can be restricted to the federal courts or to individual cantons by clicking on the corresponding links. You can expand a canton to see
+         the courts available there and, in some cases, their chambers. The names of courts and chambers are shown in German.</p>
+      <p>The metadata are always combined with the current search terms. If you want to search by metadata only in the text search, enter <i>*</i> as the search term.</p>
+      <h2>Updates</h2>
+      <p>Under <b-link href="status">Data status</b-link> you will find an overview of our sources with the date of the last synchronisation of each.</p>
+    </template>
   </div>
 </template>
 

@@ -1098,6 +1098,7 @@ import { Route } from 'vue-router'
 import router from '@/router'
 import { BButton } from 'bootstrap-vue'
 import i18n from '@/i18n'
+import contentLocale from '@/util/i18n/content-locale'
 import SponsorCard from '@/components/SponsorCard.vue'
 import data from '../data/sponsors.json'
 import { SearchUtil } from '@/util/search/search'
@@ -1470,7 +1471,7 @@ export default class SearchResults extends Vue {
     }
     const criteria = SearchUtil.buildDownloadCriteria(SearchModule.filters, SearchModule.facets, AppModule.locale)
     const request = SearchModule.isAiSearch
-      ? { ids: SearchModule.aiResultIds, label: SearchModule.query, lang: AppModule.locale.toLowerCase(), criteria }
+      ? { ids: SearchModule.aiResultIds, label: SearchModule.query, lang: contentLocale(AppModule.locale), criteria }
       : { ...SearchUtil.buildDownloadRequest(SearchModule.query, AppModule.locale, SearchModule.filters, SearchModule.sortOrder), criteria }
     const form = document.createElement('form')
     form.method = 'post'

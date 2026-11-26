@@ -1,6 +1,7 @@
 import { Aggregation, Aggregations, Facets, Filter, Filters, FilterType, SearchResult, SortOrder } from '@/store/modules/search'
 import axios, { AxiosResponse } from 'axios'
 import _ from 'lodash'
+import contentLocale from '@/util/i18n/content-locale'
 
 const searchUrl = `${process.env.VUE_APP_SEARCH_URL}`
 // Big chunks and micro chunks are embedded with different models, so a query needs one embedding per model.
@@ -52,6 +53,7 @@ export class SearchUtil {
   }
 
   private static buildPrimarySearch (query: string, lang: string, filters: Filters, sortOrder: SortOrder, searchAfter?: Array<any>): any {
+    lang = contentLocale(lang)
     const search: any = {
       size: 20,
       _source: {
@@ -243,6 +245,7 @@ export class SearchUtil {
   // Anfrage für den Downloader: dieselbe Query und Sortierung wie die Trefferliste, damit der
   // Download genau die angezeigten Treffer in derselben Reihenfolge liefert.
   public static buildDownloadRequest (query: string, lang: string, filters: Filters, sortOrder: SortOrder): any {
+    lang = contentLocale(lang)
     const search = this.buildPrimarySearch(query, lang, filters, sortOrder)
     return { query: search.query, sort: search.sort, label: query, lang: lang.toLowerCase() }
   }
@@ -396,6 +399,7 @@ export class SearchUtil {
   // The AI search loads only lean data for all results (ranking, filter tree). The details needed to
   // display a page (title, abstract, big chunk text, micro chunks) are loaded per page.
   private static async addPageDetails (pageResults: Array<SearchResult>, query: string, lang: string): Promise<void> {
+    lang = contentLocale(lang)
     for (const sr of pageResults) {
       const cached = this.pageDetails.get(sr.id)
       if (cached !== undefined) {
@@ -689,6 +693,7 @@ export class SearchUtil {
   }
 
   private static buildTermSearch (ids: string[], lang: string, filters: Filters, sortOrder: SortOrder, size: number, searchAfter?: Array<any>): any {
+    lang = contentLocale(lang)
     const search : any = {
       size: size,
       // Only what ranking, the result list and the filter tree need; title and abstract are loaded per page.
@@ -1028,6 +1033,7 @@ export class SearchUtil {
   }
 
   private static extractSearchResults (resp: any, lang: string): [Array<SearchResult>, number, Aggregations | undefined] {
+    lang = contentLocale(lang)
     const results: Array<SearchResult> = []
     let total = 0
     let aggregations: Aggregations | undefined

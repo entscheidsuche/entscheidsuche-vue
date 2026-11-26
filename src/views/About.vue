@@ -98,6 +98,47 @@
           Associazione entscheidsuche.ch, 8000 Zurigo</p>
       </div>
     </template>
+    <template v-if="locale==='en'">
+      <h1>About us</h1>
+      <h2>The entscheidsuche.ch platform</h2>
+      <p>The website entscheidsuche.ch offers a free search of published decisions of Swiss courts of all instances.</p>
+      <p>In a first phase (2018-2020), a collection dating from 2018 was published.</p>
+      <p>In 2020, thanks to a crowdfunding campaign (<b-link href="https://wemakeit.com/projects/entscheidsuche-ch" target="_blank">wemakeit.com</b-link>) and numerous supporters, the association entscheidsuche.ch was able to raise the funds needed to collect newly
+        published decisions from their sources, in most cases daily, and to make them searchable on entscheidsuche.ch.
+        The scrapers are available on <b-link href="https://github.com/entscheidsuche/NeueScraper" target="_blank">GitHub</b-link>.
+      </p>
+      <p>In 2021, an upload function was created that allows interested persons to make decisions not published by the
+        authorities searchable on entscheidsuche.ch in a suitable form.
+      </p>
+      <h2>The association entscheidsuche.ch</h2>
+      <p>The association entscheidsuche.ch was founded in Landquart (GR) in 2017. Its purpose is to make the case law of
+        Swiss courts searchable and accessible to everyone (<b-link href="https://entscheidsuche.ch/pdf/entscheidsuche-statuten.pdf">statutes, in German</b-link>). In 2020, the Canton of Bern exempted the association from
+        tax because it pursues charitable purposes (<b-link href="https://entscheidsuche.ch/pdf/VerfuegungBE_Gemeinnuetzigkeit_19.12.2019.pdf">ruling of the Bern tax administration, in German</b-link>).
+      </p>
+      <p>The members of the board of the association entscheidsuche.ch are Jörn Erbguth, Daniel Kettiger and Claudia
+        Schreiber. The board can be reached at
+        <b-link href="mailto:info@entscheidsuche.ch">info@entscheidsuche.ch</b-link>.
+      </p>
+      <p>A <a href="https://entscheidsuche.ch/pdf/HUERLIMANN_ERBGUTH_SCHREIBER_ZZZ-54-2021_559-561.pdf">short presentation</a> of the entscheidsuche.ch platform (in German) was published in July 2021 in the journal Zeitschrift für Zivilprozess- und Zwangsvollstreckungsrecht (ZZZ).</p>
+      <h2>Support us</h2>
+      <p>You can support us via Twint with an amount of your choice:</p>
+      <img src="@/assets/TwintQR.png" alt="Twint QR code" width="40%">
+      <p>Or by traditional bank transfer:</p>
+      <img src="@/assets/QR-Rechnung-de.svg" alt="Bank QR code" width="60%">
+      <p>If you would like a donation receipt, please send us an e-mail as well. Thank you for your support!</p>
+      <h2>Membership of the association</h2>
+      <p>If you would like to support the purpose of the association in the long term, you can become a member of the association entscheidsuche.ch. The
+        annual membership fee is 100 Swiss francs for natural persons and 1000 Swiss francs for institutional members.
+        Please apply informally by e-mail (<b-link href="mailto:info@entscheidsuche.ch">info@entscheidsuche.ch</b-link>).
+      </p>
+      <div class="contact">
+        <h2>Contact details of the association</h2>
+        <p>Postal address: Verein entscheidsuche.ch, 3000 Bern, Switzerland<br>
+          Account of the association entscheidsuche.ch:<br>
+          Postfinance IBAN: CH04 0900 0000 1412 0685 4,<br>
+          Verein entscheidsuche.ch, 8000 Zürich</p>
+      </div>
+    </template>
   </div>
 </template>
 

@@ -88,6 +88,7 @@
 </style>
 
 <script lang="ts">
+import contentLocale from '@/util/i18n/content-locale'
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { AppModule } from '@/store/modules/app'
 import { Facet, Filters, FilterType, SearchModule } from '@/store/modules/search'
@@ -203,7 +204,7 @@ export default class HierarchieFilter extends Vue {
 
   public transformFacets () {
     const tree: Array<TreeModel> = []
-    const locale = this.locale
+    const locale = contentLocale(this.locale)
     const facets: Array<Facet> = this.facets
     const hierarchie = SearchModule.aggregations.hierarchie || []
     const hierarchieDict: { [key: string]: number } = {}

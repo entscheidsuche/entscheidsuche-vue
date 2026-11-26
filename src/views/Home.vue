@@ -19,6 +19,7 @@
       <h1 v-if="locale==='de'">Weitere Unterstützung erhalten wir von:</h1>
       <h1 v-if="locale==='fr'">Autres soutiens :</h1>
       <h1 v-if="locale==='it'">Altro sostegno:</h1>
+      <h1 v-if="locale==='en'">We also receive support from:</h1>
 Timur <b>Acemoglu</b>, Olten;
 Martina <b>Arioli</b>, Zürich;
 Fatih <b>Aslantas</b>, Weinfelden;
@@ -78,6 +79,7 @@ Johannes <b>Wagner</b>, Appenzell;
 <font v-if="locale==='de'"><b>sowie</b> vielen weiteren Unterstützerinnen und Unterstützern, die anonym bleiben wollen.</font>
 <font v-if="locale==='fr'"><b>ainsi</b> que de nombreux autres soutiens qui souhaitent rester anonymes.</font>
 <font v-if="locale==='it'"><b>e</b> molti altri sostenitori che desiderano rimanere anonimi</font>
+<font v-if="locale==='en'"><b>and</b> many other supporters who wish to remain anonymous.</font>
      </div>
     </div>
   </div>

@@ -10,12 +10,14 @@
   "repository": "https://github.com/entscheidsuche/entscheidsuche-mcp",
   "tools": [
     "search",
+    "semantic_search",
+    "keyword_search",
     "search_by_case_number",
+    "fetch",
     "fetch_document",
     "list_hierarchy",
     "list_facets",
     "server_info"
   ],
-  "languages": ["de", "fr", "it"],
-  "status": "beta"
+  "languages": ["de", "fr", "it"]
 }

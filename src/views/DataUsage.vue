@@ -27,6 +27,15 @@
       <h2>Archiviazione a lungo termine</h2>
       <p>I contenuti della piattaforma entscheidsuche.ch sono raccolti annualmente dalla Biblioteca Nazionale Svizzera e trasferiti all'archiviazione a lungo termine (Open Archival Information System - OAIS) nel <b-link href="https://www.nb.admin.ch/snl/de/home/fachinformationen/e-helvetica/webarchiv-schweiz.html">Web Archive Switzerland</b-link>. Queste "istantanee archiviate" permettono di registrare il contenuto della piattaforma entscheidsuche.ch nel corso degli anni. L'accesso all'Archivio Web Svizzera è limitato, vale a dire che le vecchie versioni della piattaforma entscheidsuche.ch possono essere consultate solo in loco presso la Biblioteca nazionale e le istituzioni partner della Biblioteca nazionale.</p>
     </template>
+    <template v-if="locale==='en'">
+      <h1>Data</h1>
+      <h2>Storage</h2>
+      <p>The documents published on the <b-link href="https://entscheidsuche.ch">entscheidsuche.ch</b-link> platform are stored by the association entscheidsuche.ch in HTML or PDF format and are publicly accessible. For each decision file there is a metadata file in JSON format; these metadata files are publicly accessible as well. The data are freely available at <b-link href="https://entscheidsuche.ch/docs">https://entscheidsuche.ch/docs</b-link>. The current state of the scrapers is shown under <b-link href="status">Data status</b-link>. Documentation of this interface (in German) can be found <b-link href="https://entscheidsuche.ch/pdf/EntscheidsucheAPI.pdf">here</b-link>.</p>
+      <h2>Reuse of the data</h2>
+      <p>The entscheidsuche.ch platform sees itself as a privately run public service. The data collected and published by the platform are available to everyone for free use and further processing. Please name us as the source when you reuse the data. To finance this public service, the association entscheidsuche.ch depends on voluntary contributions not only from direct users but also from services that process data from entscheidsuche.ch. Voluntary contributions to the association are tax-deductible within the applicable statutory limits (<b-link href="https://entscheidsuche.ch/pdf/VerfuegungBE_Gemeinnuetzigkeit_19.12.2019.pdf">ruling on charitable status, in German</b-link>).</p>
+      <h2>Long-term archiving</h2>
+      <p>The content of the entscheidsuche.ch platform is collected once a year by the Swiss National Library and transferred to long-term archiving (Open Archival Information System, OAIS) in <b-link href="https://www.nb.admin.ch/snl/de/home/fachinformationen/e-helvetica/webarchiv-schweiz.html">Web Archive Switzerland</b-link>. These snapshots document the content of the platform over the years. Access to Web Archive Switzerland is restricted: older versions of the entscheidsuche.ch platform can only be consulted on site at the National Library and its partner institutions.</p>
+    </template>
   </div>
 </template>
 

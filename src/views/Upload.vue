@@ -15,6 +15,11 @@
       <p>Il nostro prossimo progetto è una funzione di upload che permetterà agli avvocati e ad altri di pubblicare sentenze non pubblicate online dalle autorità in una forma adeguata tramite entscheidsuche.ch. A tal fine, abbiamo ottenuto da voi il sostegno necessario sotto forma di una campagna di crowdfunding. Grazie mille!</p>
       <p>Come primo passo, potete inviarci le sentenze che non sono state pubblicate online dalle autorità per caricarle sulla piattaforma recherchedarrets.ch in formato PDF tramite questo modulo di contatto su <a href="https://www.privasphere.com/e.d?c=withAddr&email=5fq3hy9u3_1v_fw91lsy">privasphere.com</a> per farli caricare. Automatizzeremo parzialmente questo processo. Le sentenze saranno controllate dall'associazione entscheidsuche.ch prima della pubblicazione. Il prossimo passo sarà quello di utilizzare dei moduli per richiedere le decisioni dei tribunali e di indicare le raccolte di decisioni su internet che non copriamo ancora.</p>
     </template>
+    <template v-if="locale==='en'">
+      <h1>Upload of judgments / decisions</h1>
+      <p>Our next project is an upload function that allows lawyers and other persons to publish decisions not published by the authorities on entscheidsuche.ch in a suitable form. You gave us the support we needed for this in a crowdfunding campaign. Thank you very much!</p>
+      <p>For the time being, you can upload decisions not published by the authorities in PDF format for publication on the entscheidsuche.ch platform using this contact form on <a href="https://www.privasphere.com/e.d?c=withAddr&email=5fq3hy9u3_1v_fw91lsy">Privasphere.com</a>. We will partly automate this process. The decisions are reviewed by the association entscheidsuche.ch before publication. As a next step we plan forms for requesting decisions from the courts and for pointing out collections of decisions on the internet that we do not yet cover.</p>
+    </template>
   </div>
 </template>
 

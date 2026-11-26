@@ -12,6 +12,10 @@
       <h1>Pagina del vecchio sistema</h1>
       <p>Hai seguito un link che portava a un vecchio prototipo. Purtroppo questo prototipo del 2018/2019 non è più in funzione. Ora è possibile trovare le sentenze contenute nel prototipo e altro ancora sul nostro sito web attuale. Inserite i termini di ricerca nel campo di ricerca in alto.</p>
     </template>
+    <template v-if="locale==='en'">
+      <h1>Page of the old system</h1>
+      <p>You followed a link that led to an old prototype. Unfortunately, this prototype from 2018/2019 is no longer in operation. The decisions it contained, and many more, can now be found on our current website. Simply enter search terms in the search field above.</p>
+    </template>
   </div>
 </template>
 
